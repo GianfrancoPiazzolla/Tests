@@ -374,8 +374,8 @@
         }
         .weather-column { display: flex; flex-direction: column; gap: 6px; flex: 1; font-size: 0.7rem; color: var(--label-color); }
         .weather-center { display: flex; flex-direction: column; align-items: center; flex: 1.2; }
-        .weather-icon { font-size: 4.8rem; display: block; line-height: 1; }
-        .weather-temp { font-size: 1rem; font-weight: 700; color: var(--text-color); display: block; font-family: 'JetBrains Mono', monospace; }
+        .weather-icon { font-size: 4.5rem; display: block; line-height: 1; padding-top: 5px; }
+        .weather-temp { font-size: 1.2rem; font-weight: 700; color: var(--text-color); display: block; font-family: 'JetBrains Mono', monospace; }
         .weather-item { line-height: 1.3; }
         .weather-item span.wlabel {
             font-family: 'JetBrains Mono', monospace;
@@ -704,15 +704,15 @@
                     <div class="weather-display">
                         <div class="weather-column" style="text-align:right;">
                             <div class="weather-item">
-                                <span class="wlabel">Temp Min</span>
+                                <span class="wlabel">Temperature Min</span>
                                 <b id="tempMin">--</b> °C
                             </div>
                             <div class="weather-item">
-                                <span class="wlabel">Temp Max</span>
+                                <span class="wlabel">Temperature Max</span>
                                 <b id="tempMax">--</b> °C
                             </div>
                             <div class="weather-item">
-                                <span class="wlabel">Humidity</span>
+                                <span class="wlabel">Relative Humidity</span>
                                 <b id="humidityVal">--</b> %
                             </div>
                         </div>
@@ -730,7 +730,7 @@
                                 <b id="windDirVal">--</b>
                             </div>
                             <div class="weather-item">
-                                <span class="wlabel">Pressure</span>
+                                <span class="wlabel">Atm. Pressure</span>
                                 <b id="pressure">--</b> hPa
                             </div>
                         </div>
@@ -915,7 +915,7 @@
     }
 
     function getWindDirection(degree) {
-        const directions = ['↑↑ N', '↗↗ NE', '→→ E', '↘↘ SE', '↓↓ S', '↙↙ SW', '←← W', '↖↖ NW'];
+        const directions = ['↑↑↑ N', '↗↗↗ NE', '→→→ E', '↘↘↘ SE', '↓↓↓ S', '↙↙↙ SW', '←←← W', '↖↖↖ NW'];
         return directions[Math.round(degree / 45) % 8];
     }
 
@@ -1330,36 +1330,36 @@
             ${scoreBadge}
             <div class="summary-grid">
                 <div class="summary-item">
-                    <div class="summary-item-label">Total Distance</div>
+                    <div class="summary-item-label">Total Trip Distance</div>
                     <div class="summary-item-value" style="color:var(--secondary)">${distKm} Km</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-item-label">Trip Duration</div>
+                    <div class="summary-item-label">Total Trip Duration</div>
                     <div class="summary-item-value">${tripTime}</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-item-label">Avg Consumption</div>
+                    <div class="summary-item-label">Average Energy Consumption</div>
                     <div class="summary-item-value" style="color:var(--danger)">${avgConsWh_km} Wh/Km</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-item-label">Total Consumed</div>
-                    <div class="summary-item-value" style="color:var(--danger)">${totalConsumedWh.toFixed(1)} Wh</div>
+                    <div class="summary-item-label">Total Energy Consumed</div>
+                    <div class="summary-item-value" style="color:var(--danger)">${(totalConsumedWh/1000).toFixed(1)} kWh</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-item-label">Total Recovered</div>
+                    <div class="summary-item-label">Total Energy Recovered</div>
                     <div class="summary-item-value" style="color:var(--primary)">${totalRegenWh.toFixed(1)} Wh</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-item-label">Regen Efficiency</div>
-                    <div class="summary-item-value" style="color:var(--warning)">${regenEff} %</div>
+                    <div class="summary-item-label">Energy Regen Efficiency</div>
+                    <div class="summary-item-value" style="color:var(--primary)">${regenEff} %</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-item-label">Data Points</div>
-                    <div class="summary-item-value">${altChart.data.datasets[0].data.length}</div>
+                    <div class="summary-item-label">Total Net Energy</div>
+                    <div class="summary-item-value" style="color:var(--warning)">${((totalConsumedWh - totalRegenWh)/1000).toFixed(1)} kWh</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-item-label">Net Energy</div>
-                    <div class="summary-item-value" style="color:var(--accent-purple)">${(totalConsumedWh - totalRegenWh).toFixed(1)} Wh</div>
+                    <div class="summary-item-label">Total Data Points</div>
+                    <div class="summary-item-value" style="color:var(--accent-purple)">${altChart.data.datasets[0].data.length}</div>
                 </div>
             </div>
         `;
