@@ -466,7 +466,7 @@
         .score-badge.poor { background: rgba(255,23,68,0.15); color: #ff1744; border: 1px solid rgba(255,23,68,0.3); }
 
         /* === RESPONSIVE === */
-        @media (max-width: 1100px) {
+        @media (max-width: 1300px) {
             .main-display { flex-direction: column; }
             .charts-panel { width: 100%; flex-direction: row; flex-wrap: wrap; overflow-y: visible; }
             .chart-container { width: calc(50% - 4px); flex: none; }
@@ -704,11 +704,11 @@
                     <div class="weather-display">
                         <div class="weather-column" style="text-align:right;">
                             <div class="weather-item">
-                                <span class="wlabel">T.Min</span>
+                                <span class="wlabel">Temp Min</span>
                                 <b id="tempMin">--</b> °C
                             </div>
                             <div class="weather-item">
-                                <span class="wlabel">T.Max</span>
+                                <span class="wlabel">Temp Max</span>
                                 <b id="tempMax">--</b> °C
                             </div>
                             <div class="weather-item">
@@ -722,11 +722,11 @@
                         </div>
                         <div class="weather-column" style="text-align:left;">
                             <div class="weather-item">
-                                <span class="wlabel">W.Speed</span>
+                                <span class="wlabel">Wind Speed</span>
                                 <b id="windSpeedVal">--</b> Km/h
                             </div>
                             <div class="weather-item">
-                                <span class="wlabel">Direction</span>
+                                <span class="wlabel">Wind Direction</span>
                                 <b id="windDirVal">--</b>
                             </div>
                             <div class="weather-item">
@@ -915,7 +915,7 @@
     }
 
     function getWindDirection(degree) {
-        const directions = ['↑ : N', '↗ : NE', '→ : E', '↘ : SE', '↓ : S', '↙ : SW', '← : W', '↖ : NW'];
+        const directions = ['↑↑ N', '↗↗ NE', '→→ E', '↘↘ SE', '↓↓ S', '↙↙ SW', '←← W', '↖↖ NW'];
         return directions[Math.round(degree / 45) % 8];
     }
 
