@@ -516,7 +516,7 @@
         .profile-action-btn.del { color: var(--danger); border-color: rgba(255,23,68,0.4); }
         .profile-action-btn.del:hover { background: rgba(255,23,68,0.1); }
         .profile-save-row {
-            display: flex; gap: 8px; margin-top: 14px; align-items: center;
+            display: flow; gap: 8px; margin-top: 14px; align-items: center;
             padding-top: 14px; border-top: 1px solid var(--border-color);
         }
         .profile-name-input {
@@ -526,6 +526,7 @@
             border: 1px solid var(--border-color);
             background: var(--input-bg); color: var(--text-color);
             outline: none; transition: border-color 0.2s ease;
+            width: 150px;
         }
         .profile-name-input:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px var(--glow-blue); }
         .profile-save-btn {
@@ -566,7 +567,7 @@
         <div id="profilesList" class="profiles-list"></div>
         <div class="profile-save-row">
             <input type="text" id="profileNameInput" class="profile-name-input" placeholder="Profile name" maxlength="40">
-            <button class="profile-save-btn" onclick="saveProfile()">💾 Save Current</button>
+            <button class="profile-save-btn" onclick="saveProfile()">💾 Save</button>
         </div>
     </div>
 </div>
@@ -895,7 +896,7 @@
                 <div class="profile-item-info">
                     <span class="profile-item-name">${escapeHtml(name)}</span>
                     <span class="profile-item-details">
-                        Weight: ${p.vehicleWeight} Kg &nbsp;·&nbsp; GPS: ${p.gpsPolling}s &nbsp;·&nbsp; Battery: ${p.batteryKwh} kWh &nbsp;·&nbsp; Theme: ${p.theme === 'dark' ? '🌙 Dark' : '☀️ Light'}
+                        Weight: <b>${p.vehicleWeight}</b> Kg</br>Battery: <b>${p.batteryKwh}</b> kWh</br>GPS: <b>${p.gpsPolling}</b> s</br>Theme: <b>${p.theme === 'dark' ? '🌙 Dark' : '☀️ Light'}</b>
                     </span>
                 </div>
                 <div class="profile-item-actions">
