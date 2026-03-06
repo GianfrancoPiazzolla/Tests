@@ -484,6 +484,63 @@
             .config-grid { grid-template-columns: 1fr; }
             .range-card { flex-wrap: wrap; }
         }
+
+        /* === PROFILES MODAL === */
+        .profiles-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; max-height: 280px; overflow-y: auto; }
+        .profiles-list::-webkit-scrollbar { width: 4px; }
+        .profiles-list::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        .profile-item {
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--input-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 8px 12px; gap: 10px;
+        }
+        .profile-item-info { display: flex; flex-direction: column; flex: 1; }
+        .profile-item-name {
+            font-family: 'JetBrains Mono', monospace; font-weight: 700;
+            font-size: 0.85rem; color: var(--text-color);
+        }
+        .profile-item-details {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+            color: var(--label-color); margin-top: 2px; letter-spacing: 0.5px;
+        }
+        .profile-item-actions { display: flex; gap: 6px; }
+        .profile-action-btn {
+            border: 1px solid var(--border-color); background: var(--card-bg);
+            color: var(--text-color); border-radius: 6px; padding: 4px 10px;
+            font-size: 0.75rem; font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; cursor: pointer; transition: all 0.18s ease;
+        }
+        .profile-action-btn:hover { background: var(--border-color); }
+        .profile-action-btn.load { color: var(--secondary); border-color: rgba(41,182,246,0.4); }
+        .profile-action-btn.load:hover { background: rgba(41,182,246,0.1); }
+        .profile-action-btn.del { color: var(--danger); border-color: rgba(255,23,68,0.4); }
+        .profile-action-btn.del:hover { background: rgba(255,23,68,0.1); }
+        .profile-save-row {
+            display: flex; gap: 8px; margin-top: 14px; align-items: center;
+            padding-top: 14px; border-top: 1px solid var(--border-color);
+        }
+        .profile-name-input {
+            flex: 1; font-size: 13px !important; font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 8px 10px; border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg); color: var(--text-color);
+            outline: none; transition: border-color 0.2s ease;
+        }
+        .profile-name-input:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px var(--glow-blue); }
+        .profile-save-btn {
+            border: none; background: linear-gradient(135deg, var(--secondary), #0288d1);
+            color: #000; border-radius: 8px; padding: 8px 16px;
+            font-size: 0.8rem; font-weight: 800; font-family: 'Syne', sans-serif;
+            letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+            transition: all 0.18s ease; white-space: nowrap;
+        }
+        .profile-save-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px var(--glow-blue); }
+        .profiles-empty {
+            text-align: center; color: var(--label-color); font-size: 0.8rem;
+            font-style: italic; padding: 20px 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
     </style>
 </head>
 <body onload="initializeSystem()">
@@ -491,9 +548,26 @@
 <div class="header">
     <h1>Trip Master</h1>
     <div class="header-btns">
+        <button onclick="openProfilesModal()" class="hdr-btn" title="User Profiles">👤</button>
+        <button onclick="showSummary()" class="hdr-btn" title="Trip Summary">🧮</button>
         <button onclick="toggleTheme()" id="themeBtn" class="hdr-btn">🌙</button>
-        <button onclick="showSummary()" class="hdr-btn" title="Trip Summary">📈</button>
         <button onclick="toggleModal(true)" class="hdr-btn">⭐</button>
+    </div>
+</div>
+
+<!-- PROFILES MODAL -->
+<div id="profilesModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeProfilesModal()">&times;</span>
+        <h2>👤 User Profiles</h2>
+        <p style="font-size:0.85rem; color:var(--label-color); margin-top:-8px; margin-bottom:4px;">
+            Profiles store Vehicle Weight, GPS Polling, Battery kWh and Display Theme.
+        </p>
+        <div id="profilesList" class="profiles-list"></div>
+        <div class="profile-save-row">
+            <input type="text" id="profileNameInput" class="profile-name-input" placeholder="Profile name" maxlength="40">
+            <button class="profile-save-btn" onclick="saveProfile()">💾 Save Current</button>
+        </div>
     </div>
 </div>
 
@@ -573,21 +647,21 @@
     <!-- RANGE ESTIMATOR + BATTERY SOC BAR -->
     <div class="range-card">
         <div class="range-section">
-            <span class="range-label">Battery kWh</span>
-            <input type="number" id="batteryCapacity" value="100" step="5" style="width:90px; font-size:13px !important; padding: 6px 8px; text-align:center;">
+            <span class="range-label">Battery (kWh)</span>
+            <input type="number" id="batteryCapacity" value="100" step="5" style="width:120px; font-size:13px !important; padding: 6px 8px; text-align:center;">
         </div>
         <div class="range-section">
-            <span class="range-label">SOC %</span>
-            <input type="number" id="socInput" value="80" min="0" max="100" step="1" style="width:70px; font-size:13px !important; padding:6px 8px; text-align:center;" oninput="updateBattery()">
+            <span class="range-label">Current SoC (%)</span>
+            <input type="number" id="socInput" value="100" min="0" max="100" step="1" style="width:120px; font-size:13px !important; padding:6px 8px; text-align:center;" oninput="updateBattery()">
         </div>
         <div class="battery-widget" style="flex:3;">
             <div class="battery-body">
                 <div class="battery-fill" id="batteryFill" style="width:80%"></div>
             </div>
-            <span class="battery-soc-label" id="socLabel">80%</span>
+            <span class="battery-soc-label" id="socLabel">100%</span>
         </div>
         <div class="range-section">
-            <span class="range-label">Range</span>
+            <span class="range-label">Nominal Range</span>
             <span class="range-value" id="estRange" style="color: var(--primary);">-- Km</span>
         </div>
         <div class="range-section">
@@ -758,6 +832,7 @@
     let isWeatherInitialSyncDone = false;
     let lastSpeedKmh = 0;
     let lastInstantPowerW = 0;
+    let initialSoc = 100;
 
     // Per-segment power breakdown accumulator
     let powerBreakdown = { drag: 0, gravity: 0, aero: 0, regen: 0, samples: 0 };
@@ -774,11 +849,115 @@
         window.onclick = function(event) {
             if (event.target == document.getElementById('infoModal')) toggleModal(false);
             if (event.target == document.getElementById('summaryModal')) document.getElementById('summaryModal').style.display='none';
+            if (event.target == document.getElementById('profilesModal')) closeProfilesModal();
         };
 
         if ('wakeLock' in navigator) {
             navigator.wakeLock.request('screen').catch(() => {});
         }
+    }
+
+    /* ===== USER PROFILES ===== */
+    const PROFILES_KEY = 'tripmaster_profiles';
+
+    function getProfiles() {
+        try { return JSON.parse(localStorage.getItem(PROFILES_KEY)) || {}; }
+        catch(e) { return {}; }
+    }
+
+    function saveProfiles(profiles) {
+        localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles));
+    }
+
+    function openProfilesModal() {
+        renderProfilesList();
+        document.getElementById('profilesModal').style.display = 'block';
+    }
+
+    function closeProfilesModal() {
+        document.getElementById('profilesModal').style.display = 'none';
+    }
+
+    function renderProfilesList() {
+        const profiles = getProfiles();
+        const container = document.getElementById('profilesList');
+        const keys = Object.keys(profiles);
+
+        if (keys.length === 0) {
+            container.innerHTML = '<div class="profiles-empty">No saved profiles yet.<br>Configure your settings and save a profile below.</div>';
+            return;
+        }
+
+        container.innerHTML = keys.map(name => {
+            const p = profiles[name];
+            return `
+            <div class="profile-item">
+                <div class="profile-item-info">
+                    <span class="profile-item-name">${escapeHtml(name)}</span>
+                    <span class="profile-item-details">
+                        Weight: ${p.vehicleWeight} Kg &nbsp;·&nbsp; GPS: ${p.gpsPolling}s &nbsp;·&nbsp; Battery: ${p.batteryKwh} kWh &nbsp;·&nbsp; Theme: ${p.theme === 'dark' ? '🌙 Dark' : '☀️ Light'}
+                    </span>
+                </div>
+                <div class="profile-item-actions">
+                    <button class="profile-action-btn load" onclick="loadProfile('${escapeHtml(name)}')">Load</button>
+                    <button class="profile-action-btn del" onclick="deleteProfile('${escapeHtml(name)}')">✕</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function saveProfile() {
+        const nameInput = document.getElementById('profileNameInput');
+        const name = nameInput.value.trim();
+        if (!name) { nameInput.focus(); return; }
+
+        const weight = document.getElementById('vehicleWeight').value;
+        const gpsPolling = document.getElementById('gpsPolling').value;
+        const batteryKwh = document.getElementById('batteryCapacity').value;
+
+        const profiles = getProfiles();
+        profiles[name] = { vehicleWeight: weight, gpsPolling: gpsPolling, batteryKwh: batteryKwh, theme: currentTheme };
+        saveProfiles(profiles);
+
+        nameInput.value = '';
+        renderProfilesList();
+    }
+
+    function loadProfile(name) {
+        const profiles = getProfiles();
+        const p = profiles[name];
+        if (!p) return;
+
+        document.getElementById('vehicleWeight').value = p.vehicleWeight;
+        document.getElementById('batteryCapacity').value = p.batteryKwh;
+        updateBattery();
+
+        // Update GPS polling segmented control
+        document.querySelectorAll('#gpsPollingGroup .segment').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-value') === String(p.gpsPolling)) {
+                btn.classList.add('active');
+            }
+        });
+        document.getElementById('gpsPolling').value = p.gpsPolling;
+
+        // Restore theme preference if saved
+        if (p.theme && p.theme !== currentTheme) {
+            toggleTheme();
+        }
+
+        closeProfilesModal();
+    }
+
+    function deleteProfile(name) {
+        const profiles = getProfiles();
+        delete profiles[name];
+        saveProfiles(profiles);
+        renderProfilesList();
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     }
 
     function setupSegmentedControl() {
@@ -806,7 +985,7 @@
     }
 
     function computeRangeEstimate() {
-        const soc = parseFloat(document.getElementById('socInput').value) || 80;
+        const soc = parseFloat(document.getElementById('socInput').value) || 100;
         const cap = parseFloat(document.getElementById('batteryCapacity').value) || 100;
         const availableWh = cap * 1000 * (soc / 100);
 
@@ -820,7 +999,8 @@
             document.getElementById('remainRange').innerText = remaining.toFixed(0) + ' Km';
         } else {
             // Use default 180 Wh/Km as baseline
-            const estRange = (availableWh / 180).toFixed(0);
+//            const estRange = (availableWh / 180).toFixed(0);
+            const estRange = '--';
             document.getElementById('estRange').innerText = estRange + ' Km';
             document.getElementById('remainRange').innerText = '-- Km';
         }
@@ -1143,6 +1323,7 @@
         document.getElementById('btnStop').disabled = false;
         startTime = Date.now();
         tripSeconds = 0;
+        initialSoc = Math.min(100, Math.max(0, parseInt(document.getElementById('socInput').value) || 100));
 
         // Trip timer
         tripTimer = setInterval(() => {
@@ -1193,6 +1374,7 @@
                 updateCharts(totalDistance, currentAlt, instantCons, lastSpeedKmh);
                 updatePowerBreakdown(step, deltaAlt, lastSpeedKmh);
                 computeRangeEstimate();
+                updateBatterySoC();
 
                 if (Math.floor(totalDistance / 2000) > Math.floor((totalDistance - step) / 2000)) {
                     fetchWeather(latitude, longitude);
@@ -1200,6 +1382,14 @@
             }
         }
         lastPoint = { lat: latitude, lon: longitude, alt: currentAlt };
+    }
+
+    function updateBatterySoC() {
+        const cap = parseFloat(document.getElementById('batteryCapacity').value) || 100;
+        const netWh = totalConsumedWh - totalRegenWh;
+        const newSoc = Math.min(100, Math.max(0, initialSoc - (netWh / (cap * 1000)) * 100));
+        document.getElementById('socInput').value = Math.round(newSoc);
+        updateBattery();
     }
 
     function calculatePhysics(distanceM, deltaAltM, speedKmh) {
