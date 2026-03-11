@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Liken Master</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a28;
+    --border: #2a2a3d;
+    --text: #e8e8f0;
+    --text-muted: #7070a0;
+    --accent: #00e5a0;
+    --accent2: #7c6af7;
+    --accent3: #f7a26a;
+    --danger: #f74a6a;
+    --shadow: 0 4px 32px rgba(0,0,0,0.4);
+    --radius: 14px;
+    --nav-h: 68px;
+  }
+  [data-theme="light"] {
+    --bg: #f0f0f7;
+    --surface: #ffffff;
+    --surface2: #e8e8f5;
+    --border: #d0d0e8;
+    --text: #1a1a2e;
+    --text-muted: #6060a0;
+    --accent: #00b87a;
+    --accent2: #5a4ae0;
+    --accent3: #d4813e;
+    --danger: #d43060;
+    --shadow: 0 4px 32px rgba(0,0,0,0.1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: 'DM Mono', monospace; background: var(--bg); color: var(--text); transition: background .3s, color .3s; }
+
+  /* HEADER */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: 56px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .logo {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem;
+    letter-spacing: -0.03em; color: var(--accent);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .logo span { color: var(--text); }
+  .theme-btn {
+    width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--border);
+    background: var(--surface2); cursor: pointer; font-size: 1.2rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s; color: var(--text);
+  }
+  .theme-btn:hover { border-color: var(--accent); transform: scale(1.05); }
+
+  /* MAIN CONTENT */
+  main {
+    margin-top: 56px;
+    margin-bottom: var(--nav-h);
+    padding: 20px 16px;
+    min-height: calc(100vh - 56px - var(--nav-h));
+  }
+  .section { display: none; animation: fadeIn .3s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+  /* BOTTOM NAV */
+  nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: var(--nav-h); background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex; align-items: stretch;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.2);
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; cursor: pointer; border: none; background: none; color: var(--text-muted);
+    font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.05em;
+    text-transform: uppercase; transition: color .2s; padding: 8px 0;
+    position: relative;
+  }
+  .nav-item svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+  .nav-item.active { color: var(--accent); }
+  .nav-item.active::before {
+    content: ''; position: absolute; top: 0; left: 20%; right: 20%; height: 2px;
+    background: var(--accent); border-radius: 0 0 4px 4px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px;
+    margin-bottom: 16px; box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.8rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
+    margin-bottom: 18px;
+  }
+
+  /* FIELD */
+  .field { margin-bottom: 20px; }
+  .field-label {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 8px; font-size: 0.8rem;
+  }
+  .field-name { color: var(--text-muted); letter-spacing: 0.04em; }
+  .field-value {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem;
+    color: var(--text);
+  }
+  .field-unit { color: var(--accent2); font-size: 0.75rem; margin-left: 3px; }
+
+  /* SLIDER */
+  input[type=range] {
+    -webkit-appearance: none; width: 100%; height: 4px;
+    background: var(--surface2); border-radius: 4px; outline: none; cursor: pointer;
+    border: 1px solid var(--border);
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--accent); border: 3px solid var(--surface);
+    box-shadow: 0 0 0 1px var(--accent); cursor: pointer; transition: transform .15s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  input[type=range]::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--accent); border: 3px solid var(--surface); cursor: pointer;
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.6rem;
+    letter-spacing: -0.03em; margin-bottom: 20px; color: var(--text);
+  }
+  .section-title span { color: var(--accent); }
+
+  /* STATIONS */
+  .add-btn {
+    width: 100%; padding: 14px; border: 2px dashed var(--border);
+    border-radius: var(--radius); background: none; color: var(--text-muted);
+    font-family: 'DM Mono', monospace; font-size: 0.85rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all .2s; margin-bottom: 16px;
+  }
+  .add-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .station-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0; margin-bottom: 16px;
+    box-shadow: var(--shadow); overflow: hidden;
+  }
+  .station-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px; background: var(--surface2); border-bottom: 1px solid var(--border);
+  }
+  .station-name-input {
+    background: none; border: none; font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 0.95rem; color: var(--text); outline: none;
+    flex: 1; min-width: 0;
+  }
+  .station-name-input::placeholder { color: var(--text-muted); }
+  .station-fields { padding: 16px 18px; }
+  .icon-btn {
+    width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+    background: none; cursor: pointer; color: var(--text-muted);
+    display: flex; align-items: center; justify-content: center; transition: all .2s;
+  }
+  .icon-btn:hover { border-color: var(--danger); color: var(--danger); background: rgba(247,74,106,0.08); }
+  .icon-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  /* GRAPH */
+  .chart-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+    position: relative;
+  }
+  .chart-title {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.75rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
+    margin-bottom: 14px;
+  }
+  canvas { max-width: 100%; }
+
+  .legend-wrap {
+    display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.72rem; color: var(--text-muted);
+  }
+  .legend-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* EMPTY STATE */
+  .empty {
+    text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 0.85rem;
+  }
+  .empty-icon { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.4; }
+
+  /* Number input */
+  .num-input {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px; color: var(--text);
+    font-family: 'DM Mono', monospace; font-size: 0.9rem;
+    width: 100%; outline: none; margin-top: 4px; transition: border-color .2s;
+  }
+  .num-input:focus { border-color: var(--accent); }
+
+  .info-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px;
+  }
+  .info-chip {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 14px;
+  }
+  .info-chip-label { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px; }
+  .info-chip-val { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--text); }
+  .info-chip-val span { font-size: 0.75rem; color: var(--accent2); font-weight: 400; }
+
+  @media (min-width: 600px) {
+    main { padding: 24px; max-width: 700px; margin-left: auto; margin-right: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">⚡ Liken<span>Master</span></div>
+  <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
+</header>
+
+<main>
+  <!-- VEHICLE SECTION -->
+  <section class="section active" id="sec-vehicle">
+    <div class="section-title">Your <span>Vehicle</span></div>
+    <div class="card">
+      <div class="card-title">Battery</div>
+      <div class="field">
+        <div class="field-label">
+          <span class="field-name">Battery Capacity</span>
+          <span class="field-value" id="val-capacity">75<span class="field-unit">kWh</span></span>
+        </div>
+        <input type="range" id="sl-capacity" min="10" max="200" step="1" value="75">
+      </div>
+      <div class="field">
+        <div class="field-label">
+          <span class="field-name">Minimum Level</span>
+          <span class="field-value" id="val-minlevel">20<span class="field-unit">%</span></span>
+        </div>
+        <input type="range" id="sl-minlevel" min="0" max="50" step="1" value="20">
+      </div>
+      <div class="field">
+        <div class="field-label">
+          <span class="field-name">Maximum Level</span>
+          <span class="field-value" id="val-maxlevel">80<span class="field-unit">%</span></span>
+        </div>
+        <input type="range" id="sl-maxlevel" min="50" max="100" step="1" value="80">
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">BEV Efficiency</div>
+      <div class="field">
+        <div class="field-label">
+          <span class="field-name">BEV Efficiency</span>
+          <span class="field-value" id="val-beveff">6.0<span class="field-unit">km/kWh</span></span>
+        </div>
+        <input type="range" id="sl-beveff" min="1" max="15" step="0.1" value="6">
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">ICE Reference</div>
+      <div class="field">
+        <div class="field-label">
+          <span class="field-name">ICE Fuel Cost</span>
+          <span class="field-value" id="val-icecost">1.80<span class="field-unit">€/L</span></span>
+        </div>
+        <input type="range" id="sl-icecost" min="0.5" max="5" step="0.01" value="1.80">
+      </div>
+      <div class="field">
+        <div class="field-label">
+          <span class="field-name">ICE Efficiency</span>
+          <span class="field-value" id="val-iceeff">15<span class="field-unit">km/L</span></span>
+        </div>
+        <input type="range" id="sl-iceeff" min="1" max="40" step="0.5" value="15">
+      </div>
+      <div class="info-grid">
+        <div class="info-chip">
+          <div class="info-chip-label">ICE Cost per km</div>
+          <div class="info-chip-val" id="chip-icekm">—<span> €/km</span></div>
+        </div>
+        <div class="info-chip">
+          <div class="info-chip-label">Breakeven Price</div>
+          <div class="info-chip-val" id="chip-break">—<span> €/kWh</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATIONS SECTION -->
+  <section class="section" id="sec-stations">
+    <div class="section-title">Charging <span>Stations</span></div>
+    <button class="add-btn" id="addStationBtn">
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Station
+    </button>
+    <div id="stationsList"></div>
+  </section>
+
+  <!-- GRAPHS SECTION -->
+  <section class="section" id="sec-graphs">
+    <div class="section-title">Cost <span>Analysis</span></div>
+    <div class="chart-wrap">
+      <div class="chart-title">Effective Charging Cost per Station</div>
+      <canvas id="mainChart" height="300"></canvas>
+      <div class="legend-wrap" id="chartLegend"></div>
+    </div>
+  </section>
+</main>
+
+<nav>
+  <button class="nav-item active" data-section="vehicle" onclick="switchTab(this,'vehicle')">
+    <svg viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v7a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/><path d="M14 11V7l-2-2H3"/></svg>
+    Vehicle
+  </button>
+  <button class="nav-item" data-section="stations" onclick="switchTab(this,'stations')">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Stations
+  </button>
+  <button class="nav-item" data-section="graphs" onclick="switchTab(this,'graphs')">
+    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Graphs
+  </button>
+</nav>
+
+<script>
+// ==================== STATE ====================
+const COLORS = ['#00e5a0','#7c6af7','#f7a26a','#f74a6a','#4af7e5','#f7e54a','#a04af7','#4af77c'];
+
+let state = {
+  vehicle: { capacity:75, minlevel:20, maxlevel:80, beveff:6, icecost:1.80, iceeff:15 },
+  stations: [],
+  theme: 'dark'
+};
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('likenmaster');
+    if (s) state = JSON.parse(s);
+  } catch(e) {}
+}
+function saveState() {
+  localStorage.setItem('likenmaster', JSON.stringify(state));
+}
+
+// ==================== THEME ====================
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', state.theme);
+  document.getElementById('themeBtn').textContent = state.theme === 'dark' ? '☀️' : '🌙';
+  if (window.chartInstance) { updateChart(); }
+}
+document.getElementById('themeBtn').onclick = () => {
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  applyTheme(); saveState();
+};
+
+// ==================== TABS ====================
+function switchTab(el, id) {
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('sec-'+id).classList.add('active');
+  if (id === 'graphs') updateChart();
+}
+
+// ==================== VEHICLE SLIDERS ====================
+function bindSlider(sliderId, valueId, key, decimals, unitHtml) {
+  const sl = document.getElementById(sliderId);
+  const vd = document.getElementById(valueId);
+  sl.value = state.vehicle[key];
+  vd.innerHTML = parseFloat(state.vehicle[key]).toFixed(decimals) + unitHtml;
+  sl.addEventListener('input', () => {
+    state.vehicle[key] = parseFloat(sl.value);
+    vd.innerHTML = parseFloat(sl.value).toFixed(decimals) + unitHtml;
+    updateChips(); saveState();
+  });
+}
+
+function updateChips() {
+  const v = state.vehicle;
+  const icekm = v.icecost / v.iceeff;
+  const breakeven = icekm * v.beveff;
+  document.getElementById('chip-icekm').innerHTML = icekm.toFixed(3) + '<span> €/km</span>';
+  document.getElementById('chip-break').innerHTML = breakeven.toFixed(3) + '<span> €/kWh</span>';
+}
+
+function initVehicle() {
+  bindSlider('sl-capacity','val-capacity','capacity',0,'<span class="field-unit">kWh</span>');
+  bindSlider('sl-minlevel','val-minlevel','minlevel',0,'<span class="field-unit">%</span>');
+  bindSlider('sl-maxlevel','val-maxlevel','maxlevel',0,'<span class="field-unit">%</span>');
+  bindSlider('sl-beveff','val-beveff','beveff',1,'<span class="field-unit">km/kWh</span>');
+  bindSlider('sl-icecost','val-icecost','icecost',2,'<span class="field-unit">€/L</span>');
+  bindSlider('sl-iceeff','val-iceeff','iceeff',0,'<span class="field-unit">km/L</span>');
+  updateChips();
+}
+
+// ==================== STATIONS ====================
+function renderStations() {
+  const list = document.getElementById('stationsList');
+  if (state.stations.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">⚡</div>No stations yet.<br>Add one to get started.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  state.stations.forEach((st, i) => {
+    const card = document.createElement('div');
+    card.className = 'station-card';
+    card.innerHTML = `
+      <div class="station-header">
+        <input class="station-name-input" type="text" placeholder="Station name…" value="${escHtml(st.name)}" data-idx="${i}" data-field="name">
+        <button class="icon-btn" onclick="removeStation(${i})" title="Remove">
+          <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>
+      <div class="station-fields">
+        ${stationField(i,'price','Price','€/kWh',0,2,0.01,st.price)}
+        ${stationField(i,'outward','Outward Distance','km',0,500,1,st.outward)}
+        ${stationField(i,'returnDist','Return Distance','km',0,500,1,st.returnDist)}
+      </div>`;
+    list.appendChild(card);
+  });
+
+  // bind name inputs
+  list.querySelectorAll('.station-name-input').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const idx = parseInt(inp.dataset.idx);
+      state.stations[idx].name = inp.value;
+      saveState();
+    });
+  });
+  // bind sliders
+  list.querySelectorAll('input[type=range][data-st]').forEach(sl => {
+    sl.addEventListener('input', () => {
+      const idx = parseInt(sl.dataset.st);
+      const field = sl.dataset.field;
+      state.stations[idx][field] = parseFloat(sl.value);
+      const vspan = document.getElementById(`sv-${idx}-${field}`);
+      if (vspan) vspan.textContent = parseFloat(sl.value).toFixed(sl.step < 1 ? 2 : 0);
+      saveState();
+    });
+  });
+}
+
+function stationField(idx, field, label, unit, min, max, step, val) {
+  return `
+    <div class="field">
+      <div class="field-label">
+        <span class="field-name">${label}</span>
+        <span class="field-value"><span id="sv-${idx}-${field}">${parseFloat(val).toFixed(step < 1 ? 2 : 0)}</span><span class="field-unit">${unit}</span></span>
+      </div>
+      <input type="range" data-st="${idx}" data-field="${field}" min="${min}" max="${max}" step="${step}" value="${val}">
+    </div>`;
+}
+
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+document.getElementById('addStationBtn').onclick = () => {
+  state.stations.push({ name: `Station ${state.stations.length+1}`, price: 0.40, outward: 10, returnDist: 10 });
+  saveState(); renderStations();
+};
+
+function removeStation(i) {
+  state.stations.splice(i,1);
+  saveState(); renderStations();
+}
+
+// ==================== CHART ====================
+let chartInstance = null;
+
+function calcEffectiveCost(station, soc_pct) {
+  // soc_pct: current battery state in %
+  const v = state.vehicle;
+  const cap = v.capacity;
+  // Energy available at this SOC level
+  const energyAvail_kWh = cap * soc_pct / 100;
+  // Energy consumed driving to the station (outward)
+  const outEnergy = station.outward / v.beveff;
+  // Energy remaining when arriving at the station
+  const energyAtStation = energyAvail_kWh - outEnergy;
+  if (energyAtStation < 0) return null;
+  // kWh charged to reach maxlevel from energyAtStation
+  const maxCharge = cap * v.maxlevel / 100 - energyAtStation;
+  if (maxCharge <= 0) return null;
+  // Total energy paid for at the station:
+  //   - maxCharge  : to refill up to maxlevel
+  //   - outEnergy  : to reimburse the energy spent driving there
+  //                  (it must be "bought back" at station price)
+  const totalEnergyPaid = maxCharge + outEnergy;
+  const totalCost = totalEnergyPaid * station.price;
+  // Energy consumed for the return trip
+  const retEnergy = station.returnDist / v.beveff;
+  // Net useful energy actually gained after the round trip
+  const netEnergy = maxCharge - retEnergy;
+  if (netEnergy <= 0) return null;
+  // Effective cost per net kWh gained
+  return totalCost / netEnergy;
+}
+
+function calcReturnSOC(station) {
+  // SOC after return trip starting from maxlevel
+  const v = state.vehicle;
+  const cap = v.capacity;
+  const retEnergy = station.returnDist / v.beveff;
+  const returnSOC = v.maxlevel - (retEnergy / cap * 100);
+  return Math.max(returnSOC, 0);
+}
+
+function updateChart() {
+  const canvas = document.getElementById('mainChart');
+  const v = state.vehicle;
+  const isDark = state.theme === 'dark';
+  const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+  const labelColor = isDark ? '#7070a0' : '#6060a0';
+
+  // x axis: SOC from minlevel to maxlevel
+  const minSoc = v.minlevel;
+  const maxSoc = v.maxlevel;
+  const steps = 80;
+  const labels = [];
+  for (let i = 0; i <= steps; i++) labels.push((minSoc + (maxSoc - minSoc) * i / steps).toFixed(1));
+
+  // Breakeven (ICE equivalent cost per kWh)
+  // BEV breakeven: price[€/kWh] = (icecost/iceeff)[€/km] * beveff[km/kWh]
+  const breakeven = (v.icecost / v.iceeff) * v.beveff;
+
+  const datasets = [];
+
+  // Station curves
+  const curveData = [];
+  state.stations.forEach((st, si) => {
+    const color = COLORS[si % COLORS.length];
+    const data = labels.map(lbl => {
+      const soc = parseFloat(lbl);
+      return calcEffectiveCost(st, soc);
+    });
+    curveData.push({ station: st, data, color, idx: si });
+    datasets.push({
+      label: st.name || `Station ${si+1}`,
+      data: data,
+      borderColor: color,
+      backgroundColor: 'transparent',
+      borderWidth: 2.5,
+      pointRadius: 0,
+      tension: 0.4,
+      spanGaps: false,
+    });
+  });
+
+  // Find minimum curve at each x point to fill under
+  if (state.stations.length > 0) {
+    const minCurve = labels.map((lbl, xi) => {
+      const vals = curveData.map(c => c.data[xi]).filter(v => v !== null && !isNaN(v));
+      return vals.length ? Math.min(...vals) : null;
+    });
+    datasets.unshift({
+      label: '_fill',
+      data: minCurve,
+      borderColor: 'transparent',
+      backgroundColor: 'rgba(0,229,160,0.15)',
+      fill: { target: 'origin', above: 'rgba(0,229,160,0.12)' },
+      pointRadius: 0,
+      tension: 0.4,
+      spanGaps: false,
+    });
+  }
+
+  // Breakeven horizontal line
+  datasets.push({
+    label: 'ICE Breakeven',
+    data: labels.map(() => breakeven),
+    borderColor: '#f7a26a',
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderDash: [8,4],
+    pointRadius: 0,
+  });
+
+  // Return SOC points (one per station)
+  state.stations.forEach((st, si) => {
+    const color = COLORS[si % COLORS.length];
+    const retSOC = calcReturnSOC(st);
+    // Find cost at retSOC to place point on x axis (y=0 for axis marker)
+    const xIdx = Math.round((retSOC - minSoc) / (maxSoc - minSoc) * steps);
+    const pointData = labels.map((_, xi) => xi === xIdx ? 0 : null);
+    datasets.push({
+      label: `_pt_${si}`,
+      data: pointData,
+      borderColor: color,
+      backgroundColor: color,
+      pointRadius: labels.map((_, xi) => xi === xIdx ? 8 : 0),
+      pointStyle: 'triangle',
+      showLine: false,
+      spanGaps: false,
+    });
+  });
+
+  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+
+  chartInstance = new Chart(canvas, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          filter: item => !item.dataset.label.startsWith('_'),
+          callbacks: {
+            label: ctx => {
+              if (ctx.dataset.label === 'ICE Breakeven') return `Breakeven: ${ctx.parsed.y.toFixed(3)} €/kWh`;
+              return `${ctx.dataset.label}: ${ctx.parsed.y !== null ? ctx.parsed.y.toFixed(3)+' €/kWh' : 'N/A'}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Battery Level (%)', color: labelColor, font: { family: 'DM Mono', size: 11 } },
+          ticks: { color: labelColor, maxTicksLimit: 10, font: { family: 'DM Mono', size: 10 } },
+          grid: { color: gridColor },
+          border: { color: gridColor }
+        },
+        y: {
+          title: { display: true, text: 'Effective Cost (€/kWh)', color: labelColor, font: { family: 'DM Mono', size: 11 } },
+          ticks: { color: labelColor, font: { family: 'DM Mono', size: 10 } },
+          grid: { color: gridColor },
+          border: { color: gridColor },
+          min: 0,
+          max: 1.2
+        }
+      }
+    }
+  });
+
+  // Render custom legend
+  const leg = document.getElementById('chartLegend');
+  leg.innerHTML = '';
+  state.stations.forEach((st, si) => {
+    const color = COLORS[si % COLORS.length];
+    leg.innerHTML += `<div class="legend-item"><div class="legend-dot" style="background:${color}"></div>${st.name||'Station '+(si+1)}</div>`;
+  });
+  leg.innerHTML += `<div class="legend-item"><div class="legend-dot" style="background:#f7a26a;border-radius:2px;height:3px;width:18px;margin-right:-8px"></div>&nbsp;ICE Breakeven</div>`;
+  leg.innerHTML += `<div class="legend-item"><div class="legend-dot" style="background:rgba(0,229,160,0.3);border-radius:2px;"></div>Best cost zone</div>`;
+}
+
+// ==================== INIT ====================
+loadState();
+applyTheme();
+initVehicle();
+renderStations();
+</script>
+</body>
+</html>
