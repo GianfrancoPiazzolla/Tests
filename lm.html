@@ -36,7 +36,8 @@
     --shadow: 0 4px 32px rgba(0,0,0,0.1);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; font-family: 'DM Mono', monospace; background: var(--bg); color: var(--text); transition: background .3s, color .3s; }
+  html { height: 100%; }
+  body { min-height: 100%; font-family: 'DM Mono', monospace; background: var(--bg); color: var(--text); transition: background .3s, color .3s; overflow-y: auto; }
 
   /* HEADER */
   header {
