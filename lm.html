@@ -36,8 +36,7 @@
     --shadow: 0 4px 32px rgba(0,0,0,0.1);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { height: 100%; }
-  body { min-height: 100%; font-family: 'DM Mono', monospace; background: var(--bg); color: var(--text); transition: background .3s, color .3s; overflow-y: auto; }
+  html, body { height: 100%; font-family: 'DM Mono', monospace; background: var(--bg); color: var(--text); transition: background .3s, color .3s; overflow: hidden; }
 
   /* HEADER */
   header {
@@ -64,24 +63,27 @@
 
   /* MAIN CONTENT */
   main {
-    margin-top: 56px;
-    margin-bottom: var(--nav-h);
-    padding: 20px 16px;
-    min-height: calc(100vh - 56px - var(--nav-h));
+    position: fixed;
+    top: 56px;
+    bottom: var(--nav-h);
+    left: 0;
+    right: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .section { display: none; animation: fadeIn .3s ease; }
-  .section.active { display: block; }
+  .section.active { display: block; padding: 20px 16px; }
 
   /* GRAPH SECTION FULL HEIGHT */
   #sec-graphs {
     display: none;
     flex-direction: column;
-    height: calc(100vh - 56px - var(--nav-h));
+    height: 100%;
     overflow: hidden;
-    padding-bottom: 0;
   }
   #sec-graphs.active {
     display: flex;
+    padding: 16px;
   }
   #sec-graphs .section-title {
     flex-shrink: 0;
@@ -266,21 +268,18 @@
   .info-chip-val span { font-size: 0.75rem; color: var(--accent2); font-weight: 400; }
 
   @media (min-width: 600px) {
-    main { padding: 24px; max-width: 700px; margin-left: auto; margin-right: auto; }
-    main:has(#sec-graphs.active) {
-      padding: 0;
-      max-width: 100%;
+    .section.active:not(#sec-graphs) {
+      padding: 24px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
     }
-    main:has(#sec-graphs.active) #sec-graphs {
+    #sec-graphs.active {
       padding: 20px 24px;
     }
   }
   main:has(#sec-graphs.active) {
-    padding: 0;
-    max-width: 100%;
-  }
-  main:has(#sec-graphs.active) #sec-graphs {
-    padding: 16px;
+    overflow: hidden;
   }
 </style>
 </head>
