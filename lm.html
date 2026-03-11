@@ -70,6 +70,42 @@
   }
   .section { display: none; animation: fadeIn .3s ease; }
   .section.active { display: block; }
+
+  /* GRAPH SECTION FULL HEIGHT */
+  #sec-graphs {
+    display: none;
+    flex-direction: column;
+    height: calc(100vh - 56px - var(--nav-h));
+    overflow: hidden;
+    padding-bottom: 0;
+  }
+  #sec-graphs.active {
+    display: flex;
+  }
+  #sec-graphs .section-title {
+    flex-shrink: 0;
+    margin-bottom: 12px;
+  }
+  #sec-graphs .chart-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    margin-bottom: 0;
+  }
+  #sec-graphs .chart-title {
+    flex-shrink: 0;
+  }
+  #sec-graphs canvas {
+    flex: 1;
+    min-height: 0;
+    max-width: 100%;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  #sec-graphs .legend-wrap {
+    flex-shrink: 0;
+  }
   @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
 
   /* BOTTOM NAV */
@@ -230,6 +266,20 @@
 
   @media (min-width: 600px) {
     main { padding: 24px; max-width: 700px; margin-left: auto; margin-right: auto; }
+    main:has(#sec-graphs.active) {
+      padding: 0;
+      max-width: 100%;
+    }
+    main:has(#sec-graphs.active) #sec-graphs {
+      padding: 20px 24px;
+    }
+  }
+  main:has(#sec-graphs.active) {
+    padding: 0;
+    max-width: 100%;
+  }
+  main:has(#sec-graphs.active) #sec-graphs {
+    padding: 16px;
   }
 </style>
 </head>
@@ -322,7 +372,7 @@
     <div class="section-title">Cost <span>Analysis</span></div>
     <div class="chart-wrap">
       <div class="chart-title">Effective Charging Cost per Station</div>
-      <canvas id="mainChart" height="300"></canvas>
+      <canvas id="mainChart"></canvas>
       <div class="legend-wrap" id="chartLegend"></div>
     </div>
   </section>
@@ -621,6 +671,7 @@ function updateChart() {
     data: { labels, datasets },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: { display: false },
