@@ -57,10 +57,6 @@
             filter: brightness(0.55) contrast(2.1) saturate(2.0);
         }
 
-        [data-theme="dark"] #map3d {
-            filter: brightness(5) contrast(3.5) saturate(3.5);
-        }
-
         * { box-sizing: border-box; }
 
         body {
@@ -1142,32 +1138,6 @@
         document.body.setAttribute('data-theme', currentTheme === 'dark' ? 'dark' : '');
         document.getElementById('themeBtn').innerText = currentTheme === 'dark' ? '☀️' : '🌙';
         updateChartTheme();
-
-        // Update 3D map style if already initialized
-        if (map3d) {
-            const lightStyle = 'https://tiles.openfreemap.org/styles/liberty';
-            const darkStyle  = 'https://tiles.openfreemap.org/styles/dark';
-            map3d.setStyle(currentTheme === 'dark' ? darkStyle : lightStyle);
-            map3d.once('styledata', () => {
-                if (map3dCoords.length > 1) {
-                    map3dSource = map3d.getSource('trip-path');
-                    if (!map3dSource) {
-                        map3d.addSource('trip-path', {
-                            type: 'geojson',
-                            data: { type: 'Feature', geometry: { type: 'LineString', coordinates: map3dCoords } }
-                        });
-                        map3dSource = map3d.getSource('trip-path');
-                        map3d.addLayer({
-                            id: 'trip-path-layer',
-                            type: 'line',
-                            source: 'trip-path',
-                            layout: { 'line-join': 'round', 'line-cap': 'round' },
-                            paint: { 'line-color': '#e21017', 'line-width': 5, 'line-opacity': 0.9 }
-                        });
-                    }
-                }
-            });
-        }
     }
 
     function setupMap() {
