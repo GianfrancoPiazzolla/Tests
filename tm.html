@@ -717,7 +717,7 @@
         <div class="map-wrapper">
             <div id="map"></div>
             <div id="map3d"></div>
-            <button class="map-heading-btn" id="btnHeadingToggle" onclick="toggleHeadingMode()" title="Toggle North Up / Heading Up">H↑</button>
+            <button class="map-heading-btn" id="btnHeadingToggle" onclick="toggleHeadingMode()" title="Toggle North Up / Heading Up">N↑</button>
             <button class="map3d-toggle-btn" id="btn3DToggle" onclick="toggle3DMap()" title="Toggle 3D Map">3D</button>
         </div>
 
@@ -1326,13 +1326,13 @@
         const btn = document.getElementById('btnHeadingToggle');
         isHeadingUp = !isHeadingUp;
         if (isHeadingUp) {
-            btn.textContent = 'H↑';
+            btn.textContent = 'N↑';
             btn.classList.add('active');
             // Apply current heading immediately to the active map
             const activeMap = is3DMode ? map3d : map;
             if (activeMap) activeMap.easeTo({ bearing: lastHeading, duration: 400 });
         } else {
-            btn.textContent = 'N↑';
+            btn.textContent = 'H↑';
             btn.classList.remove('active');
             // Reset to north-up on the active map
             const activeMap = is3DMode ? map3d : map;
