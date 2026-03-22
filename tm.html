@@ -52,11 +52,11 @@
         }
 
         [data-theme="dark"] #map {
-            filter: brightness(0.55);
+            filter: brightness(0.7);
         }
 
         [data-theme="dark"] #map3d {
-            filter: brightness(0.55);
+            filter: brightness(0.7);
         }
 
         * { box-sizing: border-box; }
@@ -201,7 +201,7 @@
             padding: 10px 14px;
             box-shadow: var(--card-shadow);
             display: flex;
-            align-items: center;
+            align-items: stretch;
             gap: 16px;
             flex-shrink: 0;
             position: relative;
@@ -214,16 +214,19 @@
             width: 3px;
             background: linear-gradient(180deg, var(--primary), var(--secondary));
         }
-        .range-section { display: flex; flex-direction: column; align-items: center; flex: 1; }
+        .range-section { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; }
         .range-label { font-size: 0.6rem; color: var(--label-color); text-transform: uppercase; letter-spacing: 1px; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
         .range-value { font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
 
         /* SOC Battery Visual */
         .battery-widget {
-            display: flex; align-items: center; gap: 8px; flex: 2;
+            display: flex; align-items: center; gap: 0px; flex: 2;
+            align-self: stretch;
         }
         .battery-body {
-            flex: 1; height: 22px; background: var(--input-bg);
+            flex: 1;
+            height: 100%;
+            background: var(--input-bg);
             border: 2px solid var(--border-color); border-radius: 4px;
             position: relative; overflow: hidden;
         }
@@ -250,6 +253,49 @@
             background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 60%);
         }
         .battery-soc-label { font-size: 0.85rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; min-width: 38px; text-align: right; }
+
+        /* Battery range group: battery bar + range sections share a flex container */
+        .battery-range-group {
+            display: flex;
+            align-items: stretch;
+            gap: 16px;
+            flex: 3;
+        }
+        .battery-range-group .battery-widget {
+            flex: 3;
+        }
+
+        /* Stacked layout: battery-range-group drops to its own full-width row,
+           then battery bar stacks above the two range sections */
+        .range-card.battery-stacked {
+            flex-wrap: wrap;
+        }
+        .range-card.battery-stacked .battery-range-group {
+            flex: 1 1 100%;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+        }
+        .range-card.battery-stacked .battery-range-group .battery-widget {
+            flex: none;
+            height: 18px;
+            align-items: center;
+        }
+        .range-card.battery-stacked .battery-range-group .battery-widget .battery-body {
+            height: 100%;
+        }
+        .range-card.battery-stacked .battery-range-group .battery-widget .battery-body::after {
+            display: none;
+        }
+        .range-card.battery-stacked .battery-range-group .battery-widget .battery-soc-label {
+            min-width: 42px;
+        }
+        .range-card.battery-stacked .battery-range-group .range-section {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            flex: none;
+        }
 
         /* === MAIN DISPLAY === */
         .main-display { display: flex; gap: 10px; flex: 1; min-height: 0; }
@@ -527,7 +573,32 @@
             .grid-stats { grid-template-columns: repeat(2, 1fr); }
             .config-grid { grid-template-columns: 1fr; }
             .range-card { flex-wrap: wrap; }
+            /* map3d-toggle-btn and map-heading-btn remain visible on small screens */
         }
+
+        /* === STEPPER BUTTONS === */
+        .stepper-wrap {
+            display: flex; align-items: center; gap: 4px;
+        }
+        .stepper-wrap input[type="number"] {
+            flex: 1;
+        }
+        .stepper-btn {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            width: 28px; height: 28px;
+            font-size: 1rem; font-weight: 700;
+            cursor: pointer; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s ease;
+            font-family: 'JetBrains Mono', monospace;
+            line-height: 1;
+            padding: 0;
+        }
+        .stepper-btn:hover { background: var(--border-color); transform: translateY(-1px); }
+        .stepper-btn:active { transform: translateY(0); }
 
         /* === PROFILES MODAL === */
         .profiles-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; max-height: 280px; overflow-y: auto; }
@@ -678,25 +749,35 @@
     <div class="range-card">
         <div class="range-section">
             <span class="range-label">Battery (kWh)</span>
-            <input type="number" id="batteryCapacity" value="100" step="5" style="width:120px; font-size:13px !important; padding: 6px 8px; text-align:center;">
+            <div class="stepper-wrap" style="width:140px;">
+                <button class="stepper-btn" onclick="stepValue('batteryCapacity', -1)">−</button>
+                <input type="number" id="batteryCapacity" value="100" step="1" style="font-size:13px !important; padding: 6px 8px; text-align:center;">
+                <button class="stepper-btn" onclick="stepValue('batteryCapacity', 1)">+</button>
+            </div>
         </div>
         <div class="range-section">
             <span class="range-label">Current SoC (%)</span>
-            <input type="number" id="socInput" value="100" min="0" max="100" step="1" style="width:120px; font-size:13px !important; padding:6px 8px; text-align:center;" oninput="updateBattery()">
-        </div>
-        <div class="battery-widget" style="flex:3;">
-            <div class="battery-body">
-                <div class="battery-fill" id="batteryFill" style="width:80%"></div>
+            <div class="stepper-wrap" style="width:140px;">
+                <button class="stepper-btn" onclick="stepValue('socInput', -1); updateBattery()">−</button>
+                <input type="number" id="socInput" value="100" min="0" max="100" step="1" style="font-size:13px !important; padding:6px 8px; text-align:center;" oninput="updateBattery()">
+                <button class="stepper-btn" onclick="stepValue('socInput', 1); updateBattery()">+</button>
             </div>
-            <span class="battery-soc-label" id="socLabel">100%</span>
         </div>
-        <div class="range-section">
-            <span class="range-label">Nominal Range</span>
-            <span class="range-value" id="estRange" style="color: var(--primary);">-- Km</span>
-        </div>
-        <div class="range-section">
-            <span class="range-label">Remaining Range</span>
-            <span class="range-value" id="remainRange" style="color: var(--secondary);">-- Km</span>
+        <div class="battery-range-group">
+            <div class="battery-widget">
+                <div class="battery-body">
+                    <div class="battery-fill" id="batteryFill" style="width:80%;"></div>
+                </div>
+                <span class="battery-soc-label" id="socLabel">100%</span>
+            </div>
+            <div class="range-section">
+                <span class="range-label">Nominal Range</span>
+                <span class="range-value" id="estRange" style="color: var(--primary);">-- Km</span>
+            </div>
+            <div class="range-section">
+                <span class="range-label">Remaining Range</span>
+                <span class="range-value" id="remainRange" style="color: var(--secondary);">-- Km</span>
+            </div>
         </div>
     </div>
 
@@ -941,12 +1022,14 @@
 
         container.innerHTML = keys.map(name => {
             const p = profiles[name];
+            const modeLabel = p.is3DMode ? '3D' : '2D';
+            const headingLabel = p.isHeadingUp ? 'H↑' : 'N↑';
             return `
             <div class="profile-item">
                 <div class="profile-item-info">
                     <span class="profile-item-name">${escapeHtml(name)}</span>
                     <span class="profile-item-details">
-                        Weight: <b>${p.vehicleWeight}</b> Kg</br>Battery: <b>${p.batteryKwh}</b> kWh</br>GPS: <b>${p.gpsPolling}</b> s</br>Theme: <b>${p.theme === 'dark' ? '🌙 Dark' : '☀️ Light'}</b>
+                        Weight: <b>${p.vehicleWeight}</b> Kg</br>Battery: <b>${p.batteryKwh}</b> kWh</br>GPS: <b>${p.gpsPolling}</b> s</br>Map: <b>${modeLabel}</b> / <b>${headingLabel}</b></br>Theme: <b>${p.theme === 'dark' ? '🌙 Dark' : '☀️ Light'}</b>
                     </span>
                 </div>
                 <div class="profile-item-actions">
@@ -967,7 +1050,14 @@
         const batteryKwh = document.getElementById('batteryCapacity').value;
 
         const profiles = getProfiles();
-        profiles[name] = { vehicleWeight: weight, gpsPolling: gpsPolling, batteryKwh: batteryKwh, theme: currentTheme };
+        profiles[name] = {
+            vehicleWeight: weight,
+            gpsPolling: gpsPolling,
+            batteryKwh: batteryKwh,
+            theme: currentTheme,
+            is3DMode: is3DMode,
+            isHeadingUp: isHeadingUp
+        };
         saveProfiles(profiles);
 
         nameInput.value = '';
@@ -997,6 +1087,16 @@
             toggleTheme();
         }
 
+        // Restore 3D mode if saved and different from current state
+        if (typeof p.is3DMode === 'boolean' && p.is3DMode !== is3DMode) {
+            toggle3DMap();
+        }
+
+        // Restore heading mode if saved and different from current state
+        if (typeof p.isHeadingUp === 'boolean' && p.isHeadingUp !== isHeadingUp) {
+            toggleHeadingMode();
+        }
+
         closeProfilesModal();
     }
 
@@ -1009,6 +1109,15 @@
 
     function escapeHtml(str) {
         return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    function stepValue(inputId, delta) {
+        const input = document.getElementById(inputId);
+        const min = input.min !== '' ? parseFloat(input.min) : -Infinity;
+        const max = input.max !== '' ? parseFloat(input.max) : Infinity;
+        let val = (parseFloat(input.value) || 0) + delta;
+        val = Math.min(max, Math.max(min, val));
+        input.value = val;
     }
 
     function setupSegmentedControl() {
@@ -1794,6 +1903,52 @@
     }
 </script>
 <script>
+    // Hide map overlay buttons when the map wrapper height drops below 50px
+    (function() {
+        function updateMapBtnVisibility(height) {
+            var toggle = document.querySelector('.map3d-toggle-btn');
+            var heading = document.querySelector('.map-heading-btn');
+            var hidden = height < 50;
+            if (toggle) toggle.style.display = hidden ? 'none' : '';
+            if (heading) heading.style.display = hidden ? 'none' : '';
+        }
+        window.addEventListener('DOMContentLoaded', function() {
+            var wrapper = document.querySelector('.map-wrapper');
+            if (!wrapper) return;
+            updateMapBtnVisibility(wrapper.offsetHeight);
+            var ro = new ResizeObserver(function(entries) {
+                for (var i = 0; i < entries.length; i++) {
+                    updateMapBtnVisibility(entries[i].contentRect.height);
+                }
+            });
+            ro.observe(wrapper);
+        });
+    })();
+</script>
+<script>
+    // Stack the battery progress bar and range sections on their own full-width row
+    // when the battery-range-group available width < 200px
+    (function() {
+        window.addEventListener('DOMContentLoaded', function() {
+            var batteryGroup = document.querySelector('.battery-range-group');
+            var rangeCard = document.querySelector('.range-card');
+            if (!batteryGroup || !rangeCard) return;
+            function updateBatteryLayout() {
+                var width = batteryGroup.offsetWidth;
+                if (width < 200) {
+                    rangeCard.classList.add('battery-stacked');
+                } else {
+                    rangeCard.classList.remove('battery-stacked');
+                }
+            }
+            updateBatteryLayout();
+            var ro = new ResizeObserver(function() {
+                updateBatteryLayout();
+            });
+            ro.observe(rangeCard);
+        });
+    })();
+
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
             navigator.serviceWorker.register('/sw.js').then(function(registration) {
