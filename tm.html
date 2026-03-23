@@ -861,7 +861,7 @@
                 <button class="map-zoom-btn" onclick="mapCenterOnGPS()" title="Center on current GPS position">⊕</button>
                 <button class="map-zoom-btn" onclick="mapZoomIn()" title="Zoom In">+</button>
             </div>
-            <button class="map-heading-btn" id="btnHeadingToggle" onclick="toggleHeadingMode()" title="Toggle North Up / Heading Up">⮝</button>
+            <button class="map-heading-btn" id="btnHeadingToggle" onclick="toggleHeadingMode()" title="Toggle North Up / Heading Up">▲</button>
             <button class="map3d-toggle-btn" id="btn3DToggle" onclick="toggle3DMap()" title="Toggle 3D Map">3D</button>
             <button class="map-fullscreen-btn" id="btnFullscreen" onclick="toggleMapFullscreen()" title="Toggle Fullscreen Map">⛶</button>
         </div>
@@ -1090,7 +1090,7 @@
         container.innerHTML = keys.map(name => {
             const p = profiles[name];
             const modeLabel = p.is3DMode ? '3D' : '2D';
-            const headingLabel = p.isHeadingUp ? '⮝' : 'N';
+            const headingLabel = p.isHeadingUp ? '▲' : 'N';
             return `
             <div class="profile-item">
                 <div class="profile-item-info">
@@ -1569,7 +1569,7 @@
             const activeMap = is3DMode ? map3d : map;
             if (activeMap) activeMap.easeTo({ bearing: lastHeading, duration: 400 });
         } else {
-            btn.textContent = '⮝';
+            btn.textContent = '▲';
             btn.classList.remove('active');
             // Reset to north-up on the active map
             const activeMap = is3DMode ? map3d : map;
