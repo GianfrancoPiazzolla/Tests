@@ -265,7 +265,6 @@
             white-space: nowrap;
         }
 
-        /* Battery range group: battery bar + range sections share a flex container */
         .battery-range-group {
             display: flex;
             align-items: stretch;
@@ -276,8 +275,6 @@
             flex: 3;
         }
 
-        /* Stacked layout: battery-range-group drops to its own full-width row,
-           then battery bar stacks above the two range sections */
         .range-card.battery-stacked {
             flex-wrap: wrap;
         }
@@ -323,7 +320,7 @@
             z-index: 5;
         }
         .map3d-toggle-btn {
-            position: absolute; top: 10px; right: 58px; z-index: 10;
+            position: absolute; top: 10px; right: 154px; z-index: 10;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             color: var(--text-color);
@@ -335,7 +332,7 @@
             box-shadow: var(--card-shadow);
         }
         .map3d-toggle-btn:hover { background: var(--border-color); transform: translateY(-1px); }
-        .map3d-toggle-btn.active { background: var(--secondary); color: #000; border-color: var(--secondary); box-shadow: 0 2px 8px rgba(41,182,246,0.4); }
+        .map3d-toggle-btn.active { background: var(--warning); color: #000; border-color: var(--warning); box-shadow: 0 2px 8px rgba(41,182,246,0.4); }
         .map-fullscreen-btn {
             position: absolute; top: 10px; right: 10px; z-index: 10;
             background: var(--card-bg);
@@ -350,8 +347,84 @@
         }
         .map-fullscreen-btn:hover { background: var(--border-color); transform: translateY(-1px); }
         .map-fullscreen-btn.active { background: var(--accent-purple); color: #000; border-color: var(--accent-purple); box-shadow: 0 2px 8px rgba(179,157,219,0.4); }
+        .map-weather-btn {
+            position: absolute; top: 10px; right: 58px; z-index: 10;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px; padding: 5px 10px;
+            cursor: pointer; font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            box-shadow: var(--card-shadow);
+        }
+        .map-weather-btn:hover { background: var(--border-color); transform: translateY(-1px); }
+        .map-weather-btn.active { background: var(--secondary); color: #000; border-color: var(--secondary); box-shadow: 0 2px 8px rgba(41,182,246,0.4); }
 
-        /* Fullscreen map mode */
+        .map-poi-btn {
+            position: absolute; top: 10px; right: 106px; z-index: 10;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px; padding: 5px 10px;
+            cursor: pointer; font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            box-shadow: var(--card-shadow);
+        }
+        .map-poi-btn:hover { background: var(--border-color); transform: translateY(-1px); }
+        .map-poi-btn.active { background: #ff9100; color: #000; border-color: #ff9100; box-shadow: 0 2px 8px rgba(255,145,0,0.4); }
+
+        /* POI Panel */
+        .poi-panel {
+            position: absolute; top: 46px; right: 10px; z-index: 10;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 6px 8px;
+            box-shadow: var(--card-shadow);
+            display: none;
+            flex-direction: column; gap: 3px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.62rem; font-weight: 600;
+            min-width: 172px;
+        }
+        .poi-panel.visible { display: flex; }
+        .poi-panel-title {
+            font-size: 0.58rem; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--label-color); padding-bottom: 4px;
+            border-bottom: 1px solid var(--border-color); margin-bottom: 2px;
+        }
+        .poi-panel-item {
+            display: flex; align-items: center; gap: 7px;
+            padding: 4px 5px; border-radius: 6px;
+            cursor: pointer; transition: background 0.15s ease;
+            user-select: none;
+        }
+        .poi-panel-item:hover { background: var(--input-bg); }
+        .poi-panel-item.active { background: var(--input-bg); }
+        .poi-panel-emoji { font-size: 0.95rem; line-height: 1; width: 18px; text-align: center; }
+        .poi-panel-label { flex: 1; color: var(--text-color); }
+        .poi-panel-check {
+            width: 14px; height: 14px; border-radius: 3px;
+            border: 2px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: all 0.15s ease;
+            font-size: 0.6rem; color: #000; font-weight: 900;
+        }
+        .poi-panel-item.active .poi-panel-check {
+            border-color: transparent;
+        }
+        .poi-panel-item[data-poi="road_closure"].active .poi-panel-check { background: #ff6f00; }
+        .poi-panel-item[data-poi="mobile_patrol"].active .poi-panel-check { background: #1565c0; }
+        .poi-panel-item[data-poi="speed_camera"].active .poi-panel-check { background: #c62828; }
+        .poi-panel-item[data-poi="ev_charging"].active .poi-panel-check { background: #2e7d32; }
+        .poi-panel-loading {
+            font-size: 0.58rem; color: var(--label-color); text-align: center;
+            padding: 3px 0; letter-spacing: 0.5px;
+        }
+
         body.map-fullscreen .header { display: none; }
         body.map-fullscreen .container > .config-grid,
         body.map-fullscreen .container > .range-card,
@@ -366,7 +439,7 @@
         body.map-fullscreen {
             overflow: hidden;
             height: 100vh;
-            height: 100dvh; /* dynamic viewport height — handles mobile browser chrome */
+            height: 100dvh;
         }
         body.map-fullscreen .container {
             height: 100%;
@@ -378,7 +451,7 @@
             min-height: 0;
         }
         .map-heading-btn {
-            position: absolute; top: 10px; right: 110px; z-index: 10;
+            position: absolute; top: 10px; right: 206px; z-index: 10;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             color: var(--text-color);
@@ -642,9 +715,7 @@
             .grid-stats { grid-template-columns: repeat(2, 1fr); }
             .config-grid { grid-template-columns: 1fr; }
             .range-card { flex-wrap: wrap; }
-            /* map3d-toggle-btn and map-heading-btn remain visible on small screens */
 
-            /* Fullscreen override on mobile: restore full viewport dimensions */
             body.map-fullscreen {
                 overflow: hidden !important;
                 height: 100vh !important;
@@ -710,11 +781,12 @@
         .profile-item-actions { display: flex; gap: 6px; }
         .profile-action-btn {
             border: 1px solid var(--border-color); background: var(--card-bg);
-            color: var(--text-color); border-radius: 6px; padding: 4px 10px;
-            font-size: 0.75rem; font-family: 'JetBrains Mono', monospace;
-            font-weight: 700; cursor: pointer; transition: all 0.18s ease;
+            color: var(--text-color); border-radius: 6px; padding: 0;
+            width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.18s ease; flex-shrink: 0;
         }
-        .profile-action-btn:hover { background: var(--border-color); }
+        .profile-action-btn svg { display: block; }
+        .profile-action-btn:hover { background: var(--border-color); transform: translateY(-1px); }
         .profile-action-btn.load { color: var(--secondary); border-color: rgba(41,182,246,0.4); }
         .profile-action-btn.load:hover { background: rgba(41,182,246,0.1); }
         .profile-action-btn.del { color: var(--danger); border-color: rgba(255,23,68,0.4); }
@@ -798,6 +870,11 @@
         <div id="summaryContent">
             <p style="color:var(--label-color); font-style:italic;">No trip data yet. Start a trip to see the summary.</p>
         </div>
+        <div style="display:flex; gap:10px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-color);">
+            <button onclick="exportTrip()" style="flex:1; border:none; padding:10px; border-radius:8px; font-size:0.82rem; font-weight:800; cursor:pointer; text-transform:uppercase; font-family:'Syne',sans-serif; letter-spacing:1.5px; background:linear-gradient(135deg,var(--secondary),#0288d1); color:#000; transition:all 0.18s ease;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">⬇ Export Trip</button>
+            <button onclick="document.getElementById('importTripInput').click()" style="flex:1; border:none; padding:10px; border-radius:8px; font-size:0.82rem; font-weight:800; cursor:pointer; text-transform:uppercase; font-family:'Syne',sans-serif; letter-spacing:1.5px; background:linear-gradient(135deg,var(--primary),#00c853); color:#000; transition:all 0.18s ease;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">⬆ Import Trip</button>
+        </div>
+        <input type="file" id="importTripInput" accept=".json" style="display:none;" onchange="importTrip(event)">
     </div>
 </div>
 
@@ -896,6 +973,32 @@
             </div>
             <button class="map-heading-btn" id="btnHeadingToggle" onclick="toggleHeadingMode()" title="Toggle North Up / Heading Up">▲</button>
             <button class="map3d-toggle-btn" id="btn3DToggle" onclick="toggle3DMap()" title="Toggle 3D Map">3D</button>
+            <button class="map-weather-btn" id="btnWeatherOverlay" onclick="toggleWeatherOverlay()" title="Toggle Weather Overlay">🌧</button>
+            <button class="map-poi-btn" id="btnPoiOverlay" onclick="togglePoiOverlay()" title="Toggle Points of Interest">📍</button>
+            <div class="poi-panel" id="poiPanel">
+                <div class="poi-panel-title">POI Layers</div>
+                <div class="poi-panel-item active" data-poi="road_closure" onclick="togglePoiType('road_closure')">
+                    <span class="poi-panel-emoji">🚧</span>
+                    <span class="poi-panel-label">Road Closures</span>
+                    <span class="poi-panel-check">✓</span>
+                </div>
+                <div class="poi-panel-item active" data-poi="mobile_patrol" onclick="togglePoiType('mobile_patrol')">
+                    <span class="poi-panel-emoji">🚔</span>
+                    <span class="poi-panel-label">Mobile Patrols</span>
+                    <span class="poi-panel-check">✓</span>
+                </div>
+                <div class="poi-panel-item active" data-poi="speed_camera" onclick="togglePoiType('speed_camera')">
+                    <span class="poi-panel-emoji">📷</span>
+                    <span class="poi-panel-label">Speed Cameras</span>
+                    <span class="poi-panel-check">✓</span>
+                </div>
+                <div class="poi-panel-item active" data-poi="ev_charging" onclick="togglePoiType('ev_charging')">
+                    <span class="poi-panel-emoji">⚡</span>
+                    <span class="poi-panel-label">EV Charging</span>
+                    <span class="poi-panel-check">✓</span>
+                </div>
+                <div class="poi-panel-loading" id="poiLoadingLabel" style="display:none;">Fetching data…</div>
+            </div>
             <button class="map-fullscreen-btn" id="btnFullscreen" onclick="toggleMapFullscreen()" title="Toggle Fullscreen Map">⛶</button>
         </div>
 
@@ -1059,18 +1162,16 @@
     let lastInstantPowerW = 0;
     let initialSoc = 100;
     let map3d = null, map3dSource = null, is3DMode = false;
+    let isMapFullscreen = false;
     let map3dCoords = [];
     let isHeadingUp = false;
     let lastHeading = 0;
-    // Blue sphere marker for current GPS position
+    let isWeatherOverlayOn = false;
+    let weatherOverlayTimestamp = null;
     let positionMarker = null;
     let positionMarker3d = null;
-
-    // Per-segment power breakdown accumulator
     let powerBreakdown = { drag: 0, gravity: 0, aero: 0, regen: 0, samples: 0 };
-
-    // Previous weather values for comparison
-    let prevWeather = { temp: null, min: null, max: null, hum: null, windSpd: null, windDir: null, press: null };
+    let prevWeather = { temp: null, min: null, max: null, hum: null, windSpd: null, press: null };
 
     function initializeSystem() {
         setupMap();
@@ -1124,18 +1225,25 @@
             const p = profiles[name];
             const modeLabel = p.is3DMode ? '3D' : '2D';
             const headingLabel = p.isHeadingUp ? '▲' : 'N';
+            const weatherOverlayLabel = p.isWeatherOverlayOn ? 'On' : 'Off';
             return `
             <div class="profile-item">
                 <div class="profile-item-info">
                     <span class="profile-item-name">${escapeHtml(name)}</span>
                     <span class="profile-item-details">
-                        Weight: <b>${p.vehicleWeight}</b> Kg</br>Battery: <b>${p.batteryKwh}</b> kWh</br>GPS: <b>${p.gpsPolling}</b> s</br>Map: <b>${modeLabel}</b> / <b>${headingLabel}</b></br>Theme: <b>${p.theme === 'dark' ? '🌙 Dark' : '☀️ Light'}</b>
+                        Weight: <b>${p.vehicleWeight}</b> Kg</br>Battery: <b>${p.batteryKwh}</b> kWh</br>GPS: <b>${p.gpsPolling}</b> s</br>Map: <b>${modeLabel}</b> / <b>${headingLabel}</b></br>Weather: <b>${weatherOverlayLabel}</b></br>Theme: <b>${p.theme === 'dark' ? '🌙 Dark' : '☀️ Light'}</b>
                     </span>
                 </div>
                 <div class="profile-item-actions">
-                    <button class="profile-action-btn load" onclick="loadProfile('${escapeHtml(name)}')">Load</button>
-                    <button class="profile-action-btn overwrite" onclick="overwriteProfile('${escapeHtml(name)}')">Overwrite</button>
-                    <button class="profile-action-btn del" onclick="deleteProfile('${escapeHtml(name)}')">Delete</button>
+                    <button class="profile-action-btn load" onclick="loadProfile('${escapeHtml(name)}')" title="Load">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </button>
+                    <button class="profile-action-btn overwrite" onclick="overwriteProfile('${escapeHtml(name)}')" title="Overwrite">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                    </button>
+                    <button class="profile-action-btn del" onclick="deleteProfile('${escapeHtml(name)}')" title="Delete">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                    </button>
                 </div>
             </div>`;
         }).join('');
@@ -1157,7 +1265,8 @@
             batteryKwh: batteryKwh,
             theme: currentTheme,
             is3DMode: is3DMode,
-            isHeadingUp: isHeadingUp
+            isHeadingUp: isHeadingUp,
+            isWeatherOverlayOn: isWeatherOverlayOn
         };
         saveProfiles(profiles);
 
@@ -1183,19 +1292,20 @@
         });
         document.getElementById('gpsPolling').value = p.gpsPolling;
 
-        // Restore theme preference if saved
-        if (p.theme && p.theme !== currentTheme) {
-            toggleTheme();
-        }
-
-        // Restore 3D mode if saved and different from current state
         if (typeof p.is3DMode === 'boolean' && p.is3DMode !== is3DMode) {
             toggle3DMap();
         }
 
-        // Restore heading mode if saved and different from current state
         if (typeof p.isHeadingUp === 'boolean' && p.isHeadingUp !== isHeadingUp) {
             toggleHeadingMode();
+        }
+
+        if (p.theme && p.theme !== currentTheme) {
+            toggleTheme();
+        }
+
+        if (typeof p.isWeatherOverlayOn === 'boolean' && p.isWeatherOverlayOn !== isWeatherOverlayOn) {
+            toggleWeatherOverlay();
         }
 
         closeProfilesModal();
@@ -1220,7 +1330,8 @@
             batteryKwh: batteryKwh,
             theme: currentTheme,
             is3DMode: is3DMode,
-            isHeadingUp: isHeadingUp
+            isHeadingUp: isHeadingUp,
+            isWeatherOverlayOn: isWeatherOverlayOn
         };
         saveProfiles(profiles);
         renderProfilesList();
@@ -1277,8 +1388,6 @@
             const remaining = Math.max(0, parseFloat(estRange) - usedKm);
             document.getElementById('remainRange').innerText = remaining.toFixed(0) + ' Km';
         } else {
-            // Use default 180 Wh/Km as baseline
-//            const estRange = (availableWh / 180).toFixed(0);
             const estRange = '--';
             document.getElementById('estRange').innerText = estRange + ' Km';
             document.getElementById('remainRange').innerText = '-- Km';
@@ -1288,11 +1397,14 @@
     function applyValueStyle(elementId, newValue, prevValue) {
         const el = document.getElementById(elementId);
         if (prevValue === null || newValue === prevValue) {
-            el.style.color = 'var(--text-color)';
+            // FIX #2: remove inline style entirely so CSS cascade handles
+            // the default color — setting 'var(--text-color)' as an inline
+            // style does not reliably resolve CSS variables in all browsers.
+            el.style.removeProperty('color');
         } else if (newValue > prevValue) {
-            el.style.color = 'var(--up-color)';
+            el.style.color = '#00e676';
         } else {
-            el.style.color = 'var(--down-color)';
+            el.style.color = '#ff1744';
         }
     }
 
@@ -1310,6 +1422,18 @@
             const windSpeed = data.current.wind_speed_10m;
             const windDir = data.current.wind_direction_10m;
 
+            // FIX #1: update DOM text FIRST, then apply color styles so the
+            // color is always applied on the already-updated visible value.
+            document.getElementById('weatherTemp').innerText = currentTemp.toFixed(1);
+            document.getElementById('weatherIcon').innerText = getWeatherPictogram(code);
+            document.getElementById('tempMin').innerText = minTemp.toFixed(1);
+            document.getElementById('tempMax').innerText = maxTemp.toFixed(1);
+            // FIX #3: use toFixed(1) for pressure, consistent with all other values.
+            document.getElementById('pressure').innerText = pressure.toFixed(1);
+            document.getElementById('windSpeedVal').innerText = windSpeed.toFixed(1);
+            document.getElementById('windDirVal').innerText = getWindDirection(windDir);
+            document.getElementById('humidityVal').innerText = humidity;
+
             applyValueStyle('weatherTemp', currentTemp, prevWeather.temp);
             applyValueStyle('tempMin', minTemp, prevWeather.min);
             applyValueStyle('tempMax', maxTemp, prevWeather.max);
@@ -1317,16 +1441,10 @@
             applyValueStyle('windSpeedVal', windSpeed, prevWeather.windSpd);
             applyValueStyle('pressure', pressure, prevWeather.press);
 
-            document.getElementById('weatherTemp').innerText = currentTemp.toFixed(1);
-            document.getElementById('weatherIcon').innerText = getWeatherPictogram(code);
-            document.getElementById('tempMin').innerText = minTemp.toFixed(1);
-            document.getElementById('tempMax').innerText = maxTemp.toFixed(1);
-            document.getElementById('pressure').innerText = pressure;
-            document.getElementById('windSpeedVal').innerText = windSpeed.toFixed(1);
-            document.getElementById('windDirVal').innerText = getWindDirection(windDir);
-            document.getElementById('humidityVal').innerText = humidity;
-
-            prevWeather = { temp: currentTemp, min: minTemp, max: maxTemp, hum: humidity, windSpd: windSpeed, windDir: windDir, press: pressure };
+            // FIX #4: removed windDir from prevWeather — wind direction is a
+            // computed string (N/NE/...), numeric comparison makes no sense and
+            // applyValueStyle was never called on windDirVal anyway.
+            prevWeather = { temp: currentTemp, min: minTemp, max: maxTemp, hum: humidity, windSpd: windSpeed, press: pressure };
 
             if (!isWeatherInitialSyncDone) {
                 updateEfficiencyByTemp(currentTemp);
@@ -1421,6 +1539,9 @@
                     });
                 }
             }
+            if (isWeatherOverlayOn && weatherOverlayTimestamp && !is3DMode) {
+                addWeatherOverlayToMap(map, weatherOverlayTimestamp);
+            }
         });
 
         // Update 3D map style if already initialized
@@ -1445,7 +1566,53 @@
                         });
                     }
                 }
+                if (isWeatherOverlayOn && weatherOverlayTimestamp && is3DMode) {
+                    addWeatherOverlayToMap(map3d, weatherOverlayTimestamp);
+                }
             });
+        }
+    }
+
+    function createTripEndpointMarker(label, bgColor) {
+        const el = document.createElement('div');
+        el.style.cssText = [
+            'width:22px', 'height:22px', 'border-radius:50%',
+            'background:' + bgColor,
+            'border:2px solid #ffffff',
+            'box-shadow:0 0 0 2px rgba(0,0,0,0.25), 0 2px 6px rgba(0,0,0,0.4)',
+            'display:flex', 'align-items:center', 'justify-content:center',
+            'font-family:\'Syne\', sans-serif', 'font-size:11px', 'font-weight:800',
+            'color:#ffffff', 'pointer-events:none', 'z-index:20'
+        ].join(';');
+        el.textContent = label;
+        return el;
+    }
+
+    function placeImportMarkers(coords) {
+        const first = coords[0];
+        const last = coords[coords.length - 1];
+
+        if (window._importStartMarker) { window._importStartMarker.remove(); window._importStartMarker = null; }
+        if (window._importEndMarker) { window._importEndMarker.remove(); window._importEndMarker = null; }
+        if (window._importStartMarker3d) { window._importStartMarker3d.remove(); window._importStartMarker3d = null; }
+        if (window._importEndMarker3d) { window._importEndMarker3d.remove(); window._importEndMarker3d = null; }
+
+        if (map) {
+            window._importStartMarker = new maplibregl.Marker({ element: createTripEndpointMarker('S', '#00b248'), anchor: 'center' })
+                .setLngLat([first[0], first[1]])
+                .addTo(map);
+            window._importEndMarker = new maplibregl.Marker({ element: createTripEndpointMarker('E', '#e21017'), anchor: 'center' })
+                .setLngLat([last[0], last[1]])
+                .addTo(map);
+        }
+
+        if (map3d) {
+            window._importStartMarker3d = new maplibregl.Marker({ element: createTripEndpointMarker('S', '#00b248'), anchor: 'center' })
+                .setLngLat([first[0], first[1]])
+                .addTo(map3d);
+            window._importEndMarker3d = new maplibregl.Marker({ element: createTripEndpointMarker('E', '#e21017'), anchor: 'center' })
+                .setLngLat([last[0], last[1]])
+                .addTo(map3d);
         }
     }
 
@@ -1463,11 +1630,14 @@
 
     function setupMap() {
         const lightStyle = 'https://tiles.openfreemap.org/styles/liberty';
+        // Fallback coordinates (Rome) — used only if geolocation is denied or unavailable
+        const ROME_LNG = 12.5113;
+        const ROME_LAT = 41.8919;
 
         map = new maplibregl.Map({
             container: 'map',
             style: lightStyle,
-            center: [12.5113, 41.8919],
+            center: [ROME_LNG, ROME_LAT],
             zoom: 13,
             pitch: 0,
             bearing: 0,
@@ -1487,22 +1657,36 @@
                 layout: { 'line-join': 'round', 'line-cap': 'round' },
                 paint: { 'line-color': '#e21017', 'line-width': 5, 'line-opacity': 0.9 }
             });
-            // Initialize the blue sphere position marker on the 2D map
-            positionMarker = new maplibregl.Marker({ element: createBlueMarkerElement(), anchor: 'center' })
-                .setLngLat([12.5113, 41.8919])
-                .addTo(map);
-        });
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((pos) => {
-                const { latitude, longitude } = pos.coords;
-                map.setCenter([longitude, latitude]);
-                map.setZoom(15);
-                // Update marker to the initial GPS position
-                if (positionMarker) positionMarker.setLngLat([longitude, latitude]);
-                fetchWeather(latitude, longitude);
-            }, () => {}, { enableHighAccuracy: true });
-        }
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        // Geolocation granted: center map and place marker on actual device position
+                        const { latitude, longitude } = pos.coords;
+                        map.setCenter([longitude, latitude]);
+                        map.setZoom(15);
+                        positionMarker = new maplibregl.Marker({ element: createBlueMarkerElement(), anchor: 'center' })
+                            .setLngLat([longitude, latitude])
+                            .addTo(map);
+                        fetchWeather(latitude, longitude);
+                    },
+                    () => {
+                        // Geolocation denied or unavailable: fall back to Rome
+                        positionMarker = new maplibregl.Marker({ element: createBlueMarkerElement(), anchor: 'center' })
+                            .setLngLat([ROME_LNG, ROME_LAT])
+                            .addTo(map);
+                        fetchWeather(ROME_LAT, ROME_LNG);
+                    },
+                    { enableHighAccuracy: true }
+                );
+            } else {
+                // Geolocation API not supported: fall back to Rome
+                positionMarker = new maplibregl.Marker({ element: createBlueMarkerElement(), anchor: 'center' })
+                    .setLngLat([ROME_LNG, ROME_LAT])
+                    .addTo(map);
+                fetchWeather(ROME_LAT, ROME_LNG);
+            }
+        });
     }
 
     function setup3DMap(lat, lng) {
@@ -1533,7 +1717,6 @@
                 paint: { 'line-color': '#e21017', 'line-width': 5, 'line-opacity': 0.9 }
             });
 
-            // Initialize the blue sphere position marker on the 3D map
             const center = map3d.getCenter();
             positionMarker3d = new maplibregl.Marker({ element: createBlueMarkerElement(), anchor: 'center' })
                 .setLngLat([center.lng, center.lat])
@@ -1547,7 +1730,6 @@
         const center = map.getCenter();
 
         if (!is3DMode) {
-            // Switch to 3D
             is3DMode = true;
             btn.textContent = '2D';
             btn.classList.add('active');
@@ -1556,20 +1738,42 @@
 
             if (!map3d) {
                 setup3DMap(center.lat, center.lng);
+                if (isWeatherOverlayOn && weatherOverlayTimestamp) {
+                    const applyAfterLoad = function() {
+                        addWeatherOverlayToMap(map3d, weatherOverlayTimestamp);
+                        map3d.off('load', applyAfterLoad);
+                    };
+                    if (map3d) map3d.on('load', applyAfterLoad);
+                }
             } else {
                 map3d.setCenter([center.lng, center.lat]);
                 if (map3dSource) {
                     map3dSource.setData({ type: 'Feature', geometry: { type: 'LineString', coordinates: map3dCoords } });
                 }
+                if (isWeatherOverlayOn && weatherOverlayTimestamp) {
+                    if (map3d.isStyleLoaded()) {
+                        addWeatherOverlayToMap(map3d, weatherOverlayTimestamp);
+                    } else {
+                        map3d.once('styledata', function() { addWeatherOverlayToMap(map3d, weatherOverlayTimestamp); });
+                    }
+                }
             }
+            removeWeatherOverlayFromMap(map);
         } else {
-            // Switch back to 2D
             is3DMode = false;
             btn.textContent = '3D';
             btn.classList.remove('active');
             map3dEl.style.display = 'none';
             mapEl.style.display = 'block';
             map.resize();
+            removeWeatherOverlayFromMap(map3d);
+            if (isWeatherOverlayOn && weatherOverlayTimestamp) {
+                if (map.isStyleLoaded()) {
+                    addWeatherOverlayToMap(map, weatherOverlayTimestamp);
+                } else {
+                    map.once('styledata', function() { addWeatherOverlayToMap(map, weatherOverlayTimestamp); });
+                }
+            }
         }
     }
 
@@ -1598,15 +1802,85 @@
         if (isHeadingUp) {
             btn.textContent = 'N';
             btn.classList.add('active');
-            // Apply current heading immediately to the active map
+
             const activeMap = is3DMode ? map3d : map;
             if (activeMap) activeMap.easeTo({ bearing: lastHeading, duration: 400 });
         } else {
             btn.textContent = '▲';
             btn.classList.remove('active');
-            // Reset to north-up on the active map
+
             const activeMap = is3DMode ? map3d : map;
             if (activeMap) activeMap.easeTo({ bearing: 0, duration: 400 });
+        }
+    }
+
+    async function fetchRainViewerTimestamp() {
+        try {
+            const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
+            const data = await res.json();
+            const frames = data.radar && data.radar.past;
+            if (frames && frames.length > 0) {
+                // FIX #3: return the full frame object so callers can use .path
+                // for the correct RainViewer v3 tile URL.
+                return frames[frames.length - 1];
+            }
+        } catch(e) {}
+        return null;
+    }
+
+    function addWeatherOverlayToMap(targetMap, radarFrame) {
+        if (!targetMap || !radarFrame) return;
+        // FIX #1: always remove existing layer/source before re-adding,
+        // so the overlay is refreshed correctly on every call.
+        if (targetMap.getLayer('rainviewer-layer')) targetMap.removeLayer('rainviewer-layer');
+        if (targetMap.getSource('rainviewer-source')) targetMap.removeSource('rainviewer-source');
+        // FIX #3: use the full path returned by the RainViewer API (v3),
+        // instead of reconstructing it manually with the old /v2/radar/ pattern.
+        const tileUrl = 'https://tilecache.rainviewer.com' + radarFrame.path + '/256/{z}/{x}/{y}/4/1_1.png';
+        targetMap.addSource('rainviewer-source', {
+            type: 'raster',
+            tiles: [tileUrl],
+            tileSize: 256,
+            minzoom: 0,
+            maxzoom: 7,
+            attribution: 'RainViewer'
+        });
+        targetMap.addLayer({
+            id: 'rainviewer-layer',
+            type: 'raster',
+            source: 'rainviewer-source',
+            minzoom: 0,
+            maxzoom: 22,
+            paint: { 'raster-opacity': 0.6 }
+        });
+    }
+
+    function removeWeatherOverlayFromMap(targetMap) {
+        if (!targetMap) return;
+        if (targetMap.getLayer('rainviewer-layer')) targetMap.removeLayer('rainviewer-layer');
+        if (targetMap.getSource('rainviewer-source')) targetMap.removeSource('rainviewer-source');
+    }
+
+    async function toggleWeatherOverlay() {
+        const btn = document.getElementById('btnWeatherOverlay');
+        isWeatherOverlayOn = !isWeatherOverlayOn;
+        if (isWeatherOverlayOn) {
+            btn.classList.add('active');
+            // FIX #2: always fetch a fresh timestamp on every activation,
+            // so the radar data is never stale from a previous session.
+            weatherOverlayTimestamp = await fetchRainViewerTimestamp();
+            const activeMap = is3DMode ? map3d : map;
+            if (activeMap && activeMap.isStyleLoaded()) {
+                addWeatherOverlayToMap(activeMap, weatherOverlayTimestamp);
+            } else if (activeMap) {
+                activeMap.once('styledata', function() {
+                    addWeatherOverlayToMap(activeMap, weatherOverlayTimestamp);
+                });
+            }
+        } else {
+            btn.classList.remove('active');
+            removeWeatherOverlayFromMap(map);
+            removeWeatherOverlayFromMap(map3d);
         }
     }
 
@@ -1873,7 +2147,6 @@
                 const mapBearing = isHeadingUp ? lastHeading : 0;
                 map.easeTo({ center: [longitude, latitude], bearing: mapBearing, duration: 300 });
 
-                // Update blue sphere marker position on 2D map
                 if (positionMarker) positionMarker.setLngLat([longitude, latitude]);
 
                 if (map3d && map3dSource) {
@@ -1881,7 +2154,6 @@
                 }
                 if (is3DMode && map3d) {
                     map3d.easeTo({ center: [longitude, latitude], bearing: mapBearing, duration: 300 });
-                    // Update blue sphere marker position on 3D map
                     if (positionMarker3d) positionMarker3d.setLngLat([longitude, latitude]);
                 }
                 updateCharts(totalDistance, currentAlt, instantCons, lastSpeedKmh);
@@ -1951,8 +2223,6 @@
         altChart.data.datasets[0].data.push({ x: distKm, y: alt });
         consChart.data.datasets[0].data.push({ x: distKm, y: cons });
         speedChart.data.datasets[0].data.push({ x: distKm, y: parseFloat(speedKmh.toFixed(1)) });
-
-        // Update horizontal bar chart: two separate bars per row label
         energyChart.data.datasets[0].data = [totalConsumedWh, totalRegenWh];
 
         [altChart, consChart, speedChart, energyChart].forEach(c => c.update('none'));
@@ -1999,7 +2269,340 @@
         document.getElementById('regenBarVal').innerText = Math.round(regenInstantW) + ' W';
     }
 
-    let isMapFullscreen = false;
+    function exportTrip() {
+        if (map3dCoords.length < 2) {
+            alert('No GPS coordinates available to export.');
+            return;
+        }
+        const data = JSON.stringify(map3dCoords, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const now = new Date();
+        const ts = now.getFullYear().toString() +
+            String(now.getMonth() + 1).padStart(2, '0') +
+            String(now.getDate()).padStart(2, '0') + '_' +
+            String(now.getHours()).padStart(2, '0') +
+            String(now.getMinutes()).padStart(2, '0');
+        a.download = 'trip_coordinates_' + ts + '.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function importTrip(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const coords = JSON.parse(e.target.result);
+                if (!Array.isArray(coords) || coords.length < 2 || !Array.isArray(coords[0]) || coords[0].length < 2) {
+                    alert('Invalid trip file format.');
+                    return;
+                }
+                map3dCoords = coords;
+
+                if (pathLine) {
+                    pathLine.setData({ type: 'Feature', geometry: { type: 'LineString', coordinates: map3dCoords } });
+                }
+                if (map3dSource) {
+                    map3dSource.setData({ type: 'Feature', geometry: { type: 'LineString', coordinates: map3dCoords } });
+                }
+
+                const first = map3dCoords[0];
+                const last = map3dCoords[map3dCoords.length - 1];
+                const activeMap = is3DMode ? map3d : map;
+                if (activeMap) {
+                    activeMap.fitBounds(
+                        map3dCoords.reduce(function(bounds, c) {
+                            return [
+                                [Math.min(bounds[0][0], c[0]), Math.min(bounds[0][1], c[1])],
+                                [Math.max(bounds[1][0], c[0]), Math.max(bounds[1][1], c[1])]
+                            ];
+                        }, [[first[0], first[1]], [first[0], first[1]]]),
+                        { padding: 40, duration: 600 }
+                    );
+                }
+
+                placeImportMarkers(map3dCoords);
+
+                document.getElementById('summaryModal').style.display = 'none';
+            } catch(err) {
+                alert('Failed to parse trip file: ' + err.message);
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    }
+
+
+
+    /* ===== POI OVERLAY (Road Closures, Mobile Patrols, Speed Cameras, EV Charging) ===== */
+    let isPoiOverlayOn = false;
+    let isPoiLoading = false; // prevents concurrent/overlapping fetch calls
+
+    // Marker storage: plain objects keyed by poiId, one per map instance
+    const poiMarkersMap2d = {};
+    const poiMarkersMap3d = {};
+
+    const poiTypeEnabled = {
+        road_closure: true,
+        mobile_patrol: true,
+        speed_camera: true,
+        ev_charging: true
+    };
+
+    const POI_TYPES = [
+        {
+            id: 'road_closure',
+            label: 'Road Closure',
+            emoji: '🚧',
+            color: '#ff6f00',
+            source: 'osm',
+            overpassQuery: function(bbox) {
+                return '[out:json][timeout:25];(' +
+                    'node["barrier"="block"](' + bbox + ');' +
+                    'node["barrier"="jersey_barrier"](' + bbox + ');' +
+                    'node["highway"="construction"](' + bbox + ');' +
+                    'way["highway"="construction"](' + bbox + ');' +
+                    'way["construction"~"."](' + bbox + ');' +
+                    ');out center qt;';
+            }
+        },
+        {
+            id: 'mobile_patrol',
+            label: 'Mobile Patrol',
+            emoji: '🚔',
+            color: '#1565c0',
+            source: 'waze'
+        },
+        {
+            id: 'speed_camera',
+            label: 'Speed Camera',
+            emoji: '📷',
+            color: '#c62828',
+            source: 'osm',
+            overpassQuery: function(bbox) {
+                return '[out:json][timeout:25];(' +
+                    'node["highway"="speed_camera"](' + bbox + ');' +
+                    'node["enforcement"="maxspeed"](' + bbox + ');' +
+                    'node["man_made"="speed_camera"](' + bbox + ');' +
+                    ');out center qt;';
+            }
+        },
+        {
+            id: 'ev_charging',
+            label: 'EV Charging',
+            emoji: '⚡',
+            color: '#2e7d32',
+            source: 'osm',
+            overpassQuery: function(bbox) {
+                return '[out:json][timeout:25];(' +
+                    'node["amenity"="charging_station"](' + bbox + ');' +
+                    'way["amenity"="charging_station"](' + bbox + ');' +
+                    ');out center qt;';
+            }
+        }
+    ];
+
+    function getPoiStore(targetMap) {
+        if (!targetMap) return null;
+        return (targetMap === map) ? poiMarkersMap2d : poiMarkersMap3d;
+    }
+
+    function createPoiMarkerElement(emoji, color) {
+        var el = document.createElement('div');
+        el.style.cssText = [
+            'width:28px', 'height:28px', 'border-radius:50%',
+            'background:' + color,
+            'border:2px solid #ffffff',
+            'box-shadow:0 0 0 2px rgba(0,0,0,0.2),0 2px 8px rgba(0,0,0,0.4)',
+            'display:flex', 'align-items:center', 'justify-content:center',
+            'font-size:14px', 'line-height:1',
+            'cursor:pointer', 'z-index:15'
+        ].join(';');
+        el.textContent = emoji;
+        return el;
+    }
+
+    async function fetchOsmPoi(poi, bbox) {
+        var query = poi.overpassQuery(bbox);
+        try {
+            var res = await fetch('https://overpass-api.de/api/interpreter', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'data=' + encodeURIComponent(query)
+            });
+            if (!res.ok) throw new Error('Overpass HTTP ' + res.status);
+            var data = await res.json();
+            return (data.elements || []).map(function(el) {
+                return {
+                    lat: el.lat !== undefined ? el.lat : (el.center ? el.center.lat : null),
+                    lon: el.lon !== undefined ? el.lon : (el.center ? el.center.lon : null),
+                    name: (el.tags && (el.tags.name || el.tags['name:en'] || el.tags.description)) || null
+                };
+            }).filter(function(p) { return p.lat !== null && p.lon !== null; });
+        } catch(e) {
+            console.warn('OSM POI fetch failed for ' + poi.id + ':', e);
+            return [];
+        }
+    }
+
+    async function fetchWazeMobilePatrols(bounds) {
+        var top    = bounds.getNorth().toFixed(5);
+        var bottom = bounds.getSouth().toFixed(5);
+        var left   = bounds.getWest().toFixed(5);
+        var right  = bounds.getEast().toFixed(5);
+        // Waze blocks direct browser requests (CORS). Route through corsproxy.io (free, no key).
+        var wazeUrl = 'https://www.waze.com/live-map/api/georss?top=' + top +
+                      '&bottom=' + bottom + '&left=' + left + '&right=' + right +
+                      '&env=row&types=alerts';
+        var proxied = 'https://corsproxy.io/?' + encodeURIComponent(wazeUrl);
+        try {
+            var res = await fetch(proxied);
+            if (!res.ok) throw new Error('Waze proxy HTTP ' + res.status);
+            var data = await res.json();
+            var alerts = data.alerts || [];
+            return alerts
+                .filter(function(a) {
+                    return a.type === 'POLICE' || (a.subtype && a.subtype.indexOf('POLICE') === 0);
+                })
+                .map(function(a) {
+                    return {
+                        lat: a.location ? a.location.y : null,
+                        lon: a.location ? a.location.x : null,
+                        name: a.subtype
+                            ? a.subtype.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, function(c) { return c.toUpperCase(); })
+                            : 'Mobile Patrol'
+                    };
+                })
+                .filter(function(p) { return p.lat !== null && p.lon !== null; });
+        } catch(e) {
+            console.warn('Waze mobile patrol fetch failed:', e);
+            return [];
+        }
+    }
+
+    async function fetchPointsForPoi(poi, refMap) {
+        var bounds = refMap.getBounds();
+        if (poi.source === 'waze') {
+            return await fetchWazeMobilePatrols(bounds);
+        }
+        var bbox = [
+            bounds.getSouth().toFixed(5),
+            bounds.getWest().toFixed(5),
+            bounds.getNorth().toFixed(5),
+            bounds.getEast().toFixed(5)
+        ].join(',');
+        return await fetchOsmPoi(poi, bbox);
+    }
+
+    function placePoiMarkersOnMap(targetMap, poi, points) {
+        if (!targetMap || !targetMap.isStyleLoaded()) return;
+        var store = getPoiStore(targetMap);
+        if (!store) return;
+        if (!store[poi.id]) store[poi.id] = [];
+        points.forEach(function(p) {
+            var markerEl = createPoiMarkerElement(poi.emoji, poi.color);
+            var popupHtml =
+                '<div style="font-family:\'JetBrains Mono\',monospace;font-size:0.75rem;' +
+                'font-weight:700;color:#0d0d12;padding:4px 6px;line-height:1.5;">' +
+                poi.emoji + ' ' + poi.label +
+                (p.name ? '<br><span style="font-weight:400;color:#444;">' + p.name + '</span>' : '') +
+                '</div>';
+            var popup = new maplibregl.Popup({ offset: 16, closeButton: true, closeOnClick: false })
+                .setHTML(popupHtml);
+            var marker = new maplibregl.Marker({ element: markerEl, anchor: 'center' })
+                .setLngLat([p.lon, p.lat])
+                .setPopup(popup)
+                .addTo(targetMap);
+            store[poi.id].push(marker);
+        });
+    }
+
+    function removePoiMarkersForType(targetMap, poiId) {
+        var store = getPoiStore(targetMap);
+        if (!store || !store[poiId]) return;
+        store[poiId].forEach(function(m) { m.remove(); });
+        store[poiId] = [];
+    }
+
+    function removeAllPoiMarkers(targetMap) {
+        if (!targetMap) return;
+        POI_TYPES.forEach(function(poi) { removePoiMarkersForType(targetMap, poi.id); });
+    }
+
+    function setPoiLoading(on) {
+        isPoiLoading = on;
+        var el = document.getElementById('poiLoadingLabel');
+        if (el) el.style.display = on ? 'block' : 'none';
+        // Disable/re-enable the button to give visual feedback and prevent double-click
+        var btn = document.getElementById('btnPoiOverlay');
+        if (btn) btn.disabled = on;
+    }
+
+    async function togglePoiType(poiId) {
+        if (!isPoiOverlayOn || isPoiLoading) return;
+
+        poiTypeEnabled[poiId] = !poiTypeEnabled[poiId];
+        var item = document.querySelector('.poi-panel-item[data-poi="' + poiId + '"]');
+        if (item) item.classList.toggle('active', poiTypeEnabled[poiId]);
+
+        if (poiTypeEnabled[poiId]) {
+            var poi = POI_TYPES.find(function(p) { return p.id === poiId; });
+            if (!poi) return;
+            setPoiLoading(true);
+            try {
+                // Use whichever map is visible as the reference for bounds
+                var refMap = (is3DMode && map3d && map3d.isStyleLoaded()) ? map3d : map;
+                var points = await fetchPointsForPoi(poi, refMap);
+                // Place on both maps so switching 2D/3D always shows markers
+                placePoiMarkersOnMap(map, poi, points);
+                if (map3d) placePoiMarkersOnMap(map3d, poi, points);
+            } finally {
+                setPoiLoading(false);
+            }
+        } else {
+            removePoiMarkersForType(map, poiId);
+            removePoiMarkersForType(map3d, poiId);
+        }
+    }
+
+    async function togglePoiOverlay() {
+        if (isPoiLoading) return; // block while fetching
+
+        var btn = document.getElementById('btnPoiOverlay');
+        var panel = document.getElementById('poiPanel');
+        isPoiOverlayOn = !isPoiOverlayOn;
+
+        if (isPoiOverlayOn) {
+            btn.classList.add('active');
+            panel.classList.add('visible');
+
+            // Use whichever map is currently visible/loaded as the reference for bounds
+            var refMap = (is3DMode && map3d && map3d.isStyleLoaded()) ? map3d : map;
+            if (!refMap || !refMap.isStyleLoaded()) return;
+
+            setPoiLoading(true);
+            try {
+                for (var i = 0; i < POI_TYPES.length; i++) {
+                    var poi = POI_TYPES[i];
+                    if (!poiTypeEnabled[poi.id]) continue;
+                    var points = await fetchPointsForPoi(poi, refMap);
+                    placePoiMarkersOnMap(map, poi, points);
+                    if (map3d) placePoiMarkersOnMap(map3d, poi, points);
+                }
+            } finally {
+                setPoiLoading(false);
+            }
+        } else {
+            btn.classList.remove('active');
+            panel.classList.remove('visible');
+            removeAllPoiMarkers(map);
+            removeAllPoiMarkers(map3d);
+        }
+    }
 
     function toggleMapFullscreen() {
         isMapFullscreen = !isMapFullscreen;
@@ -2013,7 +2616,7 @@
             btn.classList.remove('active');
             btn.title = 'Toggle Fullscreen Map';
         }
-        // Resize maps after layout change
+
         setTimeout(function() {
             if (map) map.resize();
             if (map3d) map3d.resize();
@@ -2097,11 +2700,17 @@
             var heading = document.querySelector('.map-heading-btn');
             var zoomGroup = document.querySelector('.map-zoom-group');
             var fullscreen = document.querySelector('.map-fullscreen-btn');
+            var weather = document.querySelector('.map-weather-btn');
+            var poi = document.querySelector('.map-poi-btn');
+            var poiLegend = document.querySelector('.poi-panel');
             var hidden = height < 50;
             if (toggle) toggle.style.display = hidden ? 'none' : '';
             if (heading) heading.style.display = hidden ? 'none' : '';
             if (zoomGroup) zoomGroup.style.display = hidden ? 'none' : '';
             if (fullscreen) fullscreen.style.display = hidden ? 'none' : '';
+            if (weather) weather.style.display = hidden ? 'none' : '';
+            if (poi) poi.style.display = hidden ? 'none' : '';
+            if (poiLegend && hidden) poiLegend.classList.remove('visible');
         }
         window.addEventListener('DOMContentLoaded', function() {
             var wrapper = document.querySelector('.map-wrapper');
@@ -2117,8 +2726,6 @@
     })();
 </script>
 <script>
-    // Stack the battery progress bar and range sections on their own full-width row
-    // when the battery-range-group available width < 200px
     (function() {
         window.addEventListener('DOMContentLoaded', function() {
             var batteryGroup = document.querySelector('.battery-range-group');
