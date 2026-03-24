@@ -977,22 +977,22 @@
             <button class="map-poi-btn" id="btnPoiOverlay" onclick="togglePoiOverlay()" title="Toggle Points of Interest">📍</button>
             <div class="poi-panel" id="poiPanel">
                 <div class="poi-panel-title">POI Layers</div>
-                <div class="poi-panel-item active" data-poi="road_closure" onclick="togglePoiType('road_closure')">
+                <div class="poi-panel-item" data-poi="road_closure" onclick="togglePoiType('road_closure')">
                     <span class="poi-panel-emoji">🚧</span>
                     <span class="poi-panel-label">Road Closures</span>
                     <span class="poi-panel-check"></span>
                 </div>
-                <div class="poi-panel-item active" data-poi="mobile_patrol" onclick="togglePoiType('mobile_patrol')">
+                <div class="poi-panel-item" data-poi="mobile_patrol" onclick="togglePoiType('mobile_patrol')">
                     <span class="poi-panel-emoji">🚔</span>
                     <span class="poi-panel-label">Mobile Patrols</span>
                     <span class="poi-panel-check"></span>
                 </div>
-                <div class="poi-panel-item active" data-poi="speed_camera" onclick="togglePoiType('speed_camera')">
+                <div class="poi-panel-item" data-poi="speed_camera" onclick="togglePoiType('speed_camera')">
                     <span class="poi-panel-emoji">📷</span>
                     <span class="poi-panel-label">Speed Cameras</span>
                     <span class="poi-panel-check"></span>
                 </div>
-                <div class="poi-panel-item active" data-poi="ev_charging" onclick="togglePoiType('ev_charging')">
+                <div class="poi-panel-item" data-poi="ev_charging" onclick="togglePoiType('ev_charging')">
                     <span class="poi-panel-emoji">⚡</span>
                     <span class="poi-panel-label">EV Charging</span>
                     <span class="poi-panel-check"></span>
@@ -2387,10 +2387,10 @@
     const poiMarkersMap3d = {};
 
     const poiTypeEnabled = {
-        road_closure: true,
-        mobile_patrol: true,
-        speed_camera: true,
-        ev_charging: true
+        road_closure: false,
+        mobile_patrol: false,
+        speed_camera: false,
+        ev_charging: false
     };
 
     const POI_TYPES = [
