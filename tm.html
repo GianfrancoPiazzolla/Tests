@@ -451,7 +451,7 @@
             min-height: 0;
         }
         .map-heading-btn {
-            position: absolute; top: 10px; right: 174px; z-index: 10;
+            position: absolute; top: 10px; right: 170px; z-index: 10;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             color: var(--text-color);
@@ -968,13 +968,13 @@
             <div id="map3d"></div>
             <div class="map-zoom-group" id="mapZoomGroup">
                 <button class="map-zoom-btn" onclick="mapZoomOut()" title="Zoom Out">−</button>
-                <button class="map-zoom-btn" onclick="mapCenterOnGPS()" title="Center on current GPS position">⊕</button>
+                <button class="map-zoom-btn" onclick="mapCenterOnGPS()" title="Center on current GPS position">🎯</button>
                 <button class="map-zoom-btn" onclick="mapZoomIn()" title="Zoom In">+</button>
             </div>
-            <button class="map-heading-btn" id="btnHeadingToggle" onclick="toggleHeadingMode()" title="Toggle North Up / Heading Up">▲</button>
-            <button class="map3d-toggle-btn" id="btn3DToggle" onclick="toggle3DMap()" title="Toggle 3D Map">3D</button>
-            <button class="map-weather-btn" id="btnWeatherOverlay" onclick="toggleWeatherOverlay()" title="Toggle Weather Overlay">🌧</button>
-            <button class="map-poi-btn" id="btnPoiOverlay" onclick="togglePoiOverlay()" title="Toggle Points of Interest">📍</button>
+            <button class="map-heading-btn" id="btnHeadingToggle" onclick="toggleHeadingMode()" title="Toggle North Up / Heading Up">🔺</button>
+            <button class="map3d-toggle-btn" id="btn3DToggle" onclick="toggle3DMap()" title="Toggle 3D Map">🛣️</button>
+            <button class="map-weather-btn" id="btnWeatherOverlay" onclick="toggleWeatherOverlay()" title="Toggle Weather Overlay">⛈️</button>
+            <button class="map-poi-btn" id="btnPoiOverlay" onclick="togglePoiOverlay()" title="Toggle Points of Interest">📌</button>
             <div class="poi-panel" id="poiPanel">
                 <div class="poi-panel-title">POI Layers</div>
                 <div class="poi-panel-item" data-poi="road_closure" onclick="togglePoiType('road_closure')">
@@ -999,7 +999,7 @@
                 </div>
                 <div class="poi-panel-loading" id="poiLoadingLabel" style="display:none;">Fetching data…</div>
             </div>
-            <button class="map-fullscreen-btn" id="btnFullscreen" onclick="toggleMapFullscreen()" title="Toggle Fullscreen Map">⛶</button>
+            <button class="map-fullscreen-btn" id="btnFullscreen" onclick="toggleMapFullscreen()" title="Toggle Fullscreen Map">🖥️</button>
         </div>
 
         <div class="charts-panel">
@@ -1223,8 +1223,8 @@
 
         container.innerHTML = keys.map(name => {
             const p = profiles[name];
-            const modeLabel = p.is3DMode ? '3D' : '2D';
-            const headingLabel = p.isHeadingUp ? '▲' : 'N';
+            const modeLabel = p.is3DMode ? '🛣️' : '🗺️';
+            const headingLabel = p.isHeadingUp ? '🔺' : '🧭';
             const weatherOverlayLabel = p.isWeatherOverlayOn ? 'On' : 'Off';
             return `
             <div class="profile-item">
@@ -1724,14 +1724,15 @@
         });
     }
 
-    function toggle3DMap() {        const btn = document.getElementById('btn3DToggle');
+    function toggle3DMap() {
+        const btn = document.getElementById('btn3DToggle');
         const map3dEl = document.getElementById('map3d');
         const mapEl = document.getElementById('map');
         const center = map.getCenter();
 
         if (!is3DMode) {
             is3DMode = true;
-            btn.textContent = '2D';
+            btn.textContent = '🗺️';
             btn.classList.add('active');
             mapEl.style.display = 'none';
             map3dEl.style.display = 'block';
@@ -1761,7 +1762,7 @@
             removeWeatherOverlayFromMap(map);
         } else {
             is3DMode = false;
-            btn.textContent = '3D';
+            btn.textContent = '🛣️';
             btn.classList.remove('active');
             map3dEl.style.display = 'none';
             mapEl.style.display = 'block';
@@ -1800,13 +1801,13 @@
         const btn = document.getElementById('btnHeadingToggle');
         isHeadingUp = !isHeadingUp;
         if (isHeadingUp) {
-            btn.textContent = 'N';
+            btn.textContent = '🧭';
             btn.classList.add('active');
 
             const activeMap = is3DMode ? map3d : map;
             if (activeMap) activeMap.easeTo({ bearing: lastHeading, duration: 400 });
         } else {
-            btn.textContent = '▲';
+            btn.textContent = '🔺';
             btn.classList.remove('active');
 
             const activeMap = is3DMode ? map3d : map;
@@ -2592,7 +2593,7 @@
         var el = document.getElementById('poiLoadingLabel');
         if (el) {
             if (on) {
-                el.textContent = rateLimit ? 'Server fetching delay' : 'Fetching data…';
+                el.textContent = rateLimit ? '⛔ Server fetching delay!' : '⌛ Fetching data…';
                 el.style.display = 'block';
             } else {
                 el.style.display = 'none';
