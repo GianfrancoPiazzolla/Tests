@@ -1029,7 +1029,7 @@
         </div>
         <div style="display:flex; flex-direction:column;">
             <label>Electricity Price (€/kWh)</label>
-            <input type="number" id="elecPrice" value="0.30" step="0.01" min="0.01" max="2.00" style="font-size:13px !important; padding:6px 8px;">
+            <input type="number" id="elecPrice" value="0.30" step="0.01" min="0.01" max="2.00">
         </div>
         <div style="display:flex; flex-direction:column;">
             <label>GPS Polling (s)</label>
@@ -1192,7 +1192,7 @@
             </div>
 
             <!-- ENERGY BALANCE -->
-            <div class="chart-container short" style="height:170px;">
+            <div class="chart-container short" style="height:160px;">
                 <div class="chart-header">
                     <span class="chart-title">Energy Balance</span>
                     <span class="chart-badge energy">Wh</span>
@@ -1217,7 +1217,7 @@
             </div>
 
             <!-- POWER BREAKDOWN BARS -->
-            <div class="chart-container short" style="height:150px;">
+            <div class="chart-container short" style="height:160px;">
                 <div class="chart-header">
                     <span class="chart-title">Power Breakdown</span>
                     <span class="chart-badge power">Live</span>
@@ -1250,8 +1250,45 @@
                 </div>
             </div>
 
+            <!-- ENERGY FLOW DASHBOARD -->
+            <div class="energy-flow-card"  style="height:160px;">
+                <div class="chart-header">
+                    <span class="chart-title">Energy Flow</span>
+                    <span class="chart-badge regen">Live</span>
+                </div>
+                <svg class="energy-flow-svg" id="energyFlowSvg" viewBox="0 0 400 120"></svg>
+            </div>
+
+            <!-- DRIVING STYLE ANALYZER -->
+            <div class="driving-style-card" style="height:160px;">
+                <div class="chart-header">
+                    <span class="chart-title">Driving Style</span>
+                    <span class="chart-badge speed" id="dsBadge">--</span>
+                </div>
+                <div class="ds-gauge-wrap">
+                    <svg class="ds-gauge-svg" id="dsGaugeSvg" viewBox="0 0 100 60"></svg>
+                    <div class="ds-scores">
+                        <div class="ds-score-row">
+                            <span class="ds-score-label">Accel</span>
+                            <div class="ds-score-bar-bg"><div class="ds-score-bar-fill accel" id="dsAccelBar" style="width:100%"></div></div>
+                            <span class="ds-score-val" id="dsAccelVal">100</span>
+                        </div>
+                        <div class="ds-score-row">
+                            <span class="ds-score-label">Brake</span>
+                            <div class="ds-score-bar-bg"><div class="ds-score-bar-fill brake" id="dsBrakeBar" style="width:100%"></div></div>
+                            <span class="ds-score-val" id="dsBrakeVal">100</span>
+                        </div>
+                        <div class="ds-score-row">
+                            <span class="ds-score-label">Smooth</span>
+                            <div class="ds-score-bar-bg"><div class="ds-score-bar-fill smooth" id="dsSmoothBar" style="width:100%"></div></div>
+                            <span class="ds-score-val" id="dsSmoothVal">100</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- WEATHER PANEL -->
-            <div class="chart-container" style="height:150px;">
+            <div class="chart-container" style="height:160px;">
                 <div class="chart-header">
                     <span class="chart-title">Weather Condition</span>
                     <span class="chart-badge weather">Live</span>
@@ -1294,45 +1331,8 @@
                 </div>
             </div>
 
-            <!-- ENERGY FLOW DASHBOARD -->
-            <div class="energy-flow-card">
-                <div class="chart-header">
-                    <span class="chart-title">Energy Flow</span>
-                    <span class="chart-badge regen">Live</span>
-                </div>
-                <svg class="energy-flow-svg" id="energyFlowSvg" viewBox="0 0 400 120"></svg>
-            </div>
-
-            <!-- DRIVING STYLE ANALYZER -->
-            <div class="driving-style-card">
-                <div class="chart-header">
-                    <span class="chart-title">Driving Style</span>
-                    <span class="chart-badge speed" id="dsBadge">--</span>
-                </div>
-                <div class="ds-gauge-wrap">
-                    <svg class="ds-gauge-svg" id="dsGaugeSvg" viewBox="0 0 100 60"></svg>
-                    <div class="ds-scores">
-                        <div class="ds-score-row">
-                            <span class="ds-score-label">Accel</span>
-                            <div class="ds-score-bar-bg"><div class="ds-score-bar-fill accel" id="dsAccelBar" style="width:100%"></div></div>
-                            <span class="ds-score-val" id="dsAccelVal">100</span>
-                        </div>
-                        <div class="ds-score-row">
-                            <span class="ds-score-label">Brake</span>
-                            <div class="ds-score-bar-bg"><div class="ds-score-bar-fill brake" id="dsBrakeBar" style="width:100%"></div></div>
-                            <span class="ds-score-val" id="dsBrakeVal">100</span>
-                        </div>
-                        <div class="ds-score-row">
-                            <span class="ds-score-label">Smooth</span>
-                            <div class="ds-score-bar-bg"><div class="ds-score-bar-fill smooth" id="dsSmoothBar" style="width:100%"></div></div>
-                            <span class="ds-score-val" id="dsSmoothVal">100</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- CHARGING STATIONS -->
-            <div class="charging-stations-card">
+            <div class="charging-stations-card" style="height:160px;">
                 <div class="chart-header" onclick="toggleChargingStations()">
                     <span class="chart-title">⚡ Nearby Chargers</span>
                     <span class="chart-badge energy" id="csCount">0</span>
