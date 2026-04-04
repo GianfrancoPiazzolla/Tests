@@ -1249,17 +1249,17 @@
                         <div class="ds-score-row">
                             <span class="ds-score-label">Acceleration Bias</span>
                             <div class="ds-score-bar-bg"><div class="ds-score-bar-fill accel" id="dsAccelBar" style="width:100%"></div></div>
-                            <span class="ds-score-val" id="dsAccelVal">100</span>
+                            <span class="ds-score-val" id="dsAccelVal">100/100</span>
                         </div>
                         <div class="ds-score-row">
                             <span class="ds-score-label">Braking Bias</span>
                             <div class="ds-score-bar-bg"><div class="ds-score-bar-fill brake" id="dsBrakeBar" style="width:100%"></div></div>
-                            <span class="ds-score-val" id="dsBrakeVal">100</span>
+                            <span class="ds-score-val" id="dsBrakeVal">100/100</span>
                         </div>
                         <div class="ds-score-row">
                             <span class="ds-score-label">Smoothness Bias</span>
                             <div class="ds-score-bar-bg"><div class="ds-score-bar-fill smooth" id="dsSmoothBar" style="width:100%"></div></div>
-                            <span class="ds-score-val" id="dsSmoothVal">100</span>
+                            <span class="ds-score-val" id="dsSmoothVal">100/100</span>
                         </div>
                     </div>
                 </div>
@@ -3489,9 +3489,9 @@
         const accelVal = document.getElementById('dsAccelVal');
         const brakeVal = document.getElementById('dsBrakeVal');
         const smoothVal = document.getElementById('dsSmoothVal');
-        if (accelVal) accelVal.textContent = accelPct;
-        if (brakeVal) brakeVal.textContent = brakePct;
-        if (smoothVal) smoothVal.textContent = smoothPct;
+        if (accelVal) accelVal.textContent = accelPct + '/100';
+        if (brakeVal) brakeVal.textContent = brakePct + '/100';
+        if (smoothVal) smoothVal.textContent = smoothPct + '/100';
 
         // Update badge
         const badge = document.getElementById('dsBadge');
@@ -3557,9 +3557,9 @@
         const accelVal = document.getElementById('dsAccelVal');
         const brakeVal = document.getElementById('dsBrakeVal');
         const smoothVal = document.getElementById('dsSmoothVal');
-        if (accelVal) accelVal.textContent = '100';
-        if (brakeVal) brakeVal.textContent = '100';
-        if (smoothVal) smoothVal.textContent = '100';
+        if (accelVal) accelVal.textContent = '100/100';
+        if (brakeVal) brakeVal.textContent = '100/100';
+        if (smoothVal) smoothVal.textContent = '100/100';
         updateDrivingGauge(100);
     }
 
