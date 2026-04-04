@@ -902,50 +902,16 @@
         .ds-score-bar-fill.smooth { background: linear-gradient(90deg, #00e676, #69f0ae); }
         .ds-score-val { font-size: 0.65rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; width: 28px; text-align: right; }
 
-        /* === CHARGING STATIONS PANEL === */
-        .charging-stations-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--card-shadow);
-            flex-shrink: 0;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .charging-stations-card .chart-header { padding: 5px 8px 4px; cursor: pointer; }
-        .cs-list { padding: 4px 8px 8px; }
-        .cs-item {
-            display: flex; align-items: center; gap: 8px;
-            padding: 5px 6px; border-radius: 6px;
-            cursor: pointer; transition: background 0.15s ease;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .cs-item:hover { background: var(--input-bg); }
-        .cs-icon { font-size: 1rem; width: 22px; text-align: center; }
-        .cs-info { flex: 1; }
-        .cs-name { font-size: 0.7rem; font-weight: 700; color: var(--text-color); }
-        .cs-detail { font-size: 0.58rem; color: var(--label-color); }
-        .cs-dist { font-size: 0.65rem; font-weight: 700; color: var(--secondary); white-space: nowrap; }
-        .cs-empty { text-align: center; color: var(--label-color); font-size: 0.7rem; font-style: italic; padding: 12px 0; font-family: 'JetBrains Mono', monospace; }
-        .cs-toggle-btn {
-            background: var(--input-bg); border: 1px solid var(--border-color);
-            color: var(--text-color); border-radius: 6px; padding: 3px 8px;
-            cursor: pointer; font-size: 0.6rem; font-family: 'JetBrains Mono', monospace;
-            font-weight: 700; transition: all 0.15s ease;
-        }
-        .cs-toggle-btn:hover { background: var(--border-color); }
-        .cs-toggle-btn.active { background: var(--primary); color: #000; border-color: var(--primary); }
-
         /* === CONFIG: Electricity Price === */
         .config-grid .elec-price-wrap { display: flex; flex-direction: column; }
 
         /* === RESPONSIVE: new cards === */
         @media (max-width: 1300px) {
-            .energy-flow-card, .driving-style-card, .charging-stations-card { width: calc(50% - 4px); flex: none; }
+            .energy-flow-card, .driving-style-card { width: calc(50% - 4px); flex: none; }
             .cost-meter-card { width: 100%; }
         }
         @media (max-width: 800px) {
-            .energy-flow-card, .driving-style-card, .charging-stations-card { width: 100%; }
+            .energy-flow-card, .driving-style-card { width: 100%; }
         }
     </style>
 </head>
@@ -1331,17 +1297,6 @@
                 </div>
             </div>
 
-            <!-- CHARGING STATIONS -->
-            <div class="charging-stations-card" style="height:160px;">
-                <div class="chart-header" onclick="toggleChargingStations()">
-                    <span class="chart-title">⚡ Nearby Chargers</span>
-                    <span class="chart-badge energy" id="csCount">0</span>
-                </div>
-                <div class="cs-list" id="csList">
-                    <div class="cs-empty">Start a trip to find nearby chargers</div>
-                </div>
-            </div>
-
         </div>
     </div>
 
@@ -1375,13 +1330,9 @@
     let powerBreakdown = { drag: 0, gravity: 0, aero: 0, regen: 0, samples: 0 };
     let prevWeather = { temp: null, min: null, max: null, hum: null, windSpd: null, press: null };
 
-    /* ===== NEW STATE: Energy Flow, Driving Style, Cost Meter, Charging Stations ===== */
+    /* ===== NEW STATE: Energy Flow, Driving Style, Cost Meter ===== */
     let energyFlowAnim = null;
     let drivingStyle = { accelScore: 100, brakeScore: 100, smoothScore: 100, accelEvents: 0, brakeEvents: 0, speedVarSum: 0, speedSamples: 0, lastSpeedForAccel: 0 };
-    let chargingStations = [];
-    let chargingStationsVisible = false;
-    let csMarkers2d = [];
-    let csMarkers3d = [];
 
     function initializeSystem() {
         setupMap();
@@ -2532,11 +2483,6 @@
                 const distKmVal = totalDistance / 1000;
                 updateNewFeatures(lastSpeedKmh, instantCons, distKmVal, lastInstantPowerW);
 
-                // Fetch charging stations on first GPS fix
-                if (map3dCoords.length === 1) {
-                    fetchNearbyChargingStations(latitude, longitude);
-                }
-
                 if (isPoiOverlayOn && !isPoiLoading) {
                     var distFromLastPoi = lastPoiRefreshPoint
                         ? computeDistance(lastPoiRefreshPoint.lat, lastPoiRefreshPoint.lon, latitude, longitude)
@@ -3623,208 +3569,6 @@
         }
         if (perKmEl) perKmEl.textContent = '€' + costPerKm.toFixed(3);
         if (iceCostEl) iceCostEl.textContent = '€' + iceCostForDistance.toFixed(2);
-    }
-
-    /* ===== FEATURE 5: CHARGING STATION FINDER (Overpass API) ===== */
-    
-    // Helper: compute bounding box from center + radius (degrees)
-    function computeBBox(lat, lon, radiusM) {
-        var dLat = (radiusM / 6371000) * (180 / Math.PI);
-        var dLon = (radiusM / 6371000) * (180 / Math.PI) / Math.cos(lat * Math.PI / 180);
-        return [
-            (lat - dLat).toFixed(5),
-            (lon - dLon).toFixed(5),
-            (lat + dLat).toFixed(5),
-            (lon + dLon).toFixed(5)
-        ].join(',');
-    }
-
-    // Parse OSM tags into connector info
-    function parseChargingConnectors(tags) {
-        var connectors = [];
-        var num = parseInt(tags.socket_type_count || tags.socket_count || '0') || 0;
-        for (var i = 1; i <= num; i++) {
-            var type = tags['socket_type_' + i] || tags['socket_' + i] || 'Unknown';
-            var power = parseFloat(tags['socket_' + i + '_max_power'] || tags['socket_' + i + '_output_power'] || '0');
-            connectors.push({ type: type, power: power, level: '' });
-        }
-        // Fallback: try to detect from common OSM tags
-        if (connectors.length === 0) {
-            if (tags.amenity === 'charging_station') {
-                if (tags.operator) connectors.push({ type: tags.operator + ' Station', power: 0, level: '' });
-                else connectors.push({ type: 'Charging Station', power: 0, level: '' });
-            }
-            // Detect individual socket types
-            var socketTypes = ['type2', 'ccs', 'chademo', 'type3', 'schuko', 'tesla'];
-            for (var j = 0; j < socketTypes.length; j++) {
-                var key = 'socket:' + socketTypes[j];
-                if (tags[key] === 'yes' || tags[key] === 'limited') {
-                    var pwr = parseFloat(tags[key + ':output'] || tags[key + ':max_power'] || '0');
-                    connectors.push({ type: socketTypes[j].toUpperCase(), power: pwr, level: '' });
-                }
-            }
-        }
-        return connectors;
-    }
-
-    // Fetch charging stations from Overpass API (same API used for POI)
-    async function fetchNearbyChargingStations(lat, lon) {
-        var radius = 15000; // 15km radius
-        var bbox = computeBBox(lat, lon, radius);
-        
-        // Overpass QL query: find all charging stations and charge points
-        var query = '[out:json][timeout:25];(' +
-            'node["amenity"="charging_station"](' + bbox + ');' +
-            'way["amenity"="charging_station"](' + bbox + ');' +
-            'node["man_made"="charge_point"](' + bbox + ');' +
-            'way["man_made"="charge_point"](' + bbox + ');' +
-            ');out center qt;';
-        
-        try {
-            var response = await fetch('https://overpass-api.de/api/interpreter', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'data=' + encodeURIComponent(query)
-            });
-            
-            if (!response.ok) {
-                console.warn('Overpass API error:', response.status);
-                return;
-            }
-            
-            var data = await response.json();
-            
-            chargingStations = (data.elements || [])
-                .filter(function(el) { return el.lat || (el.center && el.center.lat); })
-                .map(function(el) {
-                    var tags = el.tags || {};
-                    var elLat = el.lat || (el.center ? el.center.lat : 0);
-                    var elLon = el.lon || (el.center ? el.center.lon : 0);
-                    return {
-                        id: 'osm_' + el.id,
-                        name: (tags.name || tags.operator || 'Charging Station').substring(0, 40),
-                        lat: elLat,
-                        lon: elLon,
-                        connectors: parseChargingConnectors(tags),
-                        distance: computeDistance(lat, lon, elLat, elLon),
-                        operator: tags.operator || '',
-                        fee: tags.fee || '',
-                        access: tags.access || '',
-                        capacity: tags.capacity || ''
-                    };
-                })
-                .filter(function(s) { return s.lat && s.lon; })
-                .sort(function(a, b) { return a.distance - b.distance; })
-                .slice(0, 10);
-            
-            renderChargingStations();
-            placeChargingStationMarkers();
-        } catch (e) {
-            console.warn('Charging station fetch failed:', e);
-        }
-    }
-
-    function renderChargingStations() {
-        var list = document.getElementById('csList');
-        var count = document.getElementById('csCount');
-        if (!list) return;
-
-        if (chargingStations.length === 0) {
-            list.innerHTML = '<div class="cs-empty">No charging stations found nearby</div>';
-            if (count) count.textContent = '0';
-            return;
-        }
-
-        // Auto-show the list when stations are found
-        chargingStationsVisible = true;
-        if (list) list.style.display = 'block';
-        
-        if (count) count.textContent = chargingStations.length;
-
-        list.innerHTML = chargingStations.map(function(cs, i) {
-            var dist = (cs.distance / 1000).toFixed(1);
-            var topConnector = cs.connectors && cs.connectors[0];
-            var connectorInfo = topConnector ? 
-                (topConnector.type + (topConnector.power > 0 ? ' ' + topConnector.power + 'kW' : '')) : 
-                'Charging Point';
-            var operatorInfo = cs.operator ? ' · ' + cs.operator : '';
-            var feeInfo = cs.fee ? ' · ' + cs.fee : '';
-            var accessInfo = cs.access === 'private' ? ' 🔒' : '';
-
-            return '<div class="cs-item" onclick="flyToChargingStation(' + i + ')" title="Click to navigate">' +
-                '<span class="cs-icon">⚡</span>' +
-                '<div class="cs-info">' +
-                    '<div class="cs-name">' + escapeHtml(cs.name) + accessInfo + '</div>' +
-                    '<div class="cs-detail">' + escapeHtml(connectorInfo) + operatorInfo + feeInfo + '</div>' +
-                '</div>' +
-                '<span class="cs-dist">' + dist + ' km</span>' +
-            '</div>';
-        }).join('');
-    }
-
-    function flyToChargingStation(index) {
-        const cs = chargingStations[index];
-        if (!cs || !map) return;
-
-        const activeMap = is3DMode ? map3d : map;
-        if (activeMap) {
-            activeMap.easeTo({ center: [cs.lon, cs.lat], zoom: 16, duration: 800 });
-        }
-    }
-
-    function placeChargingStationMarkers() {
-        // Clear existing markers
-        csMarkers2d.forEach(m => m.remove());
-        csMarkers3d.forEach(m => m.remove());
-        csMarkers2d = [];
-        csMarkers3d = [];
-
-        if (!map) return;
-
-        chargingStations.forEach(cs => {
-            const el = document.createElement('div');
-            el.style.cssText = 'width:24px;height:24px;border-radius:50%;background:#2e7d32;border:2px solid #fff;box-shadow:0 0 0 2px rgba(46,125,50,0.4),0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;z-index:10;';
-            el.textContent = '⚡';
-
-            const popup = new maplibregl.Popup({ offset: 12, closeButton: true, closeOnClick: false })
-                .setHTML(`<div style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;font-weight:700;color:#0d0d12;padding:4px 6px;line-height:1.5;">⚡ ${cs.name}<br><span style="font-weight:400;color:#444;">${(cs.distance / 1000).toFixed(1)} km away</span></div>`);
-
-            const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
-                .setLngLat([cs.lon, cs.lat])
-                .setPopup(popup)
-                .addTo(map);
-
-            csMarkers2d.push(marker);
-
-            if (map3d) {
-                const el3 = el.cloneNode(true);
-                const marker3 = new maplibregl.Marker({ element: el3, anchor: 'center' })
-                    .setLngLat([cs.lon, cs.lat])
-                    .setPopup(popup)
-                    .addTo(map3d);
-                csMarkers3d.push(marker3);
-            }
-        });
-    }
-
-    function toggleChargingStations() {
-        chargingStationsVisible = !chargingStationsVisible;
-        const list = document.getElementById('csList');
-        if (list) {
-            list.style.display = chargingStationsVisible ? 'block' : 'none';
-        }
-    }
-
-    function resetChargingStations() {
-        chargingStations = [];
-        csMarkers2d.forEach(m => m.remove());
-        csMarkers3d.forEach(m => m.remove());
-        csMarkers2d = [];
-        csMarkers3d = [];
-        const list = document.getElementById('csList');
-        if (list) list.innerHTML = '<div class="cs-empty">Start a trip to find nearby chargers</div>';
-        const count = document.getElementById('csCount');
-        if (count) count.textContent = '0';
     }
 
     /* ===== INTEGRATION: Call new features from existing updateLocation ===== */
