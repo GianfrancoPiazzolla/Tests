@@ -1062,33 +1062,33 @@
     <div class="cost-meter-card">
         <div class="cm-section">
             <div class="cm-label">Trip Cost</div>
-            <div class="cm-value spent" id="cmSpent">€0.00</div>
+            <div class="cm-value spent" id="cmSpent">0.00 €</div>
         </div>
         <div class="cm-divider"></div>
         <div class="cm-section">
             <div class="cm-label">vs ICE Saved</div>
-            <div class="cm-value saved" id="cmSaved">€0.00</div>
+            <div class="cm-value saved" id="cmSaved">0.00 €</div>
         </div>
         <div class="cm-divider"></div>
         <div class="cm-section">
             <div class="cm-label">€/Km</div>
-            <div class="cm-value perkm" id="cmPerKm">€0.000</div>
+            <div class="cm-value perkm" id="cmPerKm">0.000 €</div>
         </div>
         <div class="cm-divider"></div>
         <div class="cm-section">
             <div class="cm-label">ICE Cost</div>
-            <div class="cm-value" id="cmIceCost" style="color:var(--label-color)">€0.00</div>
+            <div class="cm-value" id="cmIceCost" style="color:var(--label-color)">0.00 €</div>
         </div>
         <div class="cm-divider"></div>
         <div class="cm-section">
             <div class="cm-label">Diesel Price</div>
-            <div class="cm-value" id="cmDieselPrice" style="color:var(--label-color); font-size: 0.82rem;">€1.800</div>
+            <div class="cm-value" id="cmDieselPrice" style="color:var(--label-color); font-size: 0.82rem;">-- €</div>
             <div style="font-size: 0.52rem; color: var(--label-color); margin-top: 2px; font-family: 'JetBrains Mono', monospace;" id="cmDieselStatus">loading...</div>
         </div>
         <div class="cm-divider"></div>
         <div class="cm-section">
             <div class="cm-label">ICE Efficiency</div>
-            <div class="cm-value" id="cmIceEfficiency" style="color:var(--label-color); font-size: 0.82rem;">17.2 Km/L</div>
+            <div class="cm-value" id="cmIceEfficiency" style="color:var(--label-color); font-size: 0.82rem;">-- Km/L</div>
             <div style="font-size: 0.52rem; color: var(--label-color); margin-top: 2px; font-family: 'JetBrains Mono', monospace;" id="cmIceEfficiencyStatus">loading...</div>
         </div>
     </div>
@@ -3580,7 +3580,7 @@
                 const parsed = JSON.parse(cached);
                 if (Date.now() - parsed.timestamp < CACHE_TTL) {
                     iceFuelPrice = parsed.price;
-                    if (priceEl) priceEl.textContent = '€' + iceFuelPrice.toFixed(3);
+                    if (priceEl) priceEl.textContent = iceFuelPrice.toFixed(3) + ' €';
                     if (statusEl) statusEl.textContent = 'cached';
                     updateCostMeter();
                     iceFuelPriceLoading = false;
@@ -3694,13 +3694,13 @@
         const perKmEl = document.getElementById('cmPerKm');
         const iceCostEl = document.getElementById('cmIceCost');
 
-        if (spentEl) spentEl.textContent = '€' + tripCost.toFixed(2);
+        if (spentEl) spentEl.textContent = tripCost.toFixed(2) + ' €';
         if (savedEl) {
-            savedEl.textContent = '€' + Math.max(0, saved).toFixed(2);
+            savedEl.textContent = Math.max(0, saved).toFixed(2) + ' €';
             savedEl.style.color = saved >= 0 ? 'var(--primary)' : 'var(--danger)';
         }
-        if (perKmEl) perKmEl.textContent = '€' + costPerKm.toFixed(3);
-        if (iceCostEl) iceCostEl.textContent = '€' + iceCostForDistance.toFixed(2);
+        if (perKmEl) perKmEl.textContent = costPerKm.toFixed(3) + ' €';
+        if (iceCostEl) iceCostEl.textContent = iceCostForDistance.toFixed(2) + ' €';
     }
 
     /* ===== INTEGRATION: Call new features from existing updateLocation ===== */
