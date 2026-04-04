@@ -3625,43 +3625,108 @@
         if (iceCostEl) iceCostEl.textContent = '€' + iceCostForDistance.toFixed(2);
     }
 
-    /* ===== FEATURE 5: CHARGING STATION FINDER (OpenChargeMap API) ===== */
+    /* ===== FEATURE 5: CHARGING STATION FINDER (Overpass API) ===== */
+    
+    // Helper: compute bounding box from center + radius (degrees)
+    function computeBBox(lat, lon, radiusM) {
+        var dLat = (radiusM / 6371000) * (180 / Math.PI);
+        var dLon = (radiusM / 6371000) * (180 / Math.PI) / Math.cos(lat * Math.PI / 180);
+        return [
+            (lat - dLat).toFixed(5),
+            (lon - dLon).toFixed(5),
+            (lat + dLat).toFixed(5),
+            (lon + dLon).toFixed(5)
+        ].join(',');
+    }
+
+    // Parse OSM tags into connector info
+    function parseChargingConnectors(tags) {
+        var connectors = [];
+        var num = parseInt(tags.socket_type_count || tags.socket_count || '0') || 0;
+        for (var i = 1; i <= num; i++) {
+            var type = tags['socket_type_' + i] || tags['socket_' + i] || 'Unknown';
+            var power = parseFloat(tags['socket_' + i + '_max_power'] || tags['socket_' + i + '_output_power'] || '0');
+            connectors.push({ type: type, power: power, level: '' });
+        }
+        // Fallback: try to detect from common OSM tags
+        if (connectors.length === 0) {
+            if (tags.amenity === 'charging_station') {
+                if (tags.operator) connectors.push({ type: tags.operator + ' Station', power: 0, level: '' });
+                else connectors.push({ type: 'Charging Station', power: 0, level: '' });
+            }
+            // Detect individual socket types
+            var socketTypes = ['type2', 'ccs', 'chademo', 'type3', 'schuko', 'tesla'];
+            for (var j = 0; j < socketTypes.length; j++) {
+                var key = 'socket:' + socketTypes[j];
+                if (tags[key] === 'yes' || tags[key] === 'limited') {
+                    var pwr = parseFloat(tags[key + ':output'] || tags[key + ':max_power'] || '0');
+                    connectors.push({ type: socketTypes[j].toUpperCase(), power: pwr, level: '' });
+                }
+            }
+        }
+        return connectors;
+    }
+
+    // Fetch charging stations from Overpass API (same API used for POI)
     async function fetchNearbyChargingStations(lat, lon) {
-        const radius = 15000; // 15km radius
-        const url = `https://api.openchargemap.io/v3/poi/?output=json&countrycode=&maxresults=20&latitude=${lat}&longitude=${lon}&distance=${radius / 1000}`;
-
+        var radius = 15000; // 15km radius
+        var bbox = computeBBox(lat, lon, radius);
+        
+        // Overpass QL query: find all charging stations and charge points
+        var query = '[out:json][timeout:25];(' +
+            'node["amenity"="charging_station"](' + bbox + ');' +
+            'way["amenity"="charging_station"](' + bbox + ');' +
+            'node["man_made"="charge_point"](' + bbox + ');' +
+            'way["man_made"="charge_point"](' + bbox + ');' +
+            ');out center qt;';
+        
         try {
-            const response = await fetch(url);
-            if (!response.ok) return;
-            const data = await response.json();
-
-            chargingStations = data
-                .filter(s => s.Address && s.Address.Latitude && s.Address.Longitude)
-                .map(s => ({
-                    id: s.ID,
-                    name: (s.Address.Title || 'Charging Station').substring(0, 40),
-                    lat: s.Address.Latitude,
-                    lon: s.Address.Longitude,
-                    connectors: (s.Connections || []).map(c => ({
-                        type: c.ConnectionType ? c.ConnectionType.Title : 'Unknown',
-                        power: c.PowerKW || 0,
-                        level: c.Level ? c.Level.Title : ''
-                    })),
-                    distance: computeDistance(lat, lon, s.Address.Latitude, s.Address.Longitude)
-                }))
-                .sort((a, b) => a.distance - b.distance)
+            var response = await fetch('https://overpass-api.de/api/interpreter', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'data=' + encodeURIComponent(query)
+            });
+            
+            if (!response.ok) {
+                console.warn('Overpass API error:', response.status);
+                return;
+            }
+            
+            var data = await response.json();
+            
+            chargingStations = (data.elements || [])
+                .filter(function(el) { return el.lat || (el.center && el.center.lat); })
+                .map(function(el) {
+                    var tags = el.tags || {};
+                    var elLat = el.lat || (el.center ? el.center.lat : 0);
+                    var elLon = el.lon || (el.center ? el.center.lon : 0);
+                    return {
+                        id: 'osm_' + el.id,
+                        name: (tags.name || tags.operator || 'Charging Station').substring(0, 40),
+                        lat: elLat,
+                        lon: elLon,
+                        connectors: parseChargingConnectors(tags),
+                        distance: computeDistance(lat, lon, elLat, elLon),
+                        operator: tags.operator || '',
+                        fee: tags.fee || '',
+                        access: tags.access || '',
+                        capacity: tags.capacity || ''
+                    };
+                })
+                .filter(function(s) { return s.lat && s.lon; })
+                .sort(function(a, b) { return a.distance - b.distance; })
                 .slice(0, 10);
-
-            renderChargingStations(lat, lon);
+            
+            renderChargingStations();
             placeChargingStationMarkers();
         } catch (e) {
             console.warn('Charging station fetch failed:', e);
         }
     }
 
-    function renderChargingStations(lat, lon) {
-        const list = document.getElementById('csList');
-        const count = document.getElementById('csCount');
+    function renderChargingStations() {
+        var list = document.getElementById('csList');
+        var count = document.getElementById('csCount');
         if (!list) return;
 
         if (chargingStations.length === 0) {
@@ -3670,23 +3735,30 @@
             return;
         }
 
+        // Auto-show the list when stations are found
+        chargingStationsVisible = true;
+        if (list) list.style.display = 'block';
+        
         if (count) count.textContent = chargingStations.length;
 
-        list.innerHTML = chargingStations.map((cs, i) => {
-            const dist = (cs.distance / 1000).toFixed(1);
-            const topConnector = cs.connectors[0];
-            const connectorInfo = topConnector ? `${topConnector.type} ${topConnector.power > 0 ? topConnector.power + 'kW' : ''}` : 'Unknown';
+        list.innerHTML = chargingStations.map(function(cs, i) {
+            var dist = (cs.distance / 1000).toFixed(1);
+            var topConnector = cs.connectors && cs.connectors[0];
+            var connectorInfo = topConnector ? 
+                (topConnector.type + (topConnector.power > 0 ? ' ' + topConnector.power + 'kW' : '')) : 
+                'Charging Point';
+            var operatorInfo = cs.operator ? ' · ' + cs.operator : '';
+            var feeInfo = cs.fee ? ' · ' + cs.fee : '';
+            var accessInfo = cs.access === 'private' ? ' 🔒' : '';
 
-            return `
-                <div class="cs-item" onclick="flyToChargingStation(${i})" title="Click to navigate">
-                    <span class="cs-icon">⚡</span>
-                    <div class="cs-info">
-                        <div class="cs-name">${escapeHtml ? escapeHtml(cs.name) : cs.name}</div>
-                        <div class="cs-detail">${escapeHtml ? escapeHtml(connectorInfo) : connectorInfo}</div>
-                    </div>
-                    <span class="cs-dist">${dist} km</span>
-                </div>
-            `;
+            return '<div class="cs-item" onclick="flyToChargingStation(' + i + ')" title="Click to navigate">' +
+                '<span class="cs-icon">⚡</span>' +
+                '<div class="cs-info">' +
+                    '<div class="cs-name">' + escapeHtml(cs.name) + accessInfo + '</div>' +
+                    '<div class="cs-detail">' + escapeHtml(connectorInfo) + operatorInfo + feeInfo + '</div>' +
+                '</div>' +
+                '<span class="cs-dist">' + dist + ' km</span>' +
+            '</div>';
         }).join('');
     }
 
