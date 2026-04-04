@@ -894,7 +894,7 @@
         .ds-gauge-svg { width: 160px; height: 100px; }
         .ds-scores { display: flex; flex-direction: column; gap: 3px; }
         .ds-score-row { display: flex; align-items: center; gap: 6px; }
-        .ds-score-label { font-size: 0.58rem; color: var(--label-color); text-transform: uppercase; letter-spacing: 0.5px; font-family: 'JetBrains Mono', monospace; font-weight: 600; width: 60px; }
+        .ds-score-label { font-size: 0.58rem; color: var(--label-color); text-transform: uppercase; letter-spacing: 0.5px; font-family: 'JetBrains Mono', monospace; font-weight: 600; width: 120px; }
         .ds-score-bar-bg { flex: 1; height: 6px; background: var(--input-bg); border-radius: 3px; overflow: hidden; }
         .ds-score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
         .ds-score-bar-fill.accel { background: linear-gradient(90deg, #ff1744, #ff5252); }
@@ -1240,24 +1240,24 @@
             <!-- DRIVING STYLE ANALYZER -->
             <div class="driving-style-card" style="height:160px;">
                 <div class="chart-header">
-                    <span class="chart-title">Driving Style</span>
+                    <span class="chart-title">Driving Behavior</span>
                     <span class="chart-badge speed" id="dsBadge">--</span>
                 </div>
                 <div class="ds-gauge-wrap">
                     <svg class="ds-gauge-svg" id="dsGaugeSvg" viewBox="0 0 100 60"></svg>
                     <div class="ds-scores">
                         <div class="ds-score-row">
-                            <span class="ds-score-label">Accel</span>
+                            <span class="ds-score-label">Accelerated Style</span>
                             <div class="ds-score-bar-bg"><div class="ds-score-bar-fill accel" id="dsAccelBar" style="width:100%"></div></div>
                             <span class="ds-score-val" id="dsAccelVal">100</span>
                         </div>
                         <div class="ds-score-row">
-                            <span class="ds-score-label">Brake</span>
+                            <span class="ds-score-label">Braked Style</span>
                             <div class="ds-score-bar-bg"><div class="ds-score-bar-fill brake" id="dsBrakeBar" style="width:100%"></div></div>
                             <span class="ds-score-val" id="dsBrakeVal">100</span>
                         </div>
                         <div class="ds-score-row">
-                            <span class="ds-score-label">Smooth</span>
+                            <span class="ds-score-label">Smooth Style</span>
                             <div class="ds-score-bar-bg"><div class="ds-score-bar-fill smooth" id="dsSmoothBar" style="width:100%"></div></div>
                             <span class="ds-score-val" id="dsSmoothVal">100</span>
                         </div>
