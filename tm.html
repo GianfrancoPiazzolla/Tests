@@ -2152,9 +2152,9 @@
       <div class="range-section">
         <span class="range-label">Current SoC (%)</span>
         <div class="stepper-wrap" style="width:140px;">
-          <button class="stepper-btn" onclick="stepValue('socInput', -1); updateBattery()">−</button>
-          <input type="number" id="socInput" value="100" min="0" max="100" step="1" style="font-size:13px !important; padding:6px 8px; text-align:center;" oninput="initialSoc = parseFloat(this.value); updateBattery()">
-          <button class="stepper-btn" onclick="stepValue('socInput', 1); updateBattery()">+</button>
+          <button class="stepper-btn" onclick="stepValue('socInput', -1)">−</button>
+          <input type="number" id="socInput" value="100" min="0" max="100" step="1" style="font-size:13px !important; padding:6px 8px; text-align:center;" onchange="recalibrateSoc(this.value)">
+          <button class="stepper-btn" onclick="stepValue('socInput', 1)">+</button>
         </div>
       </div>
       <div class="battery-range-group">
@@ -2479,6 +2479,8 @@
     let lastSpeedKmh = 0;
     let lastInstantPowerW = 0;
     let initialSoc = 100;
+    let lastManualSocChange = 0;
+    const SOC_BLACKOUT_MS = 3000;
     let map3d = null,
       map3dSource = null,
       is3DMode = false;
@@ -2839,8 +2841,19 @@
       val = Math.min(max, Math.max(min, val));
       input.value = val;
       if (inputId === 'socInput') {
-        initialSoc = val;
+        recalibrateSoc(val);
+        return;
       }
+    }
+
+    function recalibrateSoc(newSocValue) {
+      const userSetSoc = Math.min(100, Math.max(0, parseFloat(newSocValue) || 0));
+      initialSoc = userSetSoc;
+      totalConsumedWh = 0;
+      totalRegenWh = 0;
+      lastManualSocChange = Date.now();
+      document.getElementById('socInput').value = userSetSoc;
+      updateBattery();
     }
 
     function setupSegmentedControl() {
@@ -4021,6 +4034,11 @@
     }
 
     function updateBatterySoC() {
+      const timeSinceManualChange = Date.now() - lastManualSocChange;
+      if (timeSinceManualChange < SOC_BLACKOUT_MS) {
+        updateBattery();
+        return;
+      }
       const cap = parseFloat(document.getElementById('batteryCapacity').value) || 100;
       const netWh = totalConsumedWh - totalRegenWh;
       const newSoc = Math.min(100, Math.max(0, initialSoc - (netWh / (cap * 1000)) * 100));
