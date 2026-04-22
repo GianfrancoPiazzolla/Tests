@@ -3772,6 +3772,7 @@
     }
 
     function startTracking() {
+      map3dCoords = [];
       document.getElementById('btnStart').disabled = true;
       document.getElementById('btnStart').classList.add('active');
       document.getElementById('btnStop').disabled = false;
@@ -3820,6 +3821,13 @@
       document.getElementById('elecPrice').parentElement.classList.remove('trip-locked');
       document.getElementById('gpsPollingGroup').classList.remove('trip-locked');
       document.getElementById('batteryCapacity').parentElement.classList.remove('trip-locked');
+      map3dCoords = [];
+      if (pathLine) {
+        pathLine.setData({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [] } });
+      }
+      if (pathLine3d) {
+        pathLine3d.setData({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [] } });
+      }
       saveLastSettings();
     }
 
@@ -4066,7 +4074,8 @@ function updateBatterySoC() {
       } else {
         totalConsumedWh += stepWh;
       }
-      return Math.round(stepWh / distKm);
+      //GP return Math.round(stepWh / distKm);
+      return (stepWh / distKm).toFixed(1);
     }
 
     function computeDistance(lat1, lon1, lat2, lon2) {
@@ -4853,15 +4862,15 @@ function updateBatterySoC() {
                 </div>
                 <div class="summary-item">
                     <div class="summary-item-label">Average Energy Consumption</div>
-                    <div class="summary-item-value" style="color:var(--danger)">${avgConsWh_km} Wh/Km</div>
+                    <div class="summary-item-value" style="color:var(--danger)">${(avgConsWh_km/10).toFixed(2)} kWh/100Km</div>
                 </div>
                 <div class="summary-item">
                     <div class="summary-item-label">Total Energy Consumed</div>
-                    <div class="summary-item-value" style="color:var(--danger)">${(totalConsumedWh/1000).toFixed(1)} kWh</div>
+                    <div class="summary-item-value" style="color:var(--danger)">${(totalConsumedWh/1000).toFixed(2)} kWh</div>
                 </div>
                 <div class="summary-item">
                     <div class="summary-item-label">Total Energy Recovered</div>
-                    <div class="summary-item-value" style="color:var(--primary)">${totalRegenWh.toFixed(1)} Wh</div>
+                    <div class="summary-item-value" style="color:var(--primary)">${totalRegenWh.toFixed(2)} Wh</div>
                 </div>
                 <div class="summary-item">
                     <div class="summary-item-label">Energy Regen Efficiency</div>
@@ -4869,7 +4878,7 @@ function updateBatterySoC() {
                 </div>
                 <div class="summary-item">
                     <div class="summary-item-label">Total Net Energy</div>
-                    <div class="summary-item-value" style="color:var(--warning)">${((totalConsumedWh-totalRegenWh)/1000).toFixed(1)} kWh</div>
+                    <div class="summary-item-value" style="color:var(--warning)">${((totalConsumedWh-totalRegenWh)/1000).toFixed(2)} kWh</div>
                 </div>
                 <div class="summary-item">
                     <div class="summary-item-label">Trip Cost</div>
