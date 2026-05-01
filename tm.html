@@ -1277,7 +1277,7 @@
     /* === CONTROLS === */
     .controls {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 10px;
       padding-bottom: 4px;
       flex-shrink: 0;
@@ -1344,6 +1344,25 @@
     }
 
     .btn-stop:disabled {
+      background: #2a2e35;
+      color: #4a5568;
+      box-shadow: 0 2px 0 #1a1e25;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .btn-reset {
+      background: linear-gradient(135deg, #b39ddb, #7e57c2);
+      color: #fff;
+      box-shadow: 0 4px 0 #512da8, 0 6px 20px rgba(179, 157, 219, 0.25);
+    }
+
+    .btn-reset:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #512da8, 0 10px 28px rgba(179, 157, 219, 0.4);
+    }
+
+    .btn-reset:disabled {
       background: #2a2e35;
       color: #4a5568;
       box-shadow: 0 2px 0 #1a1e25;
@@ -2460,6 +2479,7 @@
     <div class="controls">
       <button id="btnStart" class="action-btn btn-start" onclick="startTracking()">▶ Start Trip</button>
       <button id="btnStop" class="action-btn btn-stop" onclick="stopTracking()" disabled>⏹ Stop Trip</button>
+      <button id="btnReset" class="action-btn btn-reset" onclick="resetTrip()" disabled>↺ Reset Trip</button>
     </div>
 
   </div>
@@ -2487,6 +2507,7 @@
       is3DMode = false;
     let isMapFullscreen = false;
     let map3dCoords = [];
+    let currentTripStartIndex = 0;
     let isHeadingUp = false;
     let lastHeading = 0;
     let isWeatherOverlayOn = false;
@@ -2538,7 +2559,6 @@
       fetchIceFuelPrice();
       fetchIceEfficiency();
       updateFeatures(0, 0, 0, 0);
-
 
       autosaveInterval = setInterval(saveLastSettings, 60000);
 
@@ -2622,8 +2642,7 @@
           Object.entries(p.poiTypeEnabled).filter(([, v]) => v).map(([k]) => {
             const t = POI_TYPES.find(pt => pt.id === k);
             return t ? (t.emoji + ' ' + t.label) : k;
-          }) :
-          [];
+          }) : [];
         const poiLines = poiLabels.length > 0 ?
           poiLabels.map(l => '<br>POI: <b>' + l + '</b>').join('') :
           '<br>POI: <b>None</b>';
@@ -3109,30 +3128,30 @@
 
       if (map) {
         window._importStartMarker = new maplibregl.Marker({
-            element: createTripEndpointMarker('S', '#00b248'),
-            anchor: 'center'
-          })
+          element: createTripEndpointMarker('S', '#00b248'),
+          anchor: 'center'
+        })
           .setLngLat([first[0], first[1]])
           .addTo(map);
         window._importEndMarker = new maplibregl.Marker({
-            element: createTripEndpointMarker('E', '#e21017'),
-            anchor: 'center'
-          })
+          element: createTripEndpointMarker('E', '#e21017'),
+          anchor: 'center'
+        })
           .setLngLat([last[0], last[1]])
           .addTo(map);
       }
 
       if (map3d) {
         window._importStartMarker3d = new maplibregl.Marker({
-            element: createTripEndpointMarker('S', '#00b248'),
-            anchor: 'center'
-          })
+          element: createTripEndpointMarker('S', '#00b248'),
+          anchor: 'center'
+        })
           .setLngLat([first[0], first[1]])
           .addTo(map3d);
         window._importEndMarker3d = new maplibregl.Marker({
-            element: createTripEndpointMarker('E', '#e21017'),
-            anchor: 'center'
-          })
+          element: createTripEndpointMarker('E', '#e21017'),
+          anchor: 'center'
+        })
           .setLngLat([last[0], last[1]])
           .addTo(map3d);
       }
@@ -3191,6 +3210,48 @@
             'line-opacity': 1
           }
         });
+        map.addSource('route-heatmap-static', {
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features: []
+          }
+        });
+        map.addLayer({
+          id: 'route-heatmap-static-layer',
+          type: 'line',
+          source: 'route-heatmap-static',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': ['get', 'color'],
+            'line-width': 6,
+            'line-opacity': 1
+          }
+        });
+        map.addSource('route-heatmap-live', {
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features: []
+          }
+        });
+        map.addLayer({
+          id: 'route-heatmap-live-layer',
+          type: 'line',
+          source: 'route-heatmap-live',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': ['get', 'color'],
+            'line-width': 6,
+            'line-opacity': 1
+          }
+        });
 
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
@@ -3202,30 +3263,30 @@
               map.setCenter([longitude, latitude]);
               map.setZoom(15);
               positionMarker = new maplibregl.Marker({
-                  element: createBlueMarkerElement(),
-                  anchor: 'center'
-                })
+                element: createBlueMarkerElement(),
+                anchor: 'center'
+              })
                 .setLngLat([longitude, latitude])
                 .addTo(map);
               fetchWeather(latitude, longitude);
             },
             () => {
               positionMarker = new maplibregl.Marker({
-                  element: createBlueMarkerElement(),
-                  anchor: 'center'
-                })
+                element: createBlueMarkerElement(),
+                anchor: 'center'
+              })
                 .setLngLat([ROME_LNG, ROME_LAT])
                 .addTo(map);
               fetchWeather(ROME_LAT, ROME_LNG);
             }, {
-              enableHighAccuracy: true
-            }
+            enableHighAccuracy: true
+          }
           );
         } else {
           positionMarker = new maplibregl.Marker({
-              element: createBlueMarkerElement(),
-              anchor: 'center'
-            })
+            element: createBlueMarkerElement(),
+            anchor: 'center'
+          })
             .setLngLat([ROME_LNG, ROME_LAT])
             .addTo(map);
           fetchWeather(ROME_LAT, ROME_LNG);
@@ -3253,7 +3314,7 @@
             type: 'Feature',
             geometry: {
               type: 'LineString',
-              coordinates: map3dCoords
+              coordinates: map3dCoords.slice(currentTripStartIndex)
             }
           }
         });
@@ -3273,12 +3334,54 @@
             'line-opacity': 1
           }
         });
+        map3d.addSource('route-heatmap-static-3d', {
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features: []
+          }
+        });
+        map3d.addLayer({
+          id: 'route-heatmap-static-3d-layer',
+          type: 'line',
+          source: 'route-heatmap-static-3d',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': ['get', 'color'],
+            'line-width': 6,
+            'line-opacity': 1
+          }
+        });
+        map3d.addSource('route-heatmap-live-3d', {
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features: []
+          }
+        });
+        map3d.addLayer({
+          id: 'route-heatmap-live-3d-layer',
+          type: 'line',
+          source: 'route-heatmap-live-3d',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': ['get', 'color'],
+            'line-width': 6,
+            'line-opacity': 1
+          }
+        });
 
         const center = map3d.getCenter();
         positionMarker3d = new maplibregl.Marker({
-            element: createBlueMarkerElement(),
-            anchor: 'center'
-          })
+          element: createBlueMarkerElement(),
+          anchor: 'center'
+        })
           .setLngLat([center.lng, center.lat])
           .addTo(map3d);
 
@@ -3315,7 +3418,7 @@
               type: 'Feature',
               geometry: {
                 type: 'LineString',
-                coordinates: map3dCoords
+                coordinates: map3dCoords.slice(currentTripStartIndex)
               }
             });
           }
@@ -3772,10 +3875,12 @@
     }
 
     function startTracking() {
-      map3dCoords = [];
+      lastPoint = null;
+      currentTripStartIndex = map3dCoords.length;
       document.getElementById('btnStart').disabled = true;
       document.getElementById('btnStart').classList.add('active');
       document.getElementById('btnStop').disabled = false;
+      document.getElementById('btnReset').disabled = true;
       document.querySelector('.header-btns button[title="EV Profiles"]').classList.add('trip-locked');
       document.getElementById('vehicleWeight').parentElement.classList.add('trip-locked');
       document.getElementById('elecPrice').parentElement.classList.add('trip-locked');
@@ -3806,8 +3911,6 @@
         });
       }
 
-      resetDrivingStyle();
-      resetRouteHeatMap();
     }
 
     function stopTracking() {
@@ -3816,18 +3919,149 @@
       document.getElementById('btnStart').disabled = false;
       document.getElementById('btnStart').classList.remove('active');
       document.getElementById('btnStop').disabled = true;
+      document.getElementById('btnReset').disabled = false;
       document.querySelector('.header-btns button[title="EV Profiles"]').classList.remove('trip-locked');
       document.getElementById('vehicleWeight').parentElement.classList.remove('trip-locked');
       document.getElementById('elecPrice').parentElement.classList.remove('trip-locked');
       document.getElementById('gpsPollingGroup').classList.remove('trip-locked');
       document.getElementById('batteryCapacity').parentElement.classList.remove('trip-locked');
+      saveLastSettings();
+    }
+
+    function resetTrip() {
+      if (pollInterval && navigator.geolocation) navigator.geolocation.clearWatch(pollInterval);
+      if (tripTimer) clearInterval(tripTimer);
+      pollInterval = null;
+      tripTimer = null;
+      totalDistance = 0;
+      totalRegenWh = 0;
+      totalConsumedWh = 0;
+      lastPoint = null;
+      startTime = null;
+      tripSeconds = 0;
+      currentTripStartIndex = 0;
       map3dCoords = [];
-      if (pathLine) {
-        pathLine.setData({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [] } });
+      lastSpeedKmh = 0;
+      lastInstantPowerW = 0;
+      consumedAtRecalibration = 0;
+      powerBreakdown = {
+        drag: 0,
+        gravity: 0,
+        aero: 0,
+        regen: 0,
+        samples: 0
+      };
+      drivingStyle = {
+        accelScore: 100,
+        brakeScore: 100,
+        smoothScore: 100,
+        accelEvents: 0,
+        brakeEvents: 0,
+        speedVarSum: 0,
+        speedSamples: 0,
+        lastSpeedForAccel: 0
+      };
+      document.getElementById('btnStart').disabled = false;
+      document.getElementById('btnStart').classList.remove('active');
+      document.getElementById('btnStop').disabled = true;
+      document.getElementById('btnReset').disabled = true;
+      document.getElementById('distDisplay').innerText = '-- Km';
+      document.getElementById('avgSpeedDisplay').innerText = '-- Km/h';
+      document.getElementById('consDisplay').innerText = '-- Wh/Km';
+      document.getElementById('regenDisplay').innerText = '-- Wh';
+      document.getElementById('altDisplay').innerText = '-- m';
+      document.getElementById('gradeDisplay').innerText = '-- %';
+      document.getElementById('powerDisplay').innerText = '-- W';
+      document.getElementById('tripTimeDisplay').innerText = '--:--:--';
+      document.getElementById('cmSpent').innerText = '-- €';
+      document.getElementById('cmPerKm').innerText = '-- €';
+      document.getElementById('cmSaved').innerText = '-- €';
+      document.getElementById('energyConsumedLabel').innerText = '0 Wh';
+      document.getElementById('energyRegenLabel').innerText = '0 Wh';
+      document.getElementById('regenEffLabel').innerText = '-- %';
+      document.getElementById('dragBar').style.width = '0%';
+      document.getElementById('gravBar').style.width = '0%';
+      document.getElementById('windBar').style.width = '0%';
+      document.getElementById('regenBar').style.width = '0%';
+      document.getElementById('dragVal').innerText = '0 W';
+      document.getElementById('gravVal').innerText = '0 W';
+      document.getElementById('windVal').innerText = '0 W';
+      document.getElementById('regenBarVal').innerText = '0 W';
+      document.getElementById('dsAccelBar').style.width = '100%';
+      document.getElementById('dsBrakeBar').style.width = '100%';
+      document.getElementById('dsSmoothBar').style.width = '100%';
+      document.getElementById('dsAccelVal').innerText = '100';
+      document.getElementById('dsBrakeVal').innerText = '100';
+      document.getElementById('dsSmoothVal').innerText = '100';
+      document.getElementById('dsBadge').innerText = '--';
+      document.getElementById('socConsumedLabel').innerText = '';
+      if (map && map.getSource('trip-path-2d')) {
+        map.getSource('trip-path-2d').setData({
+          type: 'Feature',
+          geometry: {
+            type: 'LineString',
+            coordinates: []
+          }
+        });
       }
-      if (pathLine3d) {
-        pathLine3d.setData({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [] } });
+      if (map3d && map3d.getSource('trip-path')) {
+        map3d.getSource('trip-path').setData({
+          type: 'Feature',
+          geometry: {
+            type: 'LineString',
+            coordinates: []
+          }
+        });
       }
+      if (positionMarker) {
+        positionMarker.remove();
+        positionMarker = null;
+      }
+      if (positionMarker3d) {
+        positionMarker3d.remove();
+        positionMarker3d = null;
+      }
+      if (window._importStartMarker) {
+        window._importStartMarker.remove();
+        window._importStartMarker = null;
+      }
+      if (window._importEndMarker) {
+        window._importEndMarker.remove();
+        window._importEndMarker = null;
+      }
+      if (window._importStartMarker3d) {
+        window._importStartMarker3d.remove();
+        window._importStartMarker3d = null;
+      }
+      if (window._importEndMarker3d) {
+        window._importEndMarker3d.remove();
+        window._importEndMarker3d = null;
+      }
+      weatherOverlayTimestamp = null;
+      if (altChart) {
+        altChart.destroy();
+        altChart = null;
+      }
+      if (consChart) {
+        consChart.destroy();
+        consChart = null;
+      }
+      if (speedChart) {
+        speedChart.destroy();
+        speedChart = null;
+      }
+      if (energyChart) {
+        energyChart.destroy();
+        energyChart = null;
+      }
+
+      resetRouteHeatMap();
+      initializeSystem();
+      setupCharts();
+      updateEnergyFlow(0, 0, 22);
+      updateBattery();
+      computeRangeEstimate();
+      updateFeatures(0, 0, 0, 0);
       saveLastSettings();
     }
 
@@ -3912,6 +4146,10 @@
       } = pos.coords;
       const currentAlt = altitude || 0;
 
+      if (!lastPoint) {
+        map3dCoords.push([longitude, latitude]);
+      }
+
       if (lastPoint) {
         const step = computeDistance(lastPoint.lat, lastPoint.lon, latitude, longitude);
         if (step > 5) {
@@ -3930,15 +4168,7 @@
           refreshUI(totalDistance, currentAlt, grade, instantCons, avgSpeed, lastSpeedKmh);
 
           map3dCoords.push([longitude, latitude]);
-          if (pathLine) {
-            pathLine.setData({
-              type: 'Feature',
-              geometry: {
-                type: 'LineString',
-                coordinates: map3dCoords
-              }
-            });
-          }
+          const currentTripCoords = map3dCoords.slice(currentTripStartIndex);
 
           if (map3dCoords.length >= 2) {
             const prev = map3dCoords[map3dCoords.length - 2];
@@ -3957,15 +4187,6 @@
 
           if (positionMarker) positionMarker.setLngLat([longitude, latitude]);
 
-          if (map3d && map3dSource) {
-            map3dSource.setData({
-              type: 'Feature',
-              geometry: {
-                type: 'LineString',
-                coordinates: map3dCoords
-              }
-            });
-          }
           if (is3DMode && map3d) {
             map3d.easeTo({
               center: [longitude, latitude],
@@ -4018,7 +4239,7 @@
                 } finally {
                   if (rateLimitHit) {
                     setPoiLoading(true, true);
-                    setTimeout(function() {
+                    setTimeout(function () {
                       setPoiLoading(false);
                     }, 3000);
                   } else {
@@ -4042,7 +4263,7 @@
       };
     }
 
-function updateBatterySoC() {
+    function updateBatterySoC() {
       const timeSinceManualChange = Date.now() - lastManualSocChange;
       if (timeSinceManualChange < SOC_BLACKOUT_MS) {
         updateBattery();
@@ -4074,7 +4295,6 @@ function updateBatterySoC() {
       } else {
         totalConsumedWh += stepWh;
       }
-      //GP return Math.round(stepWh / distKm);
       return (stepWh / distKm).toFixed(1);
     }
 
@@ -4200,6 +4420,7 @@ function updateBatterySoC() {
             return;
           }
           map3dCoords = coords;
+          currentTripStartIndex = 0;
 
           if (pathLine) {
             pathLine.setData({
@@ -4234,9 +4455,9 @@ function updateBatterySoC() {
                 [first[0], first[1]],
                 [first[0], first[1]]
               ]), {
-                padding: 40,
-                duration: 600
-              }
+				padding: 40,
+				duration: 600
+			  }
             );
           }
 
@@ -4268,55 +4489,55 @@ function updateBatterySoC() {
     };
 
     const POI_TYPES = [{
-        id: 'mobile_patrol',
-        label: 'Mobile Patrol',
-        emoji: '👮',
-        color: '#1565c0',
-        source: 'waze'
-      },
-      {
-        id: 'speed_camera',
-        label: 'Speed Camera',
-        emoji: '📷',
-        color: '#c62828',
-        source: 'osm',
-        overpassQuery: function(bbox) {
-          return '[out:json][timeout:25];(' +
-            'node["highway"="speed_camera"](' + bbox + ');' +
-            'node["enforcement"="maxspeed"](' + bbox + ');' +
-            'node["man_made"="speed_camera"](' + bbox + ');' +
-            ');out center qt;';
-        }
-      },
-      {
-        id: 'road_closure',
-        label: 'Road Closure',
-        emoji: '🚧',
-        color: '#ff6f00',
-        source: 'osm',
-        overpassQuery: function(bbox) {
-          return '[out:json][timeout:25];(' +
-            'node["barrier"="block"](' + bbox + ');' +
-            'node["barrier"="jersey_barrier"](' + bbox + ');' +
-            'node["highway"="construction"](' + bbox + ');' +
-            'way["highway"="construction"](' + bbox + ');' +
-            'way["construction"~"."](' + bbox + ');' +
-            ');out center qt;';
-        }
-      },
-      {
-        id: 'ev_charging',
-        label: 'EV Charging',
-        emoji: '⚡',
-        color: '#2e7d32',
-        source: 'osm',
-        overpassQuery: function(bbox) {
-          return '[out:json][timeout:25];(' +
-            'node["amenity"="charging_station"](' + bbox + ');' +
-            'way["amenity"="charging_station"](' + bbox + ');' +
-            ');out center qt;';
-        }
+      id: 'mobile_patrol',
+      label: 'Mobile Patrol',
+      emoji: '👮',
+      color: '#1565c0',
+      source: 'waze'
+    },
+    {
+      id: 'speed_camera',
+      label: 'Speed Camera',
+      emoji: '📷',
+      color: '#c62828',
+      source: 'osm',
+      overpassQuery: function(bbox) {
+        return '[out:json][timeout:25];(' +
+          'node["highway"="speed_camera"](' + bbox + ');' +
+          'node["enforcement"="maxspeed"](' + bbox + ');' +
+          'node["man_made"="speed_camera"](' + bbox + ');' +
+          ');out center qt;';
       }
+    },
+    {
+      id: 'road_closure',
+      label: 'Road Closure',
+      emoji: '🚧',
+      color: '#ff6f00',
+      source: 'osm',
+      overpassQuery: function(bbox) {
+        return '[out:json][timeout:25];(' +
+          'node["barrier"="block"](' + bbox + ');' +
+          'node["barrier"="jersey_barrier"](' + bbox + ');' +
+          'node["highway"="construction"](' + bbox + ');' +
+          'way["highway"="construction"](' + bbox + ');' +
+          'way["construction"~"."](' + bbox + ');' +
+          ');out center qt;';
+      }
+    },
+    {
+      id: 'ev_charging',
+      label: 'EV Charging',
+      emoji: '⚡',
+      color: '#2e7d32',
+      source: 'osm',
+      overpassQuery: function(bbox) {
+        return '[out:json][timeout:25];(' +
+          'node["amenity"="charging_station"](' + bbox + ');' +
+          'way["amenity"="charging_station"](' + bbox + ');' +
+          ');out center qt;';
+      }
+    }
     ];
 
     function getPoiStore(targetMap) {
@@ -4403,8 +4624,7 @@ function updateBatterySoC() {
               name: a.subtype ?
                 a.subtype.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, function(c) {
                   return c.toUpperCase();
-                }) :
-                'Mobile Patrol'
+                }) : 'Mobile Patrol'
             };
           })
           .filter(function(p) {
@@ -4453,15 +4673,15 @@ function updateBatterySoC() {
           (p.name ? '<br><span style="font-weight:400;color:#444;">' + p.name + '</span>' : '') +
           '</div>';
         var popup = new maplibregl.Popup({
-            offset: 16,
-            closeButton: true,
-            closeOnClick: false
-          })
+          offset: 16,
+          closeButton: true,
+          closeOnClick: false
+        })
           .setHTML(popupHtml);
         var marker = new maplibregl.Marker({
-            element: markerEl,
-            anchor: 'center'
-          })
+          element: markerEl,
+          anchor: 'center'
+        })
           .setLngLat([p.lon, p.lat])
           .setPopup(popup)
           .addTo(targetMap);
@@ -4862,11 +5082,11 @@ function updateBatterySoC() {
                 </div>
                 <div class="summary-item">
                     <div class="summary-item-label">Average Energy Consumption</div>
-                    <div class="summary-item-value" style="color:var(--danger)">${(avgConsWh_km/10).toFixed(2)} kWh/100Km</div>
+                    <div class="summary-item-value" style="color:var(--danger)">${(avgConsWh_km / 10).toFixed(2)} kWh/100Km</div>
                 </div>
                 <div class="summary-item">
                     <div class="summary-item-label">Total Energy Consumed</div>
-                    <div class="summary-item-value" style="color:var(--danger)">${(totalConsumedWh/1000).toFixed(2)} kWh</div>
+                    <div class="summary-item-value" style="color:var(--danger)">${(totalConsumedWh / 1000).toFixed(2)} kWh</div>
                 </div>
                 <div class="summary-item">
                     <div class="summary-item-label">Total Energy Recovered</div>
@@ -4878,7 +5098,7 @@ function updateBatterySoC() {
                 </div>
                 <div class="summary-item">
                     <div class="summary-item-label">Total Net Energy</div>
-                    <div class="summary-item-value" style="color:var(--warning)">${((totalConsumedWh-totalRegenWh)/1000).toFixed(2)} kWh</div>
+                    <div class="summary-item-value" style="color:var(--warning)">${((totalConsumedWh - totalRegenWh) / 1000).toFixed(2)} kWh</div>
                 </div>
                 <div class="summary-item">
                     <div class="summary-item-label">Trip Cost</div>
@@ -4974,14 +5194,14 @@ function updateBatterySoC() {
             <text x="347" y="100" text-anchor="middle" class="ef-value" fill="${subColor}">${auxW} W</text>
 
             <!-- Flow Lines -->
-            <line x1="65" y1="42" x2="170" y2="27" stroke="url(#flowDrive)" stroke-width="${Math.max(2, motorW/totalDraw*6)}" stroke-linecap="round" opacity="0.8"/>
-            <line x1="65" y1="55" x2="170" y2="80" stroke="url(#flowHvac)" stroke-width="${Math.max(1, hvacW/totalDraw*4)}" stroke-linecap="round" opacity="0.6"/>
-            <line x1="225" y1="27" x2="320" y2="27" stroke="url(#flowDrive)" stroke-width="${Math.max(2, motorW/totalDraw*6)}" stroke-linecap="round" opacity="0.8"/>
+            <line x1="65" y1="42" x2="170" y2="27" stroke="url(#flowDrive)" stroke-width="${Math.max(2, motorW / totalDraw * 6)}" stroke-linecap="round" opacity="0.8"/>
+            <line x1="65" y1="55" x2="170" y2="80" stroke="url(#flowHvac)" stroke-width="${instantPowerW > 0 ? Math.max(1, hvacW / totalDraw * 4) : 1}" stroke-linecap="round" opacity="0.6"/>
+            <line x1="225" y1="27" x2="320" y2="27" stroke="url(#flowDrive)" stroke-width="${Math.max(2, motorW / totalDraw * 6)}" stroke-linecap="round" opacity="0.8"/>
             <line x1="225" y1="80" x2="320" y2="80" stroke="${lineColor}" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
 
             <!-- Regen arrow (when regen active) -->
             ${regenDisplay > 0 ? `
-                <line x1="320" y1="27" x2="65" y2="42" stroke="url(#flowRegen)" stroke-width="${Math.max(2, regenDisplay/totalDraw*6)}" stroke-linecap="round" opacity="0.8" filter="url(#glow)"/>
+                <line x1="320" y1="27" x2="65" y2="42" stroke="url(#flowRegen)" stroke-width="${Math.max(2, regenDisplay / totalDraw * 6)}" stroke-linecap="round" opacity="0.8" filter="url(#glow)"/>
                 <text x="197" y="58" text-anchor="middle" class="ef-node" fill="#00e676" font-size="8">↩ ${Math.round(regenDisplay)} W</text>
             ` : ''}
         `;
@@ -4989,101 +5209,71 @@ function updateBatterySoC() {
       svg.innerHTML = svgContent;
     }
 
-    /* ===== FEATURE 2: CONSUMPTION HEAT MAP ON ROUTE ===== */
-    let routeSegments = [];
+    /* ===== FEATURE 2: CONSUMPTION HEAT MAP ===== */
+    let heatmapFeaturesStatic = [];
+    let heatmapFeaturesLive = [];
+    const HEATMAP_BATCH_SIZE = 10; // Update static source every 10 points
 
     function updateRouteHeatMap(distKm, consWhKm) {
       if (map3dCoords.length < 2) return;
 
-      routeSegments.push({
-        dist: distKm,
-        cons: consWhKm
-      });
+      const lastIdx = map3dCoords.length - 1;
+      const coords = [map3dCoords[lastIdx - 1], map3dCoords[lastIdx]];
+      if (!coords[0] || !coords[1]) return;
 
-      if (!map || !pathLine) return;
+      const color = getHeatColor(consWhKm);
+      const newFeature = {
+        type: 'Feature',
+        properties: {
+          color: color
+        },
+        geometry: {
+          type: 'LineString',
+          coordinates: coords
+        }
+      };
 
-      for (let i = 0; i < routeSegments.length; i++) {
-        const srcId = 'route-seg-' + i;
-        const lyrId = 'route-seg-lyr-' + i;
-        if (map.getLayer(lyrId)) map.removeLayer(lyrId);
-        if (map.getSource(srcId)) map.removeSource(srcId);
-        const srcId3d = 'route-seg-3d-' + i;
-        const lyrId3d = 'route-seg-3d-lyr-' + i;
-        if (map3d && map3d.getLayer(lyrId3d)) map3d.removeLayer(lyrId3d);
-        if (map3d && map3d.getSource(srcId3d)) map3d.removeSource(srcId3d);
-      }
+      heatmapFeaturesLive.push(newFeature);
 
-      for (let i = 0; i < routeSegments.length; i++) {
-        const seg = routeSegments[i];
-        const coords = [map3dCoords[i], map3dCoords[i + 1]];
-        if (!coords[0] || !coords[1]) continue;
+      // If live buffer exceeds batch size, move to static source
+      if (heatmapFeaturesLive.length >= HEATMAP_BATCH_SIZE) {
+        heatmapFeaturesStatic = heatmapFeaturesStatic.concat(heatmapFeaturesLive);
+        heatmapFeaturesLive = [];
 
-        const color = getHeatColor(seg.cons);
-
-        const srcId = 'route-seg-' + i;
-        const lyrId = 'route-seg-lyr-' + i;
-
-        map.addSource(srcId, {
-          type: 'geojson',
-          data: {
-            type: 'Feature',
-            geometry: {
-              type: 'LineString',
-              coordinates: coords
-            }
-          }
-        });
-
-        map.addLayer({
-          id: lyrId,
-          type: 'line',
-          source: srcId,
-          layout: {
-            'line-join': 'round',
-            'line-cap': 'round'
-          },
-          paint: {
-            'line-color': color,
-            'line-width': 6,
-            'line-opacity': 1
-          }
-        });
-
-        if (map3d) {
-          const srcId3d = 'route-seg-3d-' + i;
-          const lyrId3d = 'route-seg-3d-lyr-' + i;
-          map3d.addSource(srcId3d, {
-            type: 'geojson',
-            data: {
-              type: 'Feature',
-              geometry: {
-                type: 'LineString',
-                coordinates: coords
-              }
-            }
+        if (map && map.getSource('route-heatmap-static')) {
+          map.getSource('route-heatmap-static').setData({
+            type: 'FeatureCollection',
+            features: heatmapFeaturesStatic
           });
-          map3d.addLayer({
-            id: lyrId3d,
-            type: 'line',
-            source: srcId3d,
-            layout: {
-              'line-join': 'round',
-              'line-cap': 'round'
-            },
-            paint: {
-              'line-color': color,
-              'line-width': 6,
-              'line-opacity': 1
-            }
+        }
+        if (map3d && map3d.getSource('route-heatmap-static-3d')) {
+          map3d.getSource('route-heatmap-static-3d').setData({
+            type: 'FeatureCollection',
+            features: heatmapFeaturesStatic
           });
         }
       }
 
-      if (map.getLayer('trip-path-2d-layer')) {
-        map.setLayoutProperty('trip-path-2d-layer', 'visibility', 'none');
+      // Always update live source (small and fast)
+      if (map && map.getSource('route-heatmap-live')) {
+        map.getSource('route-heatmap-live').setData({
+          type: 'FeatureCollection',
+          features: heatmapFeaturesLive
+        });
       }
-      if (map3d && map3d.getLayer('trip-path-layer')) {
-        map3d.setLayoutProperty('trip-path-layer', 'visibility', 'none');
+      if (map3d && map3d.getSource('route-heatmap-live-3d')) {
+        map3d.getSource('route-heatmap-live-3d').setData({
+          type: 'FeatureCollection',
+          features: heatmapFeaturesLive
+        });
+      }
+
+      // Hide basic path if we have at least one heatmap segment
+      if (heatmapFeaturesStatic.length === 0 && heatmapFeaturesLive.length === 1) {
+        if (map.getLayer('trip-path-2d-layer'))
+          map.setLayoutProperty('trip-path-2d-layer', 'visibility', 'none');
+        if (map3d && map3d.getLayer('trip-path-layer'))
+          map3d.setLayoutProperty('trip-path-layer', 'visibility', 'none');
       }
     }
 
@@ -5097,26 +5287,24 @@ function updateBatterySoC() {
     }
 
     function resetRouteHeatMap() {
-      if (!map) return;
-      routeSegments = [];
-
-      for (let i = 0; i < 2000; i++) {
-        const srcId = 'route-seg-' + i;
-        const lyrId = 'route-seg-lyr-' + i;
-        if (map.getLayer(lyrId)) map.removeLayer(lyrId);
-        if (map.getSource(srcId)) map.removeSource(srcId);
-        const srcId3d = 'route-seg-3d-' + i;
-        const lyrId3d = 'route-seg-3d-lyr-' + i;
-        if (map3d && map3d.getLayer(lyrId3d)) map3d.removeLayer(lyrId3d);
-        if (map3d && map3d.getSource(srcId3d)) map3d.removeSource(srcId3d);
-      }
-
-      if (map.getLayer('trip-path-2d-layer')) {
+      heatmapFeaturesStatic = [];
+      heatmapFeaturesLive = [];
+      ['route-heatmap-static', 'route-heatmap-live'].forEach(src => {
+        if (map && map.getSource(src)) map.getSource(src).setData({
+          type: 'FeatureCollection',
+          features: []
+        });
+      });
+      ['route-heatmap-static-3d', 'route-heatmap-live-3d'].forEach(src => {
+        if (map3d && map3d.getSource(src)) map3d.getSource(src).setData({
+          type: 'FeatureCollection',
+          features: []
+        });
+      });
+      if (map && map.getLayer('trip-path-2d-layer'))
         map.setLayoutProperty('trip-path-2d-layer', 'visibility', 'visible');
-      }
-      if (map3d && map3d.getLayer('trip-path-layer')) {
+      if (map3d && map3d.getLayer('trip-path-layer'))
         map3d.setLayoutProperty('trip-path-layer', 'visibility', 'visible');
-      }
     }
 
     /* ===== FEATURE 3: DRIVING STYLE ANALYZER ===== */
@@ -5469,4 +5657,5 @@ function updateBatterySoC() {
     }
   </script>
 </body>
+
 </html>
