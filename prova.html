@@ -369,38 +369,6 @@
       }
     })();
 
-    (function() {
-      var manifest = {
-        name: 'Il calcolatore di Tonino',
-        short_name: 'Tonino Calc',
-        description: 'Calcolatore energetico ispirato a Tonino Lucidi',
-        start_url: '.',
-        display: 'standalone',
-        background_color: '#080b10',
-        theme_color: '#080b10',
-        icons: [
-          {
-            src: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192"><rect width="192" height="192" rx="32" fill="#e21017"/><text x="96" y="128" text-anchor="middle" font-size="100" font-family="Arial,sans-serif" font-weight="bold" fill="white">TC</text></svg>'),
-            sizes: '192x192',
-            type: 'image/svg+xml'
-          },
-          {
-            src: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="64" fill="#e21017"/><text x="256" y="340" text-anchor="middle" font-size="280" font-family="Arial,sans-serif" font-weight="bold" fill="white">TC</text></svg>'),
-            sizes: '512x512',
-            type: 'image/svg+xml'
-          }
-        ]
-      };
-
-      var dataUri = 'data:application/json,' + encodeURIComponent(JSON.stringify(manifest));
-      document.getElementById('manifest-link').href = dataUri;
-
-      if ('serviceWorker' in navigator) {
-        var swCode = 'self.addEventListener("install",function(){self.skipWaiting()});self.addEventListener("activate",function(e){e.waitUntil(self.clients.claim())});self.addEventListener("fetch",function(e){e.respondWith(fetch(e.request).catch(function(){return new Response("",{status:408})}))});';
-        var swBlob = new Blob([swCode], { type: 'application/javascript' });
-        navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(function(){});
-      }
-    })();
   </script>
 </body>
 </html>
