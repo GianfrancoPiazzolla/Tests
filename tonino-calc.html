@@ -801,7 +801,7 @@
 
     function copyResult() {
       var r = calc();
-      var text = r.drawnEnergy.toFixed(2) + ' kWh';
+      var text = r.drawnEnergy.toFixed(2);
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(function() {
           els.copyBtn.setAttribute('data-copied', '');
@@ -905,7 +905,7 @@
           { src: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="64" fill="#e21017"/><text x="256" y="345" text-anchor="middle" font-size="280" font-family="Inter,sans-serif" font-weight="800" fill="white">TC</text></svg>'), sizes: '512x512', type: 'image/svg+xml' }
         ]
       };
-      //document.getElementById('manifest-link').href = 'data:application/json,' + encodeURIComponent(JSON.stringify(manifest));
+      document.getElementById('manifest-link').href = 'data:application/json,' + encodeURIComponent(JSON.stringify(manifest));
       if ('serviceWorker' in navigator) {
         var sw = 'self.addEventListener("install",function(){self.skipWaiting()});self.addEventListener("activate",function(e){e.waitUntil(self.clients.claim())});self.addEventListener("fetch",function(e){e.respondWith(fetch(e.request).catch(function(){return new Response("",{status:408})}))});';
         navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw], { type: 'application/javascript' }))).catch(function(){});
