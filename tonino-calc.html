@@ -1,14 +1,21 @@
 <!DOCTYPE html>
-<html lang="it">
-
+<html lang="it" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" id="theme-color" content="#080b10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="dcterms.rightsHolder" content="Created by Gianfranco Piazzolla in homage to Tonino Lucidi">
   <title>Il calcolatore di Tonino</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap"
-    rel="stylesheet">
+  <link rel="manifest" id="manifest-link">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+  <script>
+    (function() {
+      var t = localStorage.getItem('theme');
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
   <style>
     :root {
       --primary: #00e676;
@@ -26,6 +33,17 @@
       --header-bg: rgba(8, 11, 16, 0.92);
     }
 
+    [data-theme="light"] {
+      --bg-color: #f4f6f9;
+      --card-bg: #ffffff;
+      --text-color: #1a1d23;
+      --input-bg: #eef1f5;
+      --border-color: #d1d5db;
+      --label-color: #6b7280;
+      --header-bg: rgba(255, 255, 255, 0.92);
+      --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -41,6 +59,7 @@
       align-items: center;
       min-height: 100vh;
       padding-bottom: 40px;
+      transition: background-color 0.3s, color 0.3s;
     }
 
     .header {
@@ -56,6 +75,7 @@
       top: 0;
       z-index: 100;
       margin-bottom: 40px;
+      transition: background-color 0.3s, border-color 0.3s;
     }
 
     .header::after {
@@ -90,6 +110,28 @@
       box-shadow: 0 0 10px var(--tesla-red);
     }
 
+    .theme-toggle {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-color);
+      transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+    }
+
+    .theme-toggle:hover {
+      background: var(--input-bg);
+    }
+
     .calculator-card {
       background: var(--card-bg);
       width: 90%;
@@ -100,6 +142,7 @@
       box-shadow: var(--card-shadow);
       position: relative;
       overflow: hidden;
+      transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
     }
 
     .calculator-card::before {
@@ -125,6 +168,7 @@
       letter-spacing: 1.5px;
       margin-bottom: 8px;
       font-weight: 600;
+      transition: color 0.3s;
     }
 
     .input-wrapper {
@@ -144,7 +188,7 @@
       font-size: 1rem;
       font-weight: 600;
       outline: none;
-      transition: all 0.2s ease;
+      transition: all 0.2s ease, background-color 0.3s, border-color 0.3s, color 0.3s;
     }
 
     input:focus {
@@ -160,6 +204,7 @@
       color: var(--label-color);
       font-weight: 700;
       pointer-events: none;
+      transition: color 0.3s;
     }
 
     .calculate-btn {
@@ -194,6 +239,7 @@
       padding-top: 25px;
       border-top: 1px dashed var(--border-color);
       text-align: center;
+      transition: border-color 0.3s;
     }
 
     .result-label {
@@ -204,6 +250,7 @@
       letter-spacing: 2px;
       margin-bottom: 12px;
       display: block;
+      transition: color 0.3s;
     }
 
     .result-value {
@@ -225,7 +272,8 @@
 
 <body>
   <header class="header">
-    <h1>Il calcolatore di Tonino</h1>
+    <h1>Tonino's Calc</h1>
+    <button class="theme-toggle" id="themeToggle" aria-label="Attiva/disattiva tema scuro/chiaro"></button>
   </header>
 
   <main class="calculator-card">
@@ -286,7 +334,41 @@
 
       document.getElementById('resultDisplay').innerHTML = drawnKwh.toFixed(2) + '<span class="result-unit">kWh</span>';
     }
+
+    (function() {
+      var html = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var themeColor = document.getElementById('theme-color');
+
+      var saved = localStorage.getItem('theme');
+      if (!saved) {
+        html.setAttribute('data-theme', 'dark');
+      }
+      updateToggleIcon();
+      updateThemeColorMeta();
+
+      toggle.addEventListener('click', function() {
+        var current = html.getAttribute('data-theme');
+        var next = current === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        updateToggleIcon();
+        updateThemeColorMeta();
+      });
+
+      function updateToggleIcon() {
+        var isDark = html.getAttribute('data-theme') === 'dark';
+        toggle.innerHTML = isDark
+          ? '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
+          : '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+      }
+
+      function updateThemeColorMeta() {
+        var isDark = html.getAttribute('data-theme') === 'dark';
+        themeColor.setAttribute('content', isDark ? '#080b10' : '#f4f6f9');
+      }
+    })();
+
   </script>
 </body>
-
 </html>
