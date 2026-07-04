@@ -563,24 +563,24 @@
         <span class="input-group-value" id="capacityDisplay" aria-live="polite">100</span>
       </div>
       <div class="input-range-wrapper">
-        <input type="range" id="capacity" min="5" max="200" step="0.5" value="100" aria-describedby="capacityUnit">
+        <input type="range" id="capacity" min="10" max="150" step="0.5" value="100" aria-describedby="capacityUnit">
         <span id="capacityUnit" class="sr-only">kWh</span>
       </div>
     </div>
 
     <div class="input-group">
       <div class="input-group-header">
-        <label class="input-group-label" for="socStart">SoC iniziale</label>
+        <label class="input-group-label" for="socStart">SoC iniziale [%]</label>
         <span class="input-group-value" id="socStartDisplay" aria-live="polite">0</span>
       </div>
       <div class="input-range-wrapper">
-        <input type="range" id="socStart" min="0" max="100" step="1" value="0">
+        <input type="range" id="socStart" min="0" max="100" step="1" value="10">
       </div>
     </div>
 
     <div class="input-group">
       <div class="input-group-header">
-        <label class="input-group-label" for="socTarget">SoC finale</label>
+        <label class="input-group-label" for="socTarget">SoC finale [%]</label>
         <span class="input-group-value" id="socTargetDisplay" aria-live="polite">80</span>
       </div>
       <div class="input-range-wrapper">
@@ -590,7 +590,7 @@
 
     <div class="input-group">
       <div class="input-group-header">
-        <label class="input-group-label" for="efficiency">Efficienza</label>
+        <label class="input-group-label" for="efficiency">Efficienza di trasferimento [%]</label>
         <span class="input-group-value" id="efficiencyDisplay" aria-live="polite">90</span>
       </div>
       <div class="input-range-wrapper">
@@ -601,12 +601,12 @@
 
     <div class="input-group">
       <div class="input-group-header">
-        <label class="input-group-label" for="price">Prezzo energia</label>
+        <label class="input-group-label" for="price">Prezzo energia [€/kWh]</label>
         <span class="input-group-value" id="priceDisplay" aria-live="polite">0,25</span>
       </div>
       <div class="input-range-wrapper">
-        <input type="range" id="price" min="0.05" max="0.60" step="0.01" value="0.25" aria-describedby="priceUnit">
-        <span id="priceUnit" class="sr-only">euro per kWh</span>
+        <input type="range" id="price" min="0.00" max="1.00" step="0.01" value="0.25" aria-describedby="priceUnit">
+        <span id="priceUnit" class="sr-only">Euro per kWh</span>
       </div>
     </div>
 
@@ -635,7 +635,7 @@
           <span class="breakdown-value" id="bdNet">0,00 kWh</span>
         </div>
         <div class="breakdown-item">
-          <span class="breakdown-label">Perdite</span>
+          <span class="breakdown-label">Perdite trasferimento</span>
           <span class="breakdown-value" id="bdLosses">0,00 kWh</span>
         </div>
         <div class="breakdown-item">
