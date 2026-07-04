@@ -656,7 +656,7 @@
     })();
 
     var els = {};
-    var state = { capacity: 100, socStart: 0, socTarget: 80, efficiency: 90, price: 0.25 };
+    var state = { capacity: 100, socStart: 10, socTarget: 80, efficiency: 90, price: 0.25 };
     var debounceTimer;
 
     function fmt(n, d) { return n.toLocaleString('it-IT', { minimumFractionDigits: d || 2, maximumFractionDigits: d || 2 }); }
@@ -778,8 +778,12 @@
         case '20-80': state.socStart = 20; state.socTarget = 80; break;
         case '30-70': state.socStart = 30; state.socTarget = 70; break;
         case 'reset':
-          state.capacity = 100; state.socStart = 0; state.socTarget = 80;
-          state.efficiency = 90; state.price = 0.25; break;
+          state.capacity = 100;
+          state.socStart = 10;
+          state.socTarget = 80;
+          state.efficiency = 90;
+          state.price = 0.25;
+          break;
         default: return;
       }
       els.capacity.value = state.capacity;
