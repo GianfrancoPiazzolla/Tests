@@ -744,9 +744,9 @@
       var width = Math.max(0, s2 - s1) + '%';
       els.socFill.style.left = left;
       els.socFill.style.width = width;
-      els.socMarkerStart.textContent = s1 + '%';
+      els.socMarkerStart.textContent = fmt((s1 / 100) * state.capacity, 1) + ' kWh';
       els.socMarkerStart.style.left = left;
-      els.socMarkerEnd.textContent = s2 + '%';
+      els.socMarkerEnd.textContent = fmt((s2 / 100) * state.capacity, 1) + ' kWh';
       els.socMarkerEnd.style.left = s2 + '%';
     }
 
