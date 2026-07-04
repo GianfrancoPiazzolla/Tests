@@ -624,6 +624,8 @@
     .profile-action-btn:hover { background: var(--surface-hover); }
     .profile-action-btn.load { color: var(--cyan); border-color: rgba(56,189,248,0.3); }
     .profile-action-btn.load:hover { background: rgba(56,189,248,0.1); }
+    .profile-action-btn.upd { color: var(--amber); border-color: rgba(245,158,11,0.3); }
+    .profile-action-btn.upd:hover { background: rgba(245,158,11,0.1); }
     .profile-action-btn.del { color: var(--red); border-color: rgba(226,16,23,0.3); }
     .profile-action-btn.del:hover { background: rgba(226,16,23,0.1); }
     .profile-save-row {
@@ -934,6 +936,24 @@
       els.bdCost.textContent = fmt(r.cost, 2) + ' €';
     }
 
+    function persistState() {
+      try { localStorage.setItem('toninoCalcState', JSON.stringify(state)); } catch(e) {}
+    }
+
+    function restoreState() {
+      try {
+        var d = localStorage.getItem('toninoCalcState');
+        if (d) {
+          var s = JSON.parse(d);
+          if (s && typeof s.capacity === 'number') state.capacity = s.capacity;
+          if (s && typeof s.socStart === 'number') state.socStart = s.socStart;
+          if (s && typeof s.socTarget === 'number') state.socTarget = s.socTarget;
+          if (s && typeof s.efficiency === 'number') state.efficiency = s.efficiency;
+          if (s && typeof s.price === 'number') state.price = s.price;
+        }
+      } catch(e) {}
+    }
+
     function syncAll() {
       readState();
       writeDisplays();
@@ -941,6 +961,7 @@
       var r = calc();
       updateBattery(r);
       updateResult(r);
+      persistState();
     }
 
     function onInput(e) {
@@ -1030,6 +1051,7 @@
           '</div>' +
           '<div class="profile-item-actions">' +
             '<button class="profile-action-btn load" onclick="loadProfile(\'' + escHtml(name) + '\')">Carica</button>' +
+            '<button class="profile-action-btn upd" onclick="updateProfile(\'' + escHtml(name) + '\')">Aggiorna</button>' +
             '<button class="profile-action-btn del" onclick="deleteProfile(\'' + escHtml(name) + '\')">&#10005;</button>' +
           '</div>' +
         '</div>';
@@ -1040,6 +1062,7 @@
       var input = document.getElementById('profileNameInput');
       var name = input.value.trim();
       if (!name) { input.focus(); return; }
+      var isNew = !profiles[name];
       profiles[name] = {
         capacity: state.capacity,
         socTarget: state.socTarget,
@@ -1049,7 +1072,8 @@
       input.value = '';
       saveProfiles();
       renderProfilesList();
-      showToast('Profilo salvato: ' + name);
+      showToast(isNew ? 'Profilo salvato: ' + name : 'Profilo aggiornato: ' + name);
+      document.getElementById('saveProfileBtn').textContent = '💾 Salva';
     }
 
     function applyProfile(name) {
@@ -1070,6 +1094,15 @@
     function loadProfile(name) {
       loadProfiles();
       if (profiles[name]) applyProfile(name);
+    }
+
+    function updateProfile(name) {
+      loadProfiles();
+      if (!profiles[name]) return;
+      var input = document.getElementById('profileNameInput');
+      input.value = name;
+      input.focus();
+      document.getElementById('saveProfileBtn').textContent = '🔄 Aggiorna';
     }
 
     function deleteProfile(name) {
@@ -1137,6 +1170,7 @@
 
     function init() {
       cache();
+      restoreState();
       initTheme();
       els.capacity.value = state.capacity;
       els.socStart.value = state.socStart;
