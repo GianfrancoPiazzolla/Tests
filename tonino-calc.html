@@ -548,7 +548,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius-xs);
       padding: 0.6rem 0.85rem;
-      gap: 0.5rem;
+      gap: 0.0rem;
     }
     .profile-item-info { display: flex; flex-direction: column; flex: 1; }
     .profile-item-name {
@@ -789,8 +789,8 @@
       <p class="modal-sub">Salva e carica configurazioni dei parametri.</p>
       <div class="profiles-list" id="profilesList"></div>
       <div class="profile-save-row">
-        <input type="text" class="profile-name-input" id="profileNameInput" placeholder="Nome profilo" maxlength="40">
-        <button class="profile-save-btn" id="saveProfileBtn">💾 Salva</button>
+        <input type="text" class="profile-name-input" id="profileNameInput" placeholder="Nome profilo" maxlength="20">
+        <button class="profile-save-btn" id="saveProfileBtn">Salva</button>
       </div>
     </div>
   </div>
@@ -1079,7 +1079,7 @@
       saveProfiles();
       renderProfilesList();
       showToast(isNew ? 'Profilo salvato: ' + name : 'Profilo aggiornato: ' + name);
-      document.getElementById('saveProfileBtn').textContent = '💾 Salva';
+      document.getElementById('saveProfileBtn').textContent = 'Salva';
     }
 
     function applyProfile(name) {
@@ -1110,7 +1110,7 @@
       var input = document.getElementById('profileNameInput');
       input.value = name;
       input.focus();
-      document.getElementById('saveProfileBtn').textContent = '🔄 Aggiorna';
+      document.getElementById('saveProfileBtn').textContent = 'Aggiorna';
     }
 
     function deleteProfile(name) {
