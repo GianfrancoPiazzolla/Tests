@@ -1,1208 +1,2658 @@
 <!DOCTYPE html>
-<html lang="it" data-theme="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" id="theme-color" content="#070b12">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="dcterms.rightsHolder" content="Created by Gianfranco Piazzolla in homage to Tonino Lucidi">
-  <meta name="description" content="Calcolatore di energia per ricarica EV">
-  <title>Il calcolatore di Tonino</title>
-  <link rel="manifest" id="manifest-link">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --red: #e21017;
-      --red-dim: #b01014;
-      --red-glow: rgba(226, 16, 23, 0.35);
-      --cyan: #38bdf8;
-      --green: #22c55e;
-      --amber: #f59e0b;
-      --bg: #070b12;
-      --card: rgba(15, 23, 42, 0.78);
-      --surface: rgba(255, 255, 255, 0.04);
-      --surface-hover: rgba(255, 255, 255, 0.08);
-      --text: #f1f5f9;
-      --text-dim: #64748b;
-      --text-muted: #475569;
-      --border: rgba(255, 255, 255, 0.07);
-      --border-focus: rgba(56, 189, 248, 0.5);
-      --header-bg: rgba(7, 11, 18, 0.85);
-      --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-      --radius: 16px;
-      --radius-sm: 10px;
-      --radius-xs: 6px;
-      --font: 'Inter', system-ui, -apple-system, sans-serif;
-      --font-mono: 'JetBrains Mono', 'Cascadia Code', monospace;
-      --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000"/>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EV Master">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    <link rel="manifest" href="manifest.json">
+    <title>EV Master</title>
+    <style>
+:root {
+    --bg-dark: #020617;
+    --bg-card: #0f172a;
+    --border-color: #1e293b;
+    --text-light: #e2e8f0;
+    --text-muted: #64748b;
+    --accent-blue: #60a5fa;
+    --accent-emerald: #34d399;
+    --accent-red: #f87171;
+    --accent-amber: #fbbf24;
+    --accent-purple: #fd78d1;
+    --input-bg: #1e293b80;
+}
 
-    [data-theme="light"] {
-      --bg: #f0f4f8;
-      --card: rgba(255, 255, 255, 0.82);
-      --surface: rgba(0, 0, 0, 0.04);
-      --surface-hover: rgba(0, 0, 0, 0.07);
-      --text: #0f172a;
-      --text-dim: #64748b;
-      --text-muted: #94a3b8;
-      --border: rgba(0, 0, 0, 0.08);
-      --border-focus: rgba(56, 189, 248, 0.6);
-      --header-bg: rgba(240, 244, 248, 0.85);
-      --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-      --red-glow: rgba(226, 16, 23, 0.15);
-    }
+[data-theme="light"] {
+    --bg-dark: #ffffff;
+    --bg-card: #e9e9e9;
+    --border-color: #a9c9df;
+    --text-light: #0f172a;
+    --text-muted: #1e293b;
+    --accent-blue: #65addd;
+    --accent-emerald: #047857;
+    --accent-red: #b91c1c;
+    --accent-amber: #b45309;
+    --accent-purple: #ff62cb;
+    --input-bg: #f5f5f5;
+}
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { -webkit-text-size-adjust: 100%; }
-    body {
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 0 16px 48px;
-      transition: background var(--transition), color var(--transition);
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background:
-        radial-gradient(ellipse 60% 50% at 15% 30%, rgba(226, 16, 23, 0.06) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 85% 70%, rgba(56, 189, 248, 0.05) 0%, transparent 60%);
-      z-index: 0;
-    }
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    margin: 0;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
 
-    .header {
-      width: 100%;
-      max-width: 600px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 20px;
-      margin-top: 12px;
-      border-radius: var(--radius);
-      background: var(--header-bg);
-      backdrop-filter: blur(20px) saturate(1.4);
-      -webkit-backdrop-filter: blur(20px) saturate(1.4);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      position: sticky;
-      top: 12px;
-      z-index: 100;
-      transition: background var(--transition), border-color var(--transition);
-    }
+.container {
+    width: 100%;
+    max-width: 1024px;
+    position: relative;
+}
 
-    .header-brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
 
-    .header-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--red);
-      box-shadow: 0 0 14px var(--red-glow);
-      flex-shrink: 0;
-      transition: box-shadow var(--transition);
-    }
+header h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    background: linear-gradient(to right, var(--accent-blue), var(--accent-emerald));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin: 0;
+    line-height: 1;
+}
 
-    .header-title {
-      font-size: clamp(0.8rem, 2.5vw, 0.95rem);
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--red);
-    }
+.theme-toggle {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--text-light);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    transition: all 0.2s;
+}
 
-    .theme-toggle {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text-dim);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all var(--transition);
-      flex-shrink: 0;
-    }
-    .theme-toggle:hover {
-      background: var(--surface-hover);
-      color: var(--text);
-    }
-    .theme-toggle:focus-visible {
-      outline: 2px solid var(--cyan);
-      outline-offset: 2px;
-    }
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
 
-    .card {
-      width: 100%;
-      max-width: 600px;
-      margin-top: 24px;
-      background: var(--card);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 28px 24px 32px;
-      position: relative;
-      z-index: 1;
-      transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+@media (min-width: 1024px) {
+    .grid-container {
+        grid-template-columns: 5fr 7fr;
+        align-items: start;
     }
+}
 
-    .battery-vis {
-      margin-bottom: 28px;
-      padding-bottom: 24px;
-      border-bottom: 1px solid var(--border);
-      transition: border-color var(--transition);
-    }
+.card {
+    background-color: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: 2rem;
+    padding: 1rem;
+    margin-bottom: 2rem;
+}
 
-    .battery-vis-label {
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-dim);
-      margin-bottom: 14px;
-    }
+.input-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
 
-    .soc-track {
-      position: relative;
-      height: 32px;
-      background: var(--surface);
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 20px;
+}
 
-    .soc-fill {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      background: linear-gradient(90deg, var(--red), var(--amber), var(--green));
-      border-radius: 7px;
-      transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
-    }
+.input-group label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
 
-    .soc-marker {
-      position: absolute;
-      top: -2px;
-      transform: translateX(-50%);
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
-      font-weight: 700;
-      padding: 1px 6px;
-      border-radius: 4px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      color: var(--text);
-      white-space: nowrap;
-      transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 2;
-    }
-    .soc-marker-start { color: var(--cyan); border-color: rgba(56,189,248,0.3); }
-    .soc-marker-end { color: var(--green); border-color: rgba(34,197,94,0.3); }
+.input-wrapper {
+    position: relative;
+    display: flex;
+}
 
-    .soc-axis {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 6px;
-      font-size: 0.6rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      padding: 0 2px;
-    }
+.input-wrapper input[type="number"] {
+    width: 100%;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+}
 
-    .input-group {
-      margin-bottom: 20px;
-    }
+.input-wrapper input[type="number"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5);
+    border-color: var(--accent-blue);
+}
 
-    .input-group-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
+.input-wrapper span {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-weight: 700;
+}
 
-    .input-group-label {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--text-dim);
-      letter-spacing: 0.02em;
-      transition: color var(--transition);
-    }
+input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background-color: var(--border-color);
+    border-radius: 3px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
 
-    .input-group-value {
-      font-family: var(--font-mono);
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--text);
-      transition: color var(--transition);
-    }
-    .input-group-value:empty::before {
-      content: '--';
-      color: var(--text-muted);
-    }
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--accent-blue);
+    border: 3px solid var(--bg-card);
+}
 
-    .input-range-wrapper {
-      position: relative;
-    }
+.results-card {
+    text-align: center;
+}
 
-    input[type="range"] {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 100%;
-      height: 6px;
-      border-radius: 3px;
-      background: var(--surface);
-      outline: none;
-      cursor: pointer;
-      transition: background var(--transition);
-    }
+/* ── AUTONOMY TAB — Realistic Battery ── */
+.battery-visual-container {
+    position: relative;
+    margin: 0 auto 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
 
-    input[type="range"]::-webkit-slider-runnable-track {
-      height: 6px;
-      border-radius: 3px;
-      background: linear-gradient(to right, var(--red) 0%, var(--red) var(--pct), var(--surface) var(--pct), var(--surface) 100%);
-      transition: background 0.1s;
-    }
+/* Hidden legacy elements — kept for JS compatibility */
+#battery-box { display: none; }
+#battery-level { display: none; }
+#battery-tip { display: none; }
+#battery-buffer-marker { display: none; }
+#battery-start-marker { display: none; }
+.battery-label { display: none; }
 
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--card);
-      border: 2px solid var(--red);
-      box-shadow: 0 0 0 4px var(--surface), 0 2px 8px rgba(0,0,0,0.4);
-      cursor: grab;
-      margin-top: -8px;
-      transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
-    }
-    input[type="range"]::-webkit-slider-thumb:hover {
-      transform: scale(1.08);
-    }
-    input[type="range"]:focus::-webkit-slider-thumb {
-      border-color: var(--cyan);
-      box-shadow: 0 0 0 4px var(--surface), 0 0 0 6px rgba(56,189,248,0.2);
-    }
-    input[type="range"]:active::-webkit-slider-thumb {
-      cursor: grabbing;
-      transform: scale(0.95);
-    }
+/* ── SVG Battery Shell ── */
+.ev-battery-wrap {
+    width: 100%;
+    max-width: 1000px;
+    position: reltive;
+}
 
-    input[type="range"]::-moz-range-track {
-      height: 6px;
-      border-radius: 3px;
-      background: var(--surface);
-    }
-    input[type="range"]::-moz-range-thumb {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--card);
-      border: 2px solid var(--red);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-      cursor: grab;
-    }
-    input[type="range"]::-moz-range-progress {
-      height: 6px;
-      border-radius: 3px;
-      background: var(--red);
-    }
+.ev-battery-svg-container {
+    width: 100%;
+    position: relative;
+}
 
-    .presets {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 24px 0 20px;
-      padding-top: 20px;
-      border-top: 1px solid var(--border);
-      transition: border-color var(--transition);
-    }
+/* ── SoC Ring ── */
+.soc-ring-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
 
-    .preset-btn {
-      padding: 7px 16px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text-dim);
-      font-family: var(--font);
-      font-size: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all var(--transition);
-      white-space: nowrap;
-    }
-    .preset-btn:hover {
-      background: var(--surface-hover);
-      color: var(--text);
-      border-color: var(--text-muted);
-    }
-    .preset-btn:active {
-      transform: scale(0.96);
-    }
-    .preset-btn:focus-visible {
-      outline: 2px solid var(--cyan);
-      outline-offset: 2px;
-    }
-    .preset-btn--reset {
-      margin-left: auto;
-      color: var(--text-muted);
-    }
-    .preset-btn--reset:hover {
-      color: var(--red);
-      border-color: var(--red);
-    }
+.soc-ring-svg {
+    filter: drop-shadow(0 0 12px var(--ring-glow, rgba(52,211,153,0.4)));
+    transition: filter 0.7s ease;
+}
 
-    .result-area {
-      margin-top: 8px;
-      padding: 24px;
-      border-radius: var(--radius-sm);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      transition: background var(--transition), border-color var(--transition);
-      position: relative;
-    }
+.soc-center-text {
+    font-size: 2.6rem;
+    font-weight: 900;
+    fill: var(--text-light, #e2e8f0);
+    font-family: 'Courier New', monospace;
+    letter-spacing: -0.05em;
+}
+.soc-center-sub {
+    font-size: 0.72rem;
+    fill: var(--text-muted, #64748b);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-family: system-ui, sans-serif;
+}
 
-    .result-main {
-      display: flex;
-      align-items: baseline;
-      justify-content: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
+/* ── Horizontal Battery Body ── */
+.h-battery-outer {
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 0.5rem;
+}
 
-    .result-value {
-      font-family: var(--font-mono);
-      font-size: clamp(2rem, 6vw, 2.8rem);
-      font-weight: 700;
-      color: var(--green);
-      text-shadow: 0 0 30px rgba(34, 197, 94, 0.15);
-      transition: color var(--transition);
-      will-change: contents;
-    }
+.h-battery-body {
+    flex: 1;
+    height: 56px;
+    background: var(--bg-dark);
+    border: 2.5px solid var(--border-color);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+        inset 0 2px 4px rgba(0,0,0,0.4),
+        inset 0 -1px 2px rgba(255,255,255,0.04),
+        0 0 0 1px rgba(255,255,255,0.03);
+}
 
-    .result-unit {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--green);
-      opacity: 0.7;
-    }
+/* Sheen overlay */
+.h-battery-body::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 45%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.06), transparent);
+    border-radius: 8px 8px 0 0;
+    z-index: 3;
+    pointer-events: none;
+}
 
-    .result-label {
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text);
-      text-align: center;
-      margin-bottom: 4px;
-    }
+/* Cell dividers */
+.h-battery-cells {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    pointer-events: none;
+}
+.h-cell-divider {
+    position: absolute;
+    top: 6px; bottom: 6px;
+    width: 1.5px;
+    background: rgba(255,255,255,0.07);
+}
+[data-theme="light"] .h-cell-divider {
+    background: rgba(0,0,0,0.08);
+}
 
-    .result-copy {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      width: 34px;
-      height: 34px;
-      border-radius: var(--radius-xs);
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text-dim);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all var(--transition);
-    }
-    .result-copy:hover {
-      background: var(--surface-hover);
-      color: var(--text);
-    }
-    .result-copy:active {
-      transform: scale(0.92);
-    }
-    .result-copy[data-copied] {
-      color: var(--green);
-      border-color: var(--green);
-    }
+.h-battery-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    border-radius: 7px 0 0 7px;
+    transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1), background 0.7s ease;
+    z-index: 1;
+}
 
-    .result-breakdown {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px 24px;
-      margin-top: 16px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-      transition: border-color var(--transition);
-    }
+/* Animated glow pulse on fill */
+.h-battery-fill::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 24px;
+    background: rgba(255,255,255,0.18);
+    filter: blur(6px);
+    border-radius: 0 4px 4px 0;
+    animation: battPulse 2s ease-in-out infinite;
+}
+@keyframes battPulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
 
-    .breakdown-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.78rem;
-    }
+/* Segment tick marks on top */
+.h-battery-ticks {
+    position: absolute;
+    top: -14px;
+    left: 0; right: 0;
+    height: 10px;
+    pointer-events: none;
+    z-index: 4;
+}
+.h-battery-tick {
+    position: absolute;
+    top: 0;
+    width: 1px;
+    height: 6px;
+    background: var(--text-muted);
+    opacity: 0.4;
+    transform: translateX(-50%);
+}
+.h-battery-tick.major {
+    height: 10px;
+    opacity: 0.7;
+    width: 1.5px;
+}
+.h-battery-tick-label {
+    position: absolute;
+    top: -16px;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-muted);
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
 
-    .breakdown-label {
-      color: var(--text-dim);
-      font-weight: 500;
-    }
-    .breakdown-label--total {
-      color: var(--text);
-      font-weight: 600;
-    }
+/* Buffer + Start markers  */
+.h-marker {
+    position: absolute;
+    top: -3px; bottom: -3px;
+    width: 2px;
+    z-index: 5;
+    pointer-events: none;
+    transition: left 0.5s ease;
+}
+.h-marker.buffer { background: var(--accent-red); }
+.h-marker.start { background: var(--accent-blue); }
+.h-marker::before {
+    content: attr(data-label);
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding: 1px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+}
+.h-marker.buffer::before { color: var(--accent-red); background: rgba(248,113,113,0.12); }
+.h-marker.start::before  { color: var(--accent-blue); background: rgba(96,165,250,0.12); }
+.h-marker::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 7px; height: 7px;
+    border-radius: 50%;
+}
+.h-marker.buffer::after { background: var(--accent-red); }
+.h-marker.start::after  { background: var(--accent-blue); }
 
-    .breakdown-value {
-      font-family: var(--font-mono);
-      font-weight: 600;
-      color: var(--text);
-    }
+/* Battery nub (positive terminal) */
+.h-battery-nub {
+    width: 10px; height: 26px;
+    background: var(--border-color);
+    border-radius: 0 4px 4px 0;
+    border: 2px solid var(--border-color);
+    border-left: none;
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.06);
+    flex-shrink: 0;
+}
 
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: var(--card);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--border);
-      padding: 10px 20px;
-      border-radius: var(--radius-sm);
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: var(--text);
-      box-shadow: var(--shadow);
-      opacity: 0;
-      transition: opacity 0.35s, transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-      pointer-events: none;
-      z-index: 200;
-    }
-    .toast--visible {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-      pointer-events: auto;
-    }
+/* ── Segment Labels below bar ── */
+.h-battery-legend {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0 2px;
+    margin-bottom: 1.5rem;
+    margin-top: 18px;
+}
 
-    @media (max-width: 480px) {
-      .card { padding: 20px 16px 24px; padding-top: 24px; }
-      .header { padding: 12px 16px; }
-      .result-breakdown { grid-template-columns: 1fr; }
-      .preset-btn--reset { margin-left: 0; }
-    }
+/* ── Autonomy Geek Stats Grid ── */
+.autonomy-stats-outer {
+    width: 100%;
+}
 
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
+.autonomy-hero {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-bottom: 0.25rem;
+}
+.autonomy-hero .hero-val {
+    font-size: 5rem;
+    font-weight: 900;
+    line-height: 1;
+    font-family: 'Courier New', monospace;
+    letter-spacing: -0.04em;
+    color: var(--accent-emerald);
+    transition: color 0.7s;
+}
+.autonomy-hero .hero-unit {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    font-style: italic;
+    padding-bottom: 0.5rem;
+}
+.autonomy-hero-sub {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
 
-    @media print {
-      .header { position: static; backdrop-filter: none; }
-      .theme-toggle { display: none; }
-      .presets { display: none; }
-      .result-copy { display: none; }
-      .card { box-shadow: none; border: 1px solid #ccc; }
-      body::before { display: none; }
-    }
+/* Speed range mini-pills */
+.speed-range-pills {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 0 1.5rem;
+}
+.speed-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.6rem;
+    padding: 0.45rem 0.75rem;
+    min-width: 58px;
+    transition: border-color 0.3s;
+}
+.speed-pill:hover { border-color: var(--accent-blue); }
+.speed-pill .sp-speed {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 2px;
+}
+.speed-pill .sp-range {
+    font-size: 1rem;
+    font-weight: 900;
+    color: var(--accent-emerald);
+    line-height: 1.1;
+}
+.speed-pill .sp-unit {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    font-weight: 700;
+}
 
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      z-index: 2000;
-      left: 0; top: 0;
-      width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.6);
-      backdrop-filter: blur(8px);
-    }
-    .modal-overlay.open { display: flex; align-items: center; justify-content: center; }
-    .modal-box {
-      background: var(--card);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px 24px;
-      width: 90%;
-      max-width: 440px;
-      position: relative;
-      box-shadow: var(--shadow);
-    }
-    .modal-box h2 {
-      font-size: 1rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--cyan);
-      margin: 0 0 0.3rem;
-    }
-    .modal-box p.modal-sub {
-      font-size: 0.78rem;
-      color: var(--text-dim);
-      margin: 0 0 1rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .modal-close {
-      position: absolute;
-      top: 1.1rem; right: 1.25rem;
-      font-size: 1.4rem;
-      cursor: pointer;
-      color: var(--text-muted);
-      background: none;
-      border: none;
-      line-height: 1;
-      transition: color var(--transition);
-    }
-    .modal-close:hover { color: var(--text); }
-    .profiles-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      max-height: 260px;
-      overflow-y: auto;
-      margin-bottom: 1rem;
-    }
-    .profiles-list::-webkit-scrollbar { width: 4px; }
-    .profiles-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-    .profile-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xs);
-      padding: 0.6rem 0.85rem;
-      gap: 0.5rem;
-    }
-    .profile-item-info { display: flex; flex-direction: column; flex: 1; }
-    .profile-item-name {
-      font-weight: 800;
-      font-size: 0.9rem;
-      color: var(--text);
-    }
-    .profile-item-details {
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      margin-top: 2px;
-      letter-spacing: 0.02em;
-    }
-    .profile-item-actions { display: flex; gap: 0.4rem; }
-    .profile-action-btn {
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--text);
-      border-radius: 4px;
-      padding: 0.3rem 0.7rem;
-      font-size: 0.75rem;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: var(--font);
-      transition: all 0.18s ease;
-    }
-    .profile-action-btn:hover { background: var(--surface-hover); }
-    .profile-action-btn.load { color: var(--cyan); border-color: rgba(56,189,248,0.3); }
-    .profile-action-btn.load:hover { background: rgba(56,189,248,0.1); }
-    .profile-action-btn.del { color: var(--red); border-color: rgba(226,16,23,0.3); }
-    .profile-action-btn.del:hover { background: rgba(226,16,23,0.1); }
-    .profile-save-row {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border);
-    }
-    .profile-name-input {
-      flex: 1;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-radius: var(--radius-xs);
-      padding: 0.6rem 0.85rem;
-      font-size: 0.9rem;
-      font-weight: 600;
-      font-family: var(--font);
-      outline: none;
-      transition: border-color var(--transition);
-    }
-    .profile-name-input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 2px rgba(56,189,248,0.2); }
-    .profile-save-btn {
-      border: none;
-      background: linear-gradient(135deg, var(--cyan), var(--green));
-      color: #fff;
-      border-radius: var(--radius-xs);
-      padding: 0.6rem 1.1rem;
-      font-size: 0.82rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      cursor: pointer;
-      white-space: nowrap;
-      font-family: var(--font);
-      transition: opacity 0.18s;
-    }
-    .profile-save-btn:hover { opacity: 0.88; }
-    .profiles-empty {
-      text-align: center;
-      color: var(--text-dim);
-      font-size: 0.82rem;
-      font-style: italic;
-      padding: 1.25rem 0;
-    }
+/* Autonomy detail grid */
+.autonomy-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+.autonomy-detail-item {
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.85rem;
+    padding: 0.85rem 1rem;
+    border-bottom: 3px solid transparent;
+    text-align: left;
+    transition: border-color 0.3s;
+}
+.autonomy-detail-item .ad-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin: 0 0 4px;
+}
+.autonomy-detail-item .ad-val {
+    font-size: 1.2rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 0;
+}
+.autonomy-detail-item .ad-unit {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
 
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0,0,0,0);
-      border: 0;
+.autonomy-no-data {
+    padding: 2rem 1rem;
+    background-color: var(--input-bg);
+    border-radius: 1rem;
+    border: 1px dashed var(--border-color);
+    color: var(--text-muted);
+    text-align: center;
+}
+
+/* Charged-indicator strip */
+.soc-strip {
+    width: 100%;
+    height: 5px;
+    border-radius: 99px;
+    background: var(--border-color);
+    margin: 0.5rem 0 1.5rem;
+    overflow: hidden;
+}
+.soc-strip-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1), background 0.7s;
+}
+
+.results-display h2 {
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+}
+
+.results-data .value {
+    font-size: 6rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.results-data .unit {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-left: 0.5rem;
+    font-style: italic;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.details-item {
+    background-color: var(--input-bg);
+    padding: 1rem;
+    border-radius: 1rem;
+    text-align: left;
+    border-bottom: 4px solid transparent;
+}
+
+.details-item .label {
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+}
+
+.details-item .value {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.details-item .unit {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.stats-header {
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    border-top: 1px solid var(--border-color);
+    padding-top: 2rem;
+}
+
+.value.blue { color: var(--accent-blue); }
+.value.green { color: var(--accent-emerald); }
+.value.yellow { color: var(--accent-amber); }
+.value.red { color: var(--accent-red); }
+.value.purple { color: var(--accent-purple); }
+.value.white { color: var(--text-light); }
+
+.no-results {
+    padding: 2rem 1rem;
+    background-color: var(--input-bg);
+    border-radius: 1rem;
+    border: 1px dashed var(--border-color);
+    color: var(--text-muted);
+}
+
+/* Calculator Styles */
+.calculator-section {
+    grid-column: 1 / -1;
+}
+
+.calc-container {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .calc-container {
+        grid-template-columns: 1fr;
     }
-  </style>
+}
+
+.calc-display {
+    background: var(--input-bg);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    text-align: right;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+}
+
+.calc-display .operation {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    min-height: 1.2rem;
+    word-break: break-all;
+}
+
+.calc-display .current {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--text-light);
+    overflow: hidden;
+}
+
+.calc-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+}
+
+.btn {
+    padding: 1.2rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-light);
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn:hover { background: var(--input-bg); }
+.btn:active { transform: scale(0.95); }
+.btn-accent { background: var(--accent-blue); color: #ffffff; }
+.btn-accent:hover { opacity: 0.9; }
+.btn-op { color: var(--accent-amber); }
+
+.tape-container {
+    background: var(--input-bg);
+    border-radius: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    max-height: 450px;
+    display: flex;
+    flex-direction: column;
+}
+
+.tape-title {
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+#calc-tape {
+    overflow-y: auto;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+}
+
+.tape-entry {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tape-entry .expr { color: var(--text-muted); }
+.tape-entry .res { color: var(--accent-emerald); font-weight: bold; font-size: 1.1rem; }
+
+/* Tab Styles */
+.tab-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    padding-bottom: 1rem;
+}
+.tab-btn {
+    padding: 0.5rem 0.5rem;
+    cursor: pointer;
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0.5rem 0.5rem 0 0;
+    background: none;
+    color: var(--text-muted);
+    font-weight: 700;
+    transition: all 0.2s;
+    font-size: 1rem;
+}
+.tab-btn:hover {
+    background-color: var(--bg-card);
+    color: var(--text-light);
+}
+.tab-btn.active {
+    color: var(--accent-blue);
+    border-bottom-color: var(--accent-blue);
+}
+.tab-content {
+    display: none;
+    animation: fadeIn 0.5s;
+}
+.tab-content.active {
+    display: block;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Range vs Speed Chart ── */
+.chart-wrapper {
+    position: relative;
+    width: 100%;
+    margin-top: 1.5rem;
+}
+canvas.range-chart {
+    width: 100% !important;
+    border-radius: 0.75rem;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+}
+
+/* ── CO2 savings bar ── */
+.co2-bar-track {
+    width: 100%;
+    height: 14px;
+    background: var(--border-color);
+    border-radius: 99px;
+    overflow: hidden;
+    margin: 0.5rem 0 0.25rem;
+}
+.co2-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(to right, var(--accent-emerald), var(--accent-blue));
+    transition: width 0.7s ease-out;
+}
+
+/* ── Battery Health ── */
+.health-gauge-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1rem 0 1.5rem;
+}
+.health-arc {
+    position: relative;
+    width: 160px;
+    height: 80px;
+    overflow: hidden;
+}
+.health-arc svg { position: absolute; top: 0; left: 0; }
+.health-arc .gauge-label {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 900;
+    line-height: 1;
+}
+.health-arc .gauge-sub {
+    position: absolute;
+    bottom: -18px;
+    width: 100%;
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+}
+
+/* ── SoC Quick Converter ── */
+.soc-converter {
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    padding: 1rem 1.25rem;
+    margin-top: 1.5rem;
+}
+.soc-converter h4 {
+    font-size: 0.8rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin: 0 0 0.75rem;
+}
+.soc-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.soc-row input[type="number"] {
+    width: 110px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 700;
+}
+.soc-row input[type="number"]:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+}
+.soc-result {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent-emerald);
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-card);
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    min-width: 110px;
+    text-align: center;
+}
+.soc-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+/* ── Export button ── */
+.export-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-emerald));
+    color: #fff;
+    border: none;
+    border-radius: 0.75rem;
+    padding: 0.7rem 1.4rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-top: 1rem;
+}
+.export-btn:hover { opacity: 0.85; }
+.export-btn:active { transform: scale(0.97); }
+
+/* ── Charge rate badge ── */
+.charge-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 99px;
+    padding: 0.25rem 0.75rem;
+    margin-top: 0.5rem;
+    color: var(--accent-amber);
+}
+
+/* ── Trip log ── */
+.trip-log-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 320px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+.trip-log-item {
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+.trip-log-item .tl-date { color: var(--text-muted); font-size: 0.75rem; }
+.trip-log-item .tl-km { font-weight: 900; color: var(--accent-blue); }
+.trip-log-item .tl-cons { color: var(--accent-red); font-weight: 700; }
+.trip-log-item .tl-del {
+    background: none; border: none; color: var(--text-muted);
+    cursor: pointer; font-size: 1rem; padding: 0;
+}
+.trip-log-item .tl-del:hover { color: var(--accent-red); }
+.no-log-msg {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 1.5rem;
+    font-size: 0.9rem;
+    border: 1px dashed var(--border-color);
+    border-radius: 0.75rem;
+}
+
+/* ── Scroll fix for select ── */
+select {
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+/* ── Profiles Modal ── */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+}
+.modal-overlay.open { display: flex; align-items: center; justify-content: center; }
+.modal-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 1.25rem;
+    padding: 2rem;
+    width: 90%;
+    max-width: 480px;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+.modal-box h2 {
+    font-size: 1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent-blue);
+    margin: 0 0 0.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.modal-box p.modal-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin: 0 0 1rem;
+}
+.modal-close {
+    position: absolute;
+    top: 1.1rem; right: 1.25rem;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    line-height: 1;
+    transition: color 0.2s;
+}
+.modal-close:hover { color: var(--text-light); }
+
+/* Profiles list */
+.profiles-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 260px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+.profiles-list::-webkit-scrollbar { width: 4px; }
+.profiles-list::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+.profile-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.6rem;
+    padding: 0.6rem 0.85rem;
+    gap: 0.5rem;
+}
+.profile-item-info { display: flex; flex-direction: column; flex: 1; }
+.profile-item-name {
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+.profile-item-details {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+    letter-spacing: 0.02em;
+}
+.profile-item-actions { display: flex; gap: 0.4rem; }
+.profile-action-btn {
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-light);
+    border-radius: 0.4rem;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+.profile-action-btn:hover { background: var(--border-color); }
+.profile-action-btn.load { color: var(--accent-blue); border-color: rgba(96,165,250,0.4); }
+.profile-action-btn.load:hover { background: rgba(96,165,250,0.1); }
+.profile-action-btn.del { color: var(--accent-red); border-color: rgba(248,113,113,0.4); }
+.profile-action-btn.del:hover { background: rgba(248,113,113,0.1); }
+
+.profile-save-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+.profile-name-input {
+    flex: 1;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+    border-radius: 0.6rem;
+    padding: 0.6rem 0.85rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.profile-name-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 2px rgba(96,165,250,0.2); }
+.profile-save-btn {
+    border: none;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-emerald));
+    color: #fff;
+    border-radius: 0.6rem;
+    padding: 0.6rem 1.1rem;
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.18s;
+}
+.profile-save-btn:hover { opacity: 0.88; }
+.profiles-empty {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-style: italic;
+    padding: 1.25rem 0;
+}
+
+/* Header profile button */
+.header-profile-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--text-light);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    transition: all 0.2s;
+}
+.header-profile-btn:hover { background: var(--input-bg); }
+    </style>
 </head>
-<body>
+<body data-theme="dark">
+    <div class="container">
+        <header>
+            <h1>EV MASTER</h1>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+                <button class="header-profile-btn" id="openProfilesBtn" title="Vehicle Profiles">👤</button>
+                <button class="theme-toggle" id="themeToggle">
+                    <span id="themeIcon">☀️</span>
+                </button>
+                <button class="header-profile-btn" id="openAboutBtn" title="About">⭐</button>
+            </div>
+        </header>
 
-  <header class="header" role="banner">
-    <div class="header-brand">
-      <span class="header-dot" aria-hidden="true"></span>
-      <span class="header-title">Il calcolatore di Tonino</span>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center;">
-    <button class="theme-toggle" id="profilesToggle" type="button" aria-label="Gestisci profili" title="Profili">👤</button>
-    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Attiva tema chiaro">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-    </button>
-    </div>
-  </header>
-
-  <main class="card" role="main">
-    <div class="battery-vis" role="img" aria-label="Visualizzazione intervallo di carica">
-      <div class="battery-vis-label">Intervallo di ricarica</div>
-      <div class="soc-track">
-        <div class="soc-fill" id="socFill" style="left:0%;width:0%;"></div>
-        <span class="soc-marker soc-marker-start" id="socMarkerStart" style="left:0%;">0%</span>
-        <span class="soc-marker soc-marker-end" id="socMarkerEnd" style="left:0%;">0%</span>
-      </div>
-      <div class="soc-axis">
-        <span>0%</span>
-        <span>25%</span>
-        <span>50%</span>
-        <span>75%</span>
-        <span>100%</span>
-      </div>
-    </div>
-
-    <div class="input-group">
-      <div class="input-group-header">
-        <label class="input-group-label" for="capacity">Capacità batteria [kWh]</label>
-        <span class="input-group-value" id="capacityDisplay" aria-live="polite">100</span>
-      </div>
-      <div class="input-range-wrapper">
-        <input type="range" id="capacity" min="10" max="150" step="0.5" value="100" aria-describedby="capacityUnit">
-        <span id="capacityUnit" class="sr-only">kWh</span>
-      </div>
-    </div>
-
-    <div class="input-group">
-      <div class="input-group-header">
-        <label class="input-group-label" for="socStart">SoC iniziale [%]</label>
-        <span class="input-group-value" id="socStartDisplay" aria-live="polite">0</span>
-      </div>
-      <div class="input-range-wrapper">
-        <input type="range" id="socStart" min="0" max="100" step="1" value="10">
-      </div>
-    </div>
-
-    <div class="input-group">
-      <div class="input-group-header">
-        <label class="input-group-label" for="socTarget">SoC finale [%]</label>
-        <span class="input-group-value" id="socTargetDisplay" aria-live="polite">80</span>
-      </div>
-      <div class="input-range-wrapper">
-        <input type="range" id="socTarget" min="0" max="100" step="1" value="80">
-      </div>
-    </div>
-
-    <div class="input-group">
-      <div class="input-group-header">
-        <label class="input-group-label" for="efficiency">Efficienza di trasferimento [%]</label>
-        <span class="input-group-value" id="efficiencyDisplay" aria-live="polite">90</span>
-      </div>
-      <div class="input-range-wrapper">
-        <input type="range" id="efficiency" min="50" max="100" step="0.5" value="90" aria-describedby="effUnit">
-        <span id="effUnit" class="sr-only">percentuale</span>
-      </div>
-    </div>
-
-    <div class="input-group">
-      <div class="input-group-header">
-        <label class="input-group-label" for="price">Prezzo energia [€/kWh]</label>
-        <span class="input-group-value" id="priceDisplay" aria-live="polite">0,25</span>
-      </div>
-      <div class="input-range-wrapper">
-        <input type="range" id="price" min="0.00" max="1.50" step="0.01" value="0.25" aria-describedby="priceUnit">
-        <span id="priceUnit" class="sr-only">Euro per kWh</span>
-      </div>
-    </div>
-
-    <div class="presets">
-      <button class="preset-btn" data-preset="0-100" type="button">0% → 100%</button>
-      <button class="preset-btn" data-preset="20-80" type="button">20% → 80%</button>
-      <button class="preset-btn" data-preset="30-70" type="button">30% → 70%</button>
-      <button class="preset-btn preset-btn--reset" data-preset="reset" type="button">Azzera</button>
-    </div>
-
-    <div class="result-area">
-      <button class="result-copy" id="copyBtn" type="button" aria-label="Copia risultato" title="Copia risultato">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-      </button>
-      <div class="result-label">Energia erogata</div>
-      <div class="result-main">
-        <span class="result-value" id="resultValue" aria-live="polite">0,00</span>
-        <span class="result-unit">kWh</span>
-      </div>
-      <div class="result-breakdown" id="breakdown">
-        <div class="breakdown-item">
-          <span class="breakdown-label">Δ SoC:</span>
-          <span class="breakdown-value" id="bdDelta">0%</span>
+        <!-- ── PROFILES MODAL ── -->
+        <div class="modal-overlay" id="profilesModal">
+            <div class="modal-box">
+                <button class="modal-close" id="closeProfilesBtn">&times;</button>
+                <h2>👤 Vehicle Profiles</h2>
+                <div class="profiles-list" id="profilesList"></div>
+                <div class="profile-save-row">
+                    <input type="text" class="profile-name-input" id="profileNameInput" placeholder="Profile name" maxlength="40">
+                    <button class="profile-save-btn" id="saveProfileBtn">💾 Save</button>
+                </div>
+            </div>
         </div>
-        <div class="breakdown-item">
-          <span class="breakdown-label">Energia netta caricata:</span>
-          <span class="breakdown-value" id="bdNet">0,00 kWh</span>
+
+        <!-- ── ABOUT MODAL ── -->
+        <div class="modal-overlay" id="aboutModal">
+            <div class="modal-box">
+                <button class="modal-close" id="closeAboutBtn">&times;</button>
+                <h2>ℹ️ About EV Master</h2>
+                <p style="text-align: left; margin-bottom: 0.5rem; font-size: 0.9rem;"><strong style="color: var(--accent-blue);">Synopsis:</strong> A simple but effective web-based calculator designed for BEV owners.</p>
+                <p style="text-align: left; margin-bottom: 0.5rem; font-size: 0.9rem;"><strong style="color: var(--accent-blue);">Author:</strong> Gianfranco Piazzolla</p>
+                <p style="text-align: left; margin-bottom: 0.5rem; font-size: 0.9rem;"><strong style="color: var(--accent-blue);">GitHub repository:</strong> <a href="https://github.com/GianfrancoPiazzolla/EV-Master" target="_blank" style="color: var(--accent-emerald);">EV Master</a></p>
+                <p style="text-align: left; margin-bottom: 0.5rem; font-size: 0.9rem;"><strong style="color: var(--accent-blue);">More Apps:</strong> <a href="https://github.com/GianfrancoPiazzolla" target="_blank" style="color: var(--accent-emerald);">GitHub</a></p>
+                <p style="text-align: left; margin-bottom: 0.5rem; font-size: 0.9rem;"><strong style="color: var(--accent-blue);">License:</strong> Distributed under the MIT License. Feel free to use, modify, and share.</p>
+                <p style="text-align: left; margin-bottom: 0; font-size: 0.82rem; font-style: italic; color: var(--text-muted);">Developed for the sustainable mobility community. If you find this tool helpful, please leave a ⭐ on GitHub!</p>
+            </div>
         </div>
-        <div class="breakdown-item">
-          <span class="breakdown-label">Perdite di trasferimento:</span>
-          <span class="breakdown-value" id="bdLosses">0,00 kWh</span>
-        </div>
-        <div class="breakdown-item">
-          <span class="breakdown-label breakdown-label--total">Costo totale ricarica:</span>
-          <span class="breakdown-value" id="bdCost">0,00 €</span>
-        </div>
-      </div>
+
+        <main>
+            <div class="card input-card">
+                    <div class="input-group">
+                        <label for="startBattery">Starting battery SoC</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="startBattery" value="100" min="0" max="100">
+                            <span>%</span>
+                        </div>
+                        <input type="range" id="startBatteryRange" value="100" min="0" max="100">
+                    </div>
+                    <div class="input-group">
+                        <label for="currentBattery">Current battery SoC</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="currentBattery" value="80" min="0" max="100">
+                            <span>%</span>
+                        </div>
+                        <input type="range" id="currentBatteryRange" value="80" min="0" max="100">
+                    </div>
+                    <div class="input-group">
+                        <label for="kilometersTraveled">Traveled distance</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="kilometersTraveled" value="50" min="0" max="500" step="0.1">
+                            <span>Km</span>
+                        </div>
+                        <input type="range" id="kilometersTraveledRange" value="50" min="0" max="500" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label for="minBattery">Minimum battery SoC limit</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="minBattery" value="10" min="0" max="100">
+                            <span>%</span>
+                        </div>
+                        <input type="range" id="minBatteryRange" value="10" min="0" max="100">
+                    </div>
+                    <div class="input-group">
+                        <label for="batteryCapacity">Battery usable capacity</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="batteryCapacity" value="75" min="10" max="150" step="0.1">
+                            <span>kWh</span>
+                        </div>
+                        <input type="range" id="batteryCapacityRange" value="75" min="10" max="150" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <label for="wltpRange">WLTP rated range</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="wltpRange" value="400" min="50" max="1000" step="1">
+                            <span>Km</span>
+                        </div>
+                        <input type="range" id="wltpRangeRange" value="400" min="50" max="1000" step="1">
+                    </div>
+                    <div class="input-group">
+                        <label for="kwhPrice">Per unit kWh price</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="kwhPrice" value="0.25" min="0.01" max="1.50" step="0.01">
+                            <span>€/kWh</span>
+                        </div>
+                        <input type="range" id="kwhPriceRange" value="0.25" min="0.01" max="1.50" step="0.01">
+                    </div>
+                    <div class="input-group">
+                        <label for="fuelPrice">Per unit fuel price</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="fuelPrice" value="1.70" min="1.00" max="3.00" step="0.01">
+                            <span>€/L</span>
+                        </div>
+                        <input type="range" id="fuelPriceRange" value="1.70" min="1.00" max="3.00" step="0.01">
+                    </div>
+                    <div class="input-group">
+                        <label for="fuelConsumption">ICE fuel consumption</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="fuelConsumption" value="15" min="5" max="40" step="0.1">
+                            <span>Km/L</span>
+                        </div>
+                        <input type="range" id="fuelConsumptionRange" value="15" min="5" max="40" step="0.1">
+                    </div>
+                    <!-- CO2 factor (gCO2/kWh grid mix) -->
+                    <div class="input-group">
+                        <label for="gridCo2">Grid CO₂ emissions intensity</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="gridCo2" value="233" min="0" max="900" step="1">
+                            <span>g/kWh</span>
+                        </div>
+                        <input type="range" id="gridCo2Range" value="233" min="0" max="900" step="1">
+                    </div>
+                    <div class="input-group">
+                        <label for="iceCo2">ICE vehicle CO₂ emissions</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="iceCo2" value="120" min="50" max="400" step="1">
+                            <span>g/Km</span>
+                        </div>
+                        <input type="range" id="iceCo2Range" value="120" min="50" max="400" step="1">
+                    </div>
+                </div>
+            
+
+            <div class="tab-nav">
+                <button class="tab-btn active" data-tab="autonomy">Autonomy</button>
+                <button class="tab-btn" data-tab="stats">Stats</button>
+                <button class="tab-btn" data-tab="estimator">Estimator</button>
+                <button class="tab-btn" data-tab="charging">Charging</button>
+                <button class="tab-btn" data-tab="speed-range">Speed</button>
+                <button class="tab-btn" data-tab="health">Health</button>
+                <button class="tab-btn" data-tab="co2">CO₂</button>
+                <button class="tab-btn" data-tab="triplog">Logger</button>
+                <button class="tab-btn" data-tab="quick-calc">Calculator</button>
+            </div>
+
+            <div class="tab-content-container">
+
+                <!-- ── AUTONOMY ── -->
+                <div id="tab-autonomy" class="tab-content active">
+                    <div class="card results-card" style="text-align:left;">
+
+                        <!-- Legacy hidden elements for JS compatibility -->
+                        <div class="battery-visual-container" style="display:none;">
+                            <div id="battery-tip"></div>
+                            <div id="battery-box">
+                                <div id="battery-level"></div>
+                                <div id="battery-buffer-marker"><span>Buffer</span></div>
+                                <div id="battery-start-marker"><span>Start</span></div>
+                            </div>
+                            <div class="battery-label">
+                                <span id="battery-percentage-label">80%</span>
+                                <p>Current charge</p>
+                            </div>
+                        </div>
+
+                        <!-- ── New Realistic Battery Visual ── -->
+                        <div class="ev-battery-wrap">
+
+                            <!-- SoC Ring -->
+                            <div class="soc-ring-container">
+                                <svg class="soc-ring-svg" id="soc-ring-svg" width="180" height="180" viewBox="0 0 180 180">
+                                    <defs>
+                                        <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" id="ringGradStop1" stop-color="#34d399"/>
+                                            <stop offset="100%" id="ringGradStop2" stop-color="#60a5fa"/>
+                                        </linearGradient>
+                                        <filter id="ringGlow">
+                                            <feGaussianBlur stdDeviation="3" result="blur"/>
+                                            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                                        </filter>
+                                    </defs>
+                                    <!-- Track -->
+                                    <circle cx="90" cy="90" r="74" fill="none" stroke="var(--border-color)" stroke-width="12" stroke-linecap="round"
+                                        stroke-dasharray="424" stroke-dashoffset="106" transform="rotate(126 90 90)"/>
+                                    <!-- Glow fill -->
+                                    <circle id="soc-ring-fill" cx="90" cy="90" r="74" fill="none" stroke="url(#ringGrad)" stroke-width="12" stroke-linecap="round"
+                                        stroke-dasharray="424" stroke-dashoffset="424" transform="rotate(126 90 90)"
+                                        filter="url(#ringGlow)"
+                                        style="transition: stroke-dashoffset 0.9s cubic-bezier(0.34,1.2,0.64,1), stroke 0.7s;"/>
+                                    <!-- Tick marks at 25/50/75% -->
+                                    <line x1="90" y1="10" x2="90" y2="20" stroke="var(--border-color)" stroke-width="2" transform="rotate(-54 90 90)"/>
+                                    <line x1="90" y1="10" x2="90" y2="20" stroke="var(--border-color)" stroke-width="2" transform="rotate(18 90 90)"/>
+                                    <line x1="90" y1="10" x2="90" y2="20" stroke="var(--border-color)" stroke-width="2" transform="rotate(90 90 90)"/>
+                                    <!-- Center text -->
+                                    <text x="90" y="83" text-anchor="middle" class="soc-center-text" id="soc-ring-pct">80%</text>
+                                    <text x="90" y="104" text-anchor="middle" class="soc-center-sub">State of Charge</text>
+                                    <!-- Small kWh label -->
+                                    <text x="90" y="120" text-anchor="middle" id="soc-ring-kwh" font-size="11" font-weight="700" fill="var(--text-muted)" font-family="'Courier New', monospace">— kWh</text>
+                                </svg>
+                            </div>
+
+                            <!-- Horizontal Battery Bar -->
+                            <div style="position:relative; padding-top:22px; margin-bottom:0;">
+                                <!-- Tick marks above bar -->
+                                <div class="h-battery-ticks" id="h-battery-ticks"></div>
+
+                                <div class="h-battery-outer">
+                                    <div class="h-battery-body" id="h-battery-body">
+                                        <!-- Fill -->
+                                        <div class="h-battery-fill" id="h-battery-fill"></div>
+                                        <!-- Cell dividers -->
+                                        <div class="h-battery-cells" id="h-battery-cells"></div>
+                                        <!-- Markers -->
+                                        <div class="h-marker buffer" id="h-buffer-marker" data-label="Buffer"></div>
+                                        <div class="h-marker start"  id="h-start-marker"  data-label="Start"></div>
+                                    </div>
+                                    <div class="h-battery-nub"></div>
+                                </div>
+                            </div>
+
+                            <!-- Legend below bar -->
+                            <div class="h-battery-legend">
+                                <span>0%</span>
+                                <span>Buffer</span>
+                                <span>50%</span>
+                                <span>Start</span>
+                                <span>100%</span>
+                            </div>
+
+                        </div><!-- /.ev-battery-wrap -->
+
+                        <!-- ── Autonomy Results ── -->
+                        <div class="autonomy-stats-outer" id="results-content">
+                            <!-- injected by JS -->
+                        </div>
+
+                        <!-- hidden compat -->
+                        <div class="results-display" style="display:none;">
+                            <h2>Expected residual autonomy</h2>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ── STATS ── -->
+                <div id="tab-stats" class="tab-content">
+                    <div class="card">
+                        <h3 class="stats-header" style="border:none; padding-top:0; margin-bottom: 1.5rem;">Travel and consumption Statistics</h3>
+                        <div id="stats-grid" class="details-grid"></div>
+                        <button class="export-btn" id="exportSummaryBtn">📋 Copy Summary</button>
+                    </div>
+                </div>
+
+                <!-- ── ESTIMATOR ── -->
+                <div id="tab-estimator" class="tab-content">
+                    <div class="card" id="trip-estimator-card">
+                        <h3 class="stats-header" style="border:none; padding-top:0; margin-bottom: 1.5rem;">Trip Consumption Estimator</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: -1rem; margin-bottom: 1rem; text-align: left;">
+                            Estimates a future trip based on the <strong style="color: var(--accent-red);">real consumption</strong> calculated from your last drive.
+                        </p>
+                        <div class="input-group">
+                            <label for="tripDistance">Trip distance</label>
+                            <div class="input-wrapper"><input type="number" id="tripDistance" value="100" min="0" max="1000"><span>Km</span></div>
+                        <input type="range" id="tripDistanceRange" value="100" min="0" max="1000">
+                        </div>
+                        <div class="input-group">
+                            <label for="externalTemp">External temperature</label>
+                            <div class="input-wrapper"><input type="number" id="externalTemp" value="20" min="-20" max="50"><span>°C</span></div>
+                        <input type="range" id="externalTempRange" value="20" min="-20" max="50">
+                        </div>
+                        <div class="input-group">
+                            <label for="averageSpeed">Average speed</label>
+                            <div class="input-wrapper"><input type="number" id="averageSpeed" value="90" min="10" max="250"><span>Km/h</span></div>
+                        <input type="range" id="averageSpeedRange" value="90" min="10" max="250">
+                        </div>
+                        <div class="input-group">
+                             <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 1rem; color: var(--text-light);"><input type="checkbox" id="useHeatingAc" style="width: 1.2rem; height: 1.2rem;"> Use Heating / AC</label>
+                        </div>
+                        <div id="trip-estimator-results" class="details-grid" style="margin-top: 1.5rem; grid-template-columns: 1fr 1fr;"></div>
+                    </div>
+                </div>
+
+                <!-- ── CHARGING ── -->
+                <div id="tab-charging" class="tab-content">
+                    <div class="card" id="charging-calculator-card">
+                        <h3 class="stats-header" style="border:none; padding-top:0; margin-bottom: 1.5rem;">Charging Calculator</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: -1rem; margin-bottom: 1rem; text-align: left;">
+                            Calculates charging time and cost. Doesn't account for charging curve (assumes <strong style="color: var(--accent-red);">linear speed</strong>).
+                        </p>
+                         <div class="input-group">
+                            <label for="chargePower">Average charging power</label>
+                            <div class="input-wrapper"><input type="number" id="chargePower" value="11" min="1" max="350" step="0.1"><span>kW</span></div>
+                        <input type="range" id="chargePowerRange" value="11" min="1" max="350" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="chargeStartSoc">Starting battery SoC</label>
+                            <div class="input-wrapper"><input type="number" id="chargeStartSoc" value="20" min="0" max="100"><span>%</span></div>
+                        <input type="range" id="chargeStartSocRange" value="20" min="0" max="100">
+                        </div>
+                        <div class="input-group">
+                            <label for="chargeTargetSoc">Target battery SoC</label>
+                            <div class="input-wrapper"><input type="number" id="chargeTargetSoc" value="80" min="0" max="100"><span>%</span></div>
+                        <input type="range" id="chargeTargetSocRange" value="80" min="0" max="100">
+                        </div>
+                        <div class="input-group">
+                            <label for="transferEfficiency">Energy transfer efficiency</label>
+                            <div class="input-wrapper"><input type="number" id="transferEfficiency" value="95" min="70" max="100" step="1"><span>%</span></div>
+                        <input type="range" id="transferEfficiencyRange" value="95" min="70" max="100" step="1">
+                        </div>
+                        <div id="charging-calculator-results" class="details-grid" style="margin-top: 1.5rem;"></div>
+                    </div>
+                </div>
+
+                <!-- ── CO2 SAVINGS ── -->
+                <div id="tab-co2" class="tab-content">
+                    <div class="card">
+                        <h3 class="stats-header" style="border:none; padding-top:0; margin-bottom: 0.5rem;">CO₂ Savings vs ICE</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 1.5rem; text-align: left;">
+                            Based on your <strong style="color: var(--accent-red);">grid CO₂ intensity</strong> and the ICE reference vehicle. Requires valid main calculator data.
+                        </p>
+                        <div id="co2-results"></div>
+                    </div>
+                </div>
+
+                <!-- ── BATTERY HEALTH ── -->
+                <div id="tab-health" class="tab-content">
+                    <div class="card">
+                        <h3 class="stats-header" style="border:none; padding-top:0; margin-bottom: 0.5rem;">Battery Health (SoH) Estimator</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 1.5rem; text-align: left;">
+                            Compares your measured <strong style="color: var(--accent-red);">real-world range</strong> against the WLTP rated range to estimate battery's State of Health.
+                        </p>
+                        <div class="health-gauge-wrap">
+                            <div class="health-arc">
+                                <svg viewBox="0 0 160 80" width="160" height="80">
+                                    <path d="M10,80 A70,70,0,0,1,150,80" fill="none" stroke="#1e293b" stroke-width="14" stroke-linecap="round"/>
+                                    <path id="health-arc-fill" d="M10,80 A70,70,0,0,1,150,80" fill="none" stroke="#34d399" stroke-width="14" stroke-linecap="round" stroke-dasharray="220" stroke-dashoffset="220" style="transition:stroke-dashoffset 0.8s ease,stroke 0.8s ease;"/>
+                                </svg>
+                                <div class="gauge-label" id="health-pct-label">—</div>
+                                <div class="gauge-sub">SoH</div>
+                            </div>
+                        </div>
+                        <div id="health-results" class="details-grid" style="grid-template-columns: 1fr 1fr 1fr;"></div>
+                        <div id="health-log-section" style="margin-top:1.5rem;">
+                            <h4 style="font-size:0.8rem;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin:0 0 0.75rem;">SoH Session Log</h4>
+                            <ul id="health-log-list" class="trip-log-list"></ul>
+                            <button class="export-btn" id="clearHealthLogBtn" style="background:var(--accent-red);margin-top:0.75rem;">🗑 Clear Log</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── SPEED vs RANGE ── -->
+                <div id="tab-speed-range" class="tab-content">
+                    <div class="card">
+                        <h3 class="stats-header" style="border:none; padding-top:0; margin-bottom: 0.5rem;">Speed vs. Range Curve</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 1rem; text-align: left;">
+                            Projects how your real consumption changes across speeds, assuming <strong style="color: var(--accent-red);">90 Km/h</strong> as reference one (WLTP). Requires valid main calculator data. Aerodynamic drag modelled with <em>v²</em> scaling.
+                        </p>
+                        <div class="chart-wrapper">
+                            <canvas id="speedRangeChart" class="range-chart" height="220"></canvas>
+                        </div>
+                        <div id="speed-range-table" class="details-grid" style="grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); margin-top:1rem;"></div>
+                    </div>
+                </div>
+
+                <!-- ── TRIP LOG ── -->
+                <div id="tab-triplog" class="tab-content">
+                    <div class="card">
+                        <h3 class="stats-header" style="border:none; padding-top:0; margin-bottom: 0.5rem;">Trip Log</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 1.5rem; text-align: left;">
+                            Save each drive for historical consumption tracking. Hit <strong style="color:var(--accent-emerald)">Log Current Trip</strong> after entering data in the main panel.
+                        </p>
+                        <button class="export-btn" id="logTripBtn">📍 Log Current Trip</button>
+                        <ul id="trip-log-list" class="trip-log-list" style="margin-top:1rem;"></ul>
+                        <div id="trip-log-averages" style="margin-top:1rem;"></div>
+                    </div>
+                </div>
+
+                <!-- ── CALC ── -->
+                <div id="tab-quick-calc" class="tab-content">
+                    <div class="card calculator-section">
+                        <h3 class="stats-header" style="border:none; padding-top:0; margin-bottom: 1.5rem;">Quick calculator</h3>
+                        <div class="calc-container">
+                            <div class="calc-main">
+                                <div class="calc-display">
+                                    <div class="operation" id="calc-op"></div>
+                                    <div class="current" id="calc-current">0</div>
+                                </div>
+                                <div class="calc-buttons">
+                                    <button class="btn btn-op" onclick="calcAction('C')">C</button>
+                                    <button class="btn btn-op" onclick="calcAction('(')">(</button>
+                                    <button class="btn btn-op" onclick="calcAction(')')">)</button>
+                                    <button class="btn btn-op" onclick="calcAction('DEL')">←</button>
+                                    
+                                    <button class="btn" onclick="calcAction('7')">7</button>
+                                    <button class="btn" onclick="calcAction('8')">8</button>
+                                    <button class="btn" onclick="calcAction('9')">9</button>
+                                    <button class="btn btn-op" onclick="calcAction('/')">÷</button>
+                                    
+                                    <button class="btn" onclick="calcAction('4')">4</button>
+                                    <button class="btn" onclick="calcAction('5')">5</button>
+                                    <button class="btn" onclick="calcAction('6')">6</button>
+                                    <button class="btn btn-op" onclick="calcAction('*')">×</button>
+                                    
+                                    <button class="btn" onclick="calcAction('1')">1</button>
+                                    <button class="btn" onclick="calcAction('2')">2</button>
+                                    <button class="btn" onclick="calcAction('3')">3</button>
+                                    <button class="btn btn-op" onclick="calcAction('-')">-</button>
+                                    
+                                    <button class="btn" style="grid-column: span 1;" onclick="calcAction('0')">0</button>
+                                    <button class="btn" onclick="calcAction('.')">.</button>
+                                    <button class="btn btn-accent" onclick="calcAction('=')">=</button>
+                                    <button class="btn btn-op" onclick="calcAction('+')">+</button>
+                                </div>
+                            </div>
+                            <div class="tape-container">
+                                <div class="tape-title">History Tape</div>
+                                <div id="calc-tape">
+                                    <!-- div style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">No calculations yet.</div -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SoC ↔ Km quick converter -->
+                        <div class="soc-converter">
+                            <h4>⚡ SoC ↔ Km converter</h4>
+                            <div class="soc-row">
+                                <input type="number" id="socConvInput" placeholder="%" min="0" max="100" step="0.1">
+                                <span class="soc-label" style="color:var(--text-light);">→</span>
+                                <div class="soc-result" id="socConvKm">Km</div>
+                            </div>
+                            <div class="soc-row" style="margin-top:0.5rem;">
+                                <div class="soc-result" id="kmConvSoc">%</div>
+                                <span class="soc-label" style="color:var(--text-light);">←</span>
+                                <input type="number" id="kmConvInput" placeholder="Km" min="0" max="2000" step="1">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </main>
     </div>
 
-  </main>
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    // ── STATE ──
+    const state = {
+        startBattery: 100, currentBattery: 80, kilometersTraveled: 50, minBattery: 10,
+        batteryCapacity: 75, kwhPrice: 0.25, fuelPrice: 1.70, fuelConsumption: 15,
+        wltpRange: 400,
+        gridCo2: 233, iceCo2: 120,
+        presets: {}, selectedPreset: null,
+        tripDistance: 100, externalTemp: 20, averageSpeed: 90, useHeatingAc: false,
+        chargePower: 11, chargeStartSoc: 20, chargeTargetSoc: 80, transferEfficiency: 95,
+        theme: 'dark',
+        tripLog: [],
+        healthLog: [],
+    };
+    let baselineConsumption = null;
+    let currentKmPerPercent = null;
 
-  <div class="modal-overlay" id="profilesModal">
-    <div class="modal-box">
-      <button class="modal-close" id="closeProfilesBtn">&times;</button>
-      <h2>👤 Profili</h2>
-      <p class="modal-sub">Salva e carica configurazioni dei parametri.</p>
-      <div class="profiles-list" id="profilesList"></div>
-      <div class="profile-save-row">
-        <input type="text" class="profile-name-input" id="profileNameInput" placeholder="Nome profilo" maxlength="40">
-        <button class="profile-save-btn" id="saveProfileBtn">💾 Salva</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <script>
-    (function() {
-      var t = localStorage.getItem('theme');
-      if (t) document.documentElement.setAttribute('data-theme', t);
-    })();
-
-    var els = {};
-    var state = { capacity: 100, socStart: 10, socTarget: 80, efficiency: 90, price: 0.25 };
-    var debounceTimer;
-
-    function fmt(n, d) { return n.toLocaleString('it-IT', { minimumFractionDigits: d || 2, maximumFractionDigits: d || 2 }); }
-    function pct(n) { return Math.round(n) + '%'; }
-
-    function cache() {
-      els = {
-        capacity: document.getElementById('capacity'),
-        socStart: document.getElementById('socStart'),
-        socTarget: document.getElementById('socTarget'),
-        efficiency: document.getElementById('efficiency'),
-        price: document.getElementById('price'),
-        capDisp: document.getElementById('capacityDisplay'),
-        ssDisp: document.getElementById('socStartDisplay'),
-        stDisp: document.getElementById('socTargetDisplay'),
-        effDisp: document.getElementById('efficiencyDisplay'),
-        prcDisp: document.getElementById('priceDisplay'),
-        result: document.getElementById('resultValue'),
-        socFill: document.getElementById('socFill'),
-        socMarkerStart: document.getElementById('socMarkerStart'),
-        socMarkerEnd: document.getElementById('socMarkerEnd'),
-        bdDelta: document.getElementById('bdDelta'),
-        bdNet: document.getElementById('bdNet'),
-        bdLosses: document.getElementById('bdLosses'),
-        bdCost: document.getElementById('bdCost'),
-        copyBtn: document.getElementById('copyBtn'),
-        toast: document.getElementById('toast'),
-        themeToggle: document.getElementById('themeToggle'),
-        presetBtns: document.querySelectorAll('[data-preset]')
-      };
-    }
-
-    function updateRangeStyle(el) {
-      var min = parseFloat(el.min) || 0;
-      var max = parseFloat(el.max) || 100;
-      var val = parseFloat(el.value) || min;
-      var pct = ((val - min) / (max - min)) * 100;
-      el.style.setProperty('--pct', pct + '%');
-    }
-
-    function readState() {
-      state.capacity = parseFloat(els.capacity.value) || 0;
-      state.socStart = parseFloat(els.socStart.value) || 0;
-      state.socTarget = parseFloat(els.socTarget.value) || 0;
-      if (state.socStart > state.socTarget) {
-        state.socStart = state.socTarget;
-        els.socStart.value = state.socStart;
-      }
-      state.efficiency = parseFloat(els.efficiency.value) || 100;
-      state.price = parseFloat(els.price.value) || 0;
-    }
-
-    function writeDisplays() {
-      els.capDisp.textContent = fmt(state.capacity, 1);
-      els.ssDisp.textContent = state.socStart;
-      els.stDisp.textContent = state.socTarget;
-      els.effDisp.textContent = state.efficiency;
-      els.prcDisp.textContent = fmt(state.price, 2);
-    }
-
-    function updateRangeStyles() {
-      updateRangeStyle(els.capacity);
-      updateRangeStyle(els.socStart);
-      updateRangeStyle(els.socTarget);
-      updateRangeStyle(els.efficiency);
-      updateRangeStyle(els.price);
-    }
-
-    function clamp(v, a, b) { return Math.min(Math.max(v, a), b); }
-
-    function calc() {
-      var cap = state.capacity;
-      var s1 = state.socStart;
-      var s2 = state.socTarget;
-      var eff = state.efficiency / 100;
-      var prc = state.price;
-      var delta = Math.max(0, s2 - s1);
-      var netEnergy = (delta / 100) * cap;
-      var drawnEnergy = eff > 0 ? netEnergy / eff : 0;
-      var losses = drawnEnergy - netEnergy;
-      var cost = drawnEnergy * prc;
-      return { delta: delta, netEnergy: netEnergy, drawnEnergy: drawnEnergy, losses: losses, cost: cost };
-    }
-
-    function updateBattery(r) {
-      var s1 = state.socStart;
-      var s2 = state.socTarget;
-      var left = s1 + '%';
-      var width = Math.max(0, s2 - s1) + '%';
-      els.socFill.style.left = left;
-      els.socFill.style.width = width;
-      els.socMarkerStart.textContent = fmt((s1 / 100) * state.capacity, 1) + ' kWh';
-      els.socMarkerStart.style.left = left;
-      els.socMarkerEnd.textContent = fmt((s2 / 100) * state.capacity, 1) + ' kWh';
-      els.socMarkerEnd.style.left = s2 + '%';
-    }
-
-    function updateResult(r) {
-      els.result.textContent = fmt(r.drawnEnergy, 2);
-      els.bdDelta.textContent = pct(r.delta);
-      els.bdNet.textContent = fmt(r.netEnergy, 2) + ' kWh';
-      els.bdLosses.textContent = fmt(r.losses, 2) + ' kWh';
-      els.bdCost.textContent = fmt(r.cost, 2) + ' €';
-    }
-
-    function syncAll() {
-      readState();
-      writeDisplays();
-      updateRangeStyles();
-      var r = calc();
-      updateBattery(r);
-      updateResult(r);
-    }
-
-    function onInput(e) {
-      var t = e && e.target;
-      if (t === els.socStart || t === els.socTarget) {
-        var s1 = parseFloat(els.socStart.value) || 0;
-        var s2 = parseFloat(els.socTarget.value) || 0;
-        if (s1 > s2) {
-          if (t === els.socStart) els.socStart.value = s2;
-          else els.socTarget.value = s1;
+    // ── DOM ──
+    const DOMElements = {
+        inputs: {
+            startBattery: document.getElementById('startBattery'),
+            currentBattery: document.getElementById('currentBattery'),
+            kilometersTraveled: document.getElementById('kilometersTraveled'),
+            minBattery: document.getElementById('minBattery'),
+            batteryCapacity: document.getElementById('batteryCapacity'),
+            wltpRange: document.getElementById('wltpRange'),
+            kwhPrice: document.getElementById('kwhPrice'),
+            fuelPrice: document.getElementById('fuelPrice'),
+            fuelConsumption: document.getElementById('fuelConsumption'),
+            gridCo2: document.getElementById('gridCo2'),
+            iceCo2: document.getElementById('iceCo2'),
+            tripDistance: document.getElementById('tripDistance'),
+            externalTemp: document.getElementById('externalTemp'),
+            averageSpeed: document.getElementById('averageSpeed'),
+            useHeatingAc: document.getElementById('useHeatingAc'),
+            chargePower: document.getElementById('chargePower'),
+            chargeStartSoc: document.getElementById('chargeStartSoc'),
+            chargeTargetSoc: document.getElementById('chargeTargetSoc'),
+            transferEfficiency: document.getElementById('transferEfficiency'),
+        },
+        ranges: {
+            startBattery: document.getElementById('startBatteryRange'),
+            currentBattery: document.getElementById('currentBatteryRange'),
+            kilometersTraveled: document.getElementById('kilometersTraveledRange'),
+            minBattery: document.getElementById('minBatteryRange'),
+            batteryCapacity: document.getElementById('batteryCapacityRange'),
+            wltpRange: document.getElementById('wltpRangeRange'),
+            kwhPrice: document.getElementById('kwhPriceRange'),
+            fuelPrice: document.getElementById('fuelPriceRange'),
+            fuelConsumption: document.getElementById('fuelConsumptionRange'),
+            gridCo2: document.getElementById('gridCo2Range'),
+            iceCo2: document.getElementById('iceCo2Range'),
+            tripDistance: document.getElementById('tripDistanceRange'),
+            externalTemp: document.getElementById('externalTempRange'),
+            averageSpeed: document.getElementById('averageSpeedRange'),
+            chargePower: document.getElementById('chargePowerRange'),
+            chargeStartSoc: document.getElementById('chargeStartSocRange'),
+            chargeTargetSoc: document.getElementById('chargeTargetSocRange'),
+            transferEfficiency: document.getElementById('transferEfficiencyRange'),
+        },
+        battery: {
+            level: document.getElementById('battery-level'),
+            percentageLabel: document.getElementById('battery-percentage-label'),
+            bufferMarker: document.getElementById('battery-buffer-marker'),
+            startMarker: document.getElementById('battery-start-marker'),
+        },
+        presets: {},
+        results: {
+            main: document.getElementById('results-content'),
+            stats: document.getElementById('stats-grid'),
+            estimator: document.getElementById('trip-estimator-results'),
+            charging: document.getElementById('charging-calculator-results'),
         }
-      }
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(syncAll, 40);
-    }
+    };
 
-    function applyPreset(key) {
-      switch (key) {
-        case '0-100': state.socStart = 0; state.socTarget = 100; break;
-        case '20-80': state.socStart = 20; state.socTarget = 80; break;
-        case '30-70': state.socStart = 30; state.socTarget = 70; break;
-        case 'reset':
-          state.capacity = 100;
-          state.socStart = 10;
-          state.socTarget = 80;
-          state.efficiency = 90;
-          state.price = 0.25;
-          break;
-        default: return;
-      }
-      els.capacity.value = state.capacity;
-      els.socStart.value = state.socStart;
-      els.socTarget.value = state.socTarget;
-      els.efficiency.value = state.efficiency;
-      els.price.value = state.price;
-      syncAll();
-    }
+    // ── LOCAL STORAGE ──
+    const saveState = () => localStorage.setItem('evMasterState', JSON.stringify(state));
+    const loadState = () => {
+        const saved = localStorage.getItem('evMasterState');
+        if (saved) {
+            const loaded = JSON.parse(saved);
+            if (!loaded.presets) loaded.presets = {};
+            if (!loaded.tripLog) loaded.tripLog = [];
+            if (!loaded.healthLog) loaded.healthLog = [];
+            Object.assign(state, loaded);
+        }
+    };
 
-    function showToast(msg) {
-      els.toast.textContent = msg;
-      els.toast.classList.add('toast--visible');
-      clearTimeout(els.toast._hide);
-      els.toast._hide = setTimeout(function() {
-        els.toast.classList.remove('toast--visible');
-      }, 2000);
-    }
+    // ── THEME ──
+    const initTheme = () => {
+        const toggle = document.getElementById('themeToggle');
+        const icon = document.getElementById('themeIcon');
+        const applyTheme = (theme) => {
+            document.body.setAttribute('data-theme', theme);
+            icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+            state.theme = theme;
+            saveState();
+        };
+        applyTheme(state.theme);
+        toggle.addEventListener('click', () => applyTheme(state.theme === 'dark' ? 'light' : 'dark'));
+    };
 
-    var profiles = {};
-    var profilesLoaded = false;
+    // ── PRESETS / PROFILES ──
+    const escapeHtml = (str) => String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 
-    function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+    const openProfilesModal = () => {
+        renderProfilesList();
+        document.getElementById('profilesModal').classList.add('open');
+    };
 
-    function saveProfiles() { try { localStorage.setItem('toninoCalcProfiles', JSON.stringify(profiles)); } catch(e) {} }
+    const closeProfilesModal = () => {
+        document.getElementById('profilesModal').classList.remove('open');
+    };
 
-    function loadProfiles() {
-      if (profilesLoaded) return;
-      try {
-        var d = localStorage.getItem('toninoCalcProfiles');
-        if (d) { profiles = JSON.parse(d); if (typeof profiles !== 'object') profiles = {}; }
-      } catch(e) { profiles = {}; }
-      profilesLoaded = true;
-    }
+    const renderProfilesList = () => {
+        const container = document.getElementById('profilesList');
+        const keys = Object.keys(state.presets);
+        if (keys.length === 0) {
+            container.innerHTML = '<div class="profiles-empty">No saved profiles yet.<br>Configure your vehicle and save a profile below.</div>';
+            return;
+        }
+        container.innerHTML = keys.map(name => {
+            const p = state.presets[name];
+            return `
+            <div class="profile-item">
+                <div class="profile-item-info">
+                    <span class="profile-item-name">${escapeHtml(name)}</span>
+                    <span class="profile-item-details">Battery: <b>${p.batteryCapacity}</b> kWh</br>WLTP: <b>${p.wltpRange}</b> Km</br>ICE: <b>${p.fuelConsumption}</b> Km/L</br>kWh price: <b>${p.kwhPrice}</b> €/kWh</br>Fuel price: <b>${p.fuelPrice}</b> €/L</br>ICE consumption: <b>${p.fuelConsumption}</b> Km/L</br>Grid CO₂: <b>${p.gridCo2}</b> g/kWh</br>ICE CO₂: <b>${p.iceCo2}</b> g/Km</br>Theme: <b>${p.theme === 'dark' ? '🌙 Dark' : '☀️ Light'}</b></span>
+                </div>
+                <div class="profile-item-actions">
+                    <button class="profile-action-btn load" onclick="loadProfileEV('${escapeHtml(name)}')">Load</button>
+                    <button class="profile-action-btn del" onclick="deleteProfileEV('${escapeHtml(name)}')">✕</button>
+                </div>
+            </div>`;
+        }).join('');
+    };
 
-    function openProfilesModal() {
-      loadProfiles();
-      renderProfilesList();
-      document.getElementById('profilesModal').classList.add('open');
-    }
-
-    function closeProfilesModal() {
-      document.getElementById('profilesModal').classList.remove('open');
-    }
-
-    function renderProfilesList() {
-      var container = document.getElementById('profilesList');
-      var keys = Object.keys(profiles);
-      if (keys.length === 0) {
-        container.innerHTML = '<div class="profiles-empty">Nessun profilo salvato.<br>Configura i parametri e salva un profilo qui sotto.</div>';
-        return;
-      }
-      container.innerHTML = keys.map(function(name) {
-        var p = profiles[name];
-        return '<div class="profile-item">' +
-          '<div class="profile-item-info">' +
-            '<span class="profile-item-name">' + escHtml(name) + '</span>' +
-            '<span class="profile-item-details">Batteria: <b>' + p.capacity + '</b> kWh &middot; SoC finale: <b>' + p.socTarget + '</b>% &middot; Efficienza: <b>' + p.efficiency + '</b>% &middot; Prezzo: <b>' + p.price + '</b> &euro;/kWh</span>' +
-          '</div>' +
-          '<div class="profile-item-actions">' +
-            '<button class="profile-action-btn load" onclick="loadProfile(\'' + escHtml(name) + '\')">Carica</button>' +
-            '<button class="profile-action-btn del" onclick="deleteProfile(\'' + escHtml(name) + '\')">&#10005;</button>' +
-          '</div>' +
-        '</div>';
-      }).join('');
-    }
-
-    function saveProfile() {
-      var input = document.getElementById('profileNameInput');
-      var name = input.value.trim();
-      if (!name) { input.focus(); return; }
-      profiles[name] = {
-        capacity: state.capacity,
-        socTarget: state.socTarget,
-        efficiency: state.efficiency,
-        price: state.price
-      };
-      input.value = '';
-      saveProfiles();
-      renderProfilesList();
-      showToast('Profilo salvato: ' + name);
-    }
-
-    function applyProfile(name) {
-      var p = profiles[name];
-      if (!p) return;
-      state.capacity = p.capacity;
-      state.socTarget = p.socTarget;
-      state.efficiency = p.efficiency;
-      state.price = p.price;
-      els.capacity.value = state.capacity;
-      els.socTarget.value = state.socTarget;
-      els.efficiency.value = state.efficiency;
-      els.price.value = state.price;
-      syncAll();
-      showToast('Profilo caricato: ' + name);
-    }
-
-    function loadProfile(name) {
-      loadProfiles();
-      if (profiles[name]) applyProfile(name);
-    }
-
-    function deleteProfile(name) {
-      loadProfiles();
-      if (!profiles[name]) return;
-      delete profiles[name];
-      saveProfiles();
-      renderProfilesList();
-      showToast('Profilo eliminato');
-    }
-
-    function copyResult() {
-      var r = calc();
-      var text = r.drawnEnergy.toFixed(2);
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(function() {
-          els.copyBtn.setAttribute('data-copied', '');
-          showToast('Copiato: ' + text);
-          setTimeout(function() { els.copyBtn.removeAttribute('data-copied'); }, 1500);
-        }).catch(function() { fallbackCopy(text); });
-      } else {
-        fallbackCopy(text);
-      }
-    }
-
-    function fallbackCopy(text) {
-      var ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand('copy'); showToast('Copiato: ' + text); } catch(e) {}
-      document.body.removeChild(ta);
-    }
-
-    function toggleTheme() {
-      var html = document.documentElement;
-      var cur = html.getAttribute('data-theme') || 'dark';
-      var next = cur === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-      updateThemeIcon(next);
-      updateThemeColor(next);
-    }
-
-    function updateThemeIcon(theme) {
-      var dark = theme === 'dark';
-      els.themeToggle.setAttribute('aria-label', dark ? 'Attiva tema chiaro' : 'Attiva tema scuro');
-      els.themeToggle.innerHTML = dark
-        ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
-        : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-    }
-
-    function updateThemeColor(theme) {
-      var meta = document.getElementById('theme-color');
-      meta.setAttribute('content', theme === 'dark' ? '#070b12' : '#f0f4f8');
-    }
-
-    function initTheme() {
-      var html = document.documentElement;
-      var theme = html.getAttribute('data-theme') || 'dark';
-      updateThemeIcon(theme);
-      updateThemeColor(theme);
-    }
-
-    function init() {
-      cache();
-      initTheme();
-      els.capacity.value = state.capacity;
-      els.socStart.value = state.socStart;
-      els.socTarget.value = state.socTarget;
-      els.efficiency.value = state.efficiency;
-      els.price.value = state.price;
-      syncAll();
-
-      var inputs = [els.capacity, els.socStart, els.socTarget, els.efficiency, els.price];
-      inputs.forEach(function(inp) {
-        inp.addEventListener('input', onInput);
-      });
-
-      els.themeToggle.addEventListener('click', toggleTheme);
-
-      els.profilesToggle = document.getElementById('profilesToggle');
-      els.profilesToggle.addEventListener('click', openProfilesModal);
-      document.getElementById('closeProfilesBtn').addEventListener('click', closeProfilesModal);
-      document.getElementById('profilesModal').addEventListener('click', function(e) {
-        if (e.target === document.getElementById('profilesModal')) closeProfilesModal();
-      });
-      document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
-
-      els.presetBtns.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          applyPreset(btn.getAttribute('data-preset'));
+    const initPresets = () => {
+        document.getElementById('openProfilesBtn').addEventListener('click', openProfilesModal);
+        document.getElementById('closeProfilesBtn').addEventListener('click', closeProfilesModal);
+        document.getElementById('profilesModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('profilesModal')) closeProfilesModal();
         });
-      });
+        document.getElementById('saveProfileBtn').addEventListener('click', savePreset);
+    };
 
-      els.copyBtn.addEventListener('click', copyResult);
+    const savePreset = () => {
+        const nameInput = document.getElementById('profileNameInput');
+        const name = nameInput.value.trim();
+        if (!name) { nameInput.focus(); return; }
+        state.presets[name] = {
+            batteryCapacity: state.batteryCapacity,
+            fuelConsumption: state.fuelConsumption,
+            wltpRange: state.wltpRange,
+            theme: state.theme,
+            kwhPrice: state.kwhPrice,
+            fuelPrice: state.fuelPrice,
+            iceFuelConsumption: state.fuelConsumption,
+            gridCo2: state.gridCo2,
+            iceCo2: state.iceCo2,
+        };
+        state.selectedPreset = name;
+        nameInput.value = '';
+        saveState();
+        renderProfilesList();
+    };
 
-      document.addEventListener('keydown', function(e) {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'c' && document.activeElement && document.activeElement.closest('.result-area')) {
-          copyResult();
+    const applyPreset = (name) => {
+        if (name && state.presets[name]) {
+            const p = state.presets[name];
+            state.batteryCapacity = p.batteryCapacity;
+            state.fuelConsumption = p.fuelConsumption;
+            if (p.wltpRange) state.wltpRange = p.wltpRange;
+            if (p.theme) state.theme = p.theme;
+            if (p.kwhPrice !== undefined) state.kwhPrice = p.kwhPrice;
+            if (p.fuelPrice !== undefined) state.fuelPrice = p.fuelPrice;
+            if (p.gridCo2 !== undefined) state.gridCo2 = p.gridCo2;
+            if (p.iceCo2 !== undefined) state.iceCo2 = p.iceCo2;
+            state.selectedPreset = name;
+            syncStateToInputs();
+            updateUI();
+            saveState();
         }
-      });
-    }
+    };
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
+    // ── HELPERS ──
+    const applyBorderColors = (gridId) => {
+        const grid = document.getElementById(gridId);
+        if (!grid) return;
+        grid.querySelectorAll('.details-item').forEach(item => {
+            const valEl = item.querySelector('.value');
+            if (valEl) item.style.borderBottomColor = window.getComputedStyle(valEl).color;
+        });
+    };
+
+    const fmt = (n, d = 2) => Number(n).toFixed(d);
+    const fmtInt = (n) => Math.round(n).toLocaleString();
+
+    // ── MAIN CALCULATOR ──
+    const calculateMainResults = () => {
+        const { startBattery, currentBattery, kilometersTraveled, minBattery,
+                batteryCapacity, kwhPrice, fuelPrice, fuelConsumption, wltpRange } = state;
+        if (startBattery <= currentBattery || kilometersTraveled <= 0 || batteryCapacity <= 0) {
+            baselineConsumption = null; currentKmPerPercent = null; return null;
+        }
+
+        const usedPct = startBattery - currentBattery;
+        const kmPerPercent = kilometersTraveled / usedPct;
+        const usableRemainingPct = Math.max(0, currentBattery - minBattery);
+        const remainingRange = usableRemainingPct * kmPerPercent;
+        const energyUsedKwh = (usedPct / 100) * batteryCapacity;
+        const consumptionKwh100km = (energyUsedKwh / kilometersTraveled) * 100;
+
+        baselineConsumption = consumptionKwh100km;
+        currentKmPerPercent = kmPerPercent;
+
+        const efficiencyKmKwh = kilometersTraveled / energyUsedKwh;
+        const tripCost = energyUsedKwh * kwhPrice;
+        const fullRangeReal = kmPerPercent * 100;
+        const wltpRatio = wltpRange > 0 ? (fullRangeReal / wltpRange) * 100 : null;
+
+        return {
+            remainingRange, kmPerPercent, consumptionKwh100km, efficiencyKmKwh,
+            tripCost, energyUsedKwh,
+            energyAtMinBuffer: (minBattery / 100) * batteryCapacity,
+            costPerKm: tripCost / kilometersTraveled,
+            iceEquivalentKm: (fuelPrice > 0 && fuelConsumption > 0) ? (tripCost / fuelPrice) * fuelConsumption : 0,
+            equivalentEfficiency: (kwhPrice > 0 && isFinite(efficiencyKmKwh)) ? (fuelPrice / kwhPrice) * efficiencyKmKwh : 0,
+            equivalentIceCostPerKwh: (fuelConsumption > 0 && efficiencyKmKwh > 0) ? (fuelPrice / fuelConsumption) * efficiencyKmKwh : 0,
+            iceRefuelCost: (fuelPrice > 0 && fuelConsumption > 0) ? (kilometersTraveled / fuelConsumption) * fuelPrice : 0,
+            bevVsIceCostGain: (fuelPrice > 0 && fuelConsumption > 0) ? ((kilometersTraveled / fuelConsumption) * fuelPrice) - tripCost : 0,
+            fullRangeReal, wltpRatio, kilometersTraveled,
+        };
+    };
+
+    const calculateTripEstimation = () => {
+        if (!baselineConsumption) return null;
+        const { tripDistance, externalTemp, averageSpeed, useHeatingAc, batteryCapacity, currentBattery } = state;
+        const tempFactor = externalTemp < 20 ? 1 + (20 - externalTemp) * 0.015 : 1 - (externalTemp - 20) * 0.005;
+        const speedFactor = averageSpeed > 90 ? 1 + Math.pow((averageSpeed - 90) / 50, 2) : 1 - Math.pow((90 - averageSpeed) / 100, 1.5);
+        const heatingFactor = useHeatingAc ? 1.15 : 1;
+        const adjustedConsumption = baselineConsumption * tempFactor * speedFactor * heatingFactor;
+        const estimatedKwh = adjustedConsumption * (tripDistance / 100);
+        const socUsed = (estimatedKwh / batteryCapacity) * 100;
+        return {
+            adjustedConsumption: fmt(adjustedConsumption),
+            estimatedKwh: fmt(estimatedKwh),
+            socUsed: fmt(socUsed, 1),
+            finalSoc: fmt(currentBattery - socUsed, 1),
+        };
+    };
+
+    const calculateCharging = () => {
+        const { chargeStartSoc, chargeTargetSoc, chargePower, batteryCapacity, kwhPrice, transferEfficiency } = state;
+        if (chargeTargetSoc <= chargeStartSoc || chargePower <= 0 || transferEfficiency <= 0) return null;
+        const kwhAdded = ((chargeTargetSoc - chargeStartSoc) / 100) * batteryCapacity;
+        const kwhTransferred = kwhAdded / (transferEfficiency / 100);
+        const timeHours = kwhTransferred / chargePower;
+        const totalMinutes = Math.round(timeHours * 60);
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        const pctPerHour = (chargePower * (transferEfficiency / 100) / batteryCapacity) * 100;
+        return {
+            kwhAdded: fmt(kwhAdded), kwhTransferred: fmt(kwhTransferred),
+            chargedCost: fmt(kwhAdded * kwhPrice),
+            transferredCost: fmt(kwhTransferred * kwhPrice),
+            time: `${hours}h ${minutes}m`,
+            pctPerHour: fmt(pctPerHour, 1),
+        };
+    };
+
+    // ── CO2 CALCULATOR ──
+    const calculateCO2 = (res) => {
+        if (!res) return null;
+        const { energyUsedKwh, kilometersTraveled } = res;
+        const { gridCo2, iceCo2 } = state;
+        // EV emissions for this trip (g)
+        const evCO2g = energyUsedKwh * gridCo2;
+        // ICE reference emissions for same distance (g)
+        const iceCO2g = kilometersTraveled * iceCo2;
+        const savedG = iceCO2g - evCO2g;
+        const savedKg = savedG / 1000;
+        const savingPct = iceCO2g > 0 ? (savedG / iceCO2g) * 100 : 0;
+        // Annualised (assume same rate of Km/day)
+        return {
+            evCO2g: fmt(evCO2g, 0), iceCO2g: fmt(iceCO2g, 0),
+            savedG: fmt(savedG, 0), savedKg: fmt(savedKg, 2),
+            savingPct: fmt(savingPct, 1),
+            evGPerKm: fmt(evCO2g / kilometersTraveled, 1),
+        };
+    };
+
+    // ── BATTERY HEALTH ──
+    const calculateHealth = (res) => {
+        if (!res || !res.fullRangeReal || state.wltpRange <= 0) return null;
+        const soh = Math.min(100, (res.fullRangeReal / state.wltpRange) * 100);
+        return { soh: fmt(soh, 1), fullRangeReal: fmt(res.fullRangeReal, 0), wltpRange: state.wltpRange };
+    };
+
+    // ── SPEED vs RANGE CURVE (aerodynamic drag model: drag ∝ v²) ──
+    const buildSpeedRangeData = () => {
+        if (!baselineConsumption || !state.batteryCapacity) return null;
+        const refSpeed = 90; // calibration speed
+        const usablekWh = ((state.currentBattery - state.minBattery) / 100) * state.batteryCapacity;
+        const speeds = [30, 50, 70, 90, 110, 120, 130, 150];
+        return speeds.map(v => {
+            // simple drag model: consumption scales ~ v^2 / refSpeed^2 relative to a baseline split
+            const aeroRatio = Math.pow(v / refSpeed, 2);
+            // Rolling resistance is roughly constant; we blend 30% rolling + 70% aero
+            const factor = 0.3 + 0.7 * aeroRatio;
+            const cons = baselineConsumption * factor;
+            const range = (usablekWh / cons) * 100;
+            return { v, cons: +fmt(cons), range: +fmt(range, 0) };
+        });
+    };
+
+    // Canvas-based chart (no external library)
+    let chartData = null;
+    const drawSpeedChart = () => {
+        const canvas = document.getElementById('speedRangeChart');
+        if (!canvas) return;
+        const data = buildSpeedRangeData();
+        chartData = data;
+        const ctx = canvas.getContext('2d');
+        const W = canvas.offsetWidth || 600;
+        const H = 220;
+        canvas.width = W;
+        canvas.height = H;
+        ctx.clearRect(0, 0, W, H);
+
+        const isDark = state.theme === 'dark';
+        const gridColor = isDark ? '#1e293b' : '#d1e3f0';
+        const textColor = isDark ? '#64748b' : '#1e293b';
+        const lineColor = '#f87171';
+        const rangeColor = '#34d399';
+
+        const pad = { top: 20, right: 20, bottom: 40, left: 54 };
+        const cW = W - pad.left - pad.right;
+        const cH = H - pad.top - pad.bottom;
+
+        if (!data) {
+            ctx.fillStyle = textColor;
+            ctx.font = '14px system-ui';
+            ctx.textAlign = 'center';
+            ctx.fillText('Fill in the main calculator first.', W / 2, H / 2);
+            return;
+        }
+
+        const maxRange = Math.max(...data.map(d => d.range)) * 1.15;
+        const maxCons = Math.max(...data.map(d => d.cons)) * 1.15;
+
+        const xScale = (i) => pad.left + (i / (data.length - 1)) * cW;
+        const yScaleRange = (v) => pad.top + cH - (v / maxRange) * cH;
+        const yScaleCons = (v) => pad.top + cH - (v / maxCons) * cH;
+
+        // Grid
+        ctx.strokeStyle = gridColor;
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 4; i++) {
+            const y = pad.top + (i / 4) * cH;
+            ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+        }
+
+        // Range line
+        ctx.beginPath();
+        ctx.strokeStyle = rangeColor;
+        ctx.lineWidth = 2.5;
+        data.forEach((d, i) => {
+            i === 0 ? ctx.moveTo(xScale(i), yScaleRange(d.range)) : ctx.lineTo(xScale(i), yScaleRange(d.range));
+        });
+        ctx.stroke();
+
+        // Consumption line
+        ctx.beginPath();
+        ctx.strokeStyle = lineColor;
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash([5, 4]);
+        data.forEach((d, i) => {
+            i === 0 ? ctx.moveTo(xScale(i), yScaleCons(d.cons)) : ctx.lineTo(xScale(i), yScaleCons(d.cons));
+        });
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Dots + speed labels
+        data.forEach((d, i) => {
+            ctx.fillStyle = rangeColor;
+            ctx.beginPath(); ctx.arc(xScale(i), yScaleRange(d.range), 4, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = lineColor;
+            ctx.beginPath(); ctx.arc(xScale(i), yScaleCons(d.cons), 4, 0, Math.PI * 2); ctx.fill();
+
+            ctx.fillStyle = textColor;
+            ctx.font = '11px system-ui';
+            ctx.textAlign = 'center';
+            ctx.fillText(d.v + ' Km/h', xScale(i), H - 8);
+        });
+
+        // Y-axis label (left = range)
+        ctx.save();
+        ctx.translate(14, pad.top + cH / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillStyle = rangeColor;
+        ctx.font = 'bold 11px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText('Range (Km)', 0, 0);
+        ctx.restore();
+
+        // Legend
+        ctx.font = 'bold 11px system-ui';
+        ctx.fillStyle = rangeColor; ctx.textAlign = 'left';
+        ctx.fillText('── Range', pad.left, pad.top - 4);
+        ctx.fillStyle = lineColor;
+        ctx.fillText('- - Consumption', pad.left + 90, pad.top - 4);
+    };
+
+    // ── UI UPDATES ──
+    const updateUI = () => {
+        const { currentBattery, minBattery, startBattery, batteryCapacity } = state;
+
+        // ── Legacy DOM (hidden, but JS still references them) ──
+        DOMElements.battery.level.style.width = `${currentBattery}%`;
+        let color = currentBattery <= minBattery ? 'var(--accent-red)' : (currentBattery <= 20 ? 'var(--accent-amber)' : 'var(--accent-emerald)');
+        DOMElements.battery.level.style.backgroundColor = color;
+        DOMElements.battery.percentageLabel.innerText = `${currentBattery}%`;
+        DOMElements.battery.bufferMarker.style.left = `${minBattery}%`;
+        DOMElements.battery.startMarker.style.left = `${startBattery}%`;
+
+        // ── NEW Battery Visuals ──
+        updateNewBatteryVisuals(currentBattery, minBattery, startBattery, batteryCapacity, color);
+
+        const res = calculateMainResults();
+        if (res) {
+            renderAutonomyTab(res, currentBattery, minBattery, startBattery, batteryCapacity);
+            DOMElements.results.stats.innerHTML = `
+                <div class="details-item"><p class="label">Overall driving consumption</p><p class="value red">${fmt(res.consumptionKwh100km)} <span class="unit">kWh/100Km</span></p></div>
+                <div class="details-item"><p class="label">Overall energy consumed</p><p class="value red">${fmt(res.energyUsedKwh)} <span class="unit">kWh</span></p></div>
+                <div class="details-item"><p class="label">Overall driving efficiency</p><p class="value blue">${fmt(res.efficiencyKmKwh)} <span class="unit">Km/kWh</span></p></div>
+                <div class="details-item"><p class="label">Traveled Km per battery %</p><p class="value blue">${fmt(res.kmPerPercent)} <span class="unit">Km</span></p></div>
+                <div class="details-item"><p class="label">Overall driving cost</p><p class="value yellow">${fmt(res.tripCost)} <span class="unit">€</span></p></div>
+                <div class="details-item"><p class="label">Overall driving cost per Km</p><p class="value yellow">${fmt(res.costPerKm, 3)} <span class="unit">€/Km</span></p></div>
+                <div class="details-item"><p class="label">Equivalent ICE efficiency</p><p class="value purple">${fmt(res.equivalentEfficiency, 1)} <span class="unit">Km/L</span></p></div>
+                <div class="details-item"><p class="label">Equivalent ICE traveling cost</p><p class="value purple">${fmt(res.equivalentIceCostPerKwh)} <span class="unit">€/kWh</span></p></div>
+                <div class="details-item"><p class="label">Equivalent ICE refuel cost</p><p class="value purple">${fmt(res.iceRefuelCost)} <span class="unit">€</span></p></div>
+                <div class="details-item"><p class="label">BEV vs ICE cost gain</p><p class="value purple">${fmt(res.bevVsIceCostGain)} <span class="unit">€</span></p></div>
+                <div class="details-item"><p class="label">Equivalent ICE distance</p><p class="value purple">${fmt(res.iceEquivalentKm, 1)} <span class="unit">Km</span></p></div>
+                <div class="details-item"><p class="label">Residual energy at minimum SoC</p><p class="value green">${fmt(res.energyAtMinBuffer)} <span class="unit">kWh</span></p></div>
+                <div class="details-item"><p class="label">Projected full charge range</p><p class="value green">${fmt(res.fullRangeReal, 0)} <span class="unit">Km</span></p></div>
+                ${res.wltpRatio !== null ? `<div class="details-item"><p class="label">Real vs WLTP ratio</p><p class="value ${res.wltpRatio >= 80 ? 'green' : res.wltpRatio >= 60 ? 'yellow' : 'red'}">${fmt(res.wltpRatio, 1)} <span class="unit">%</span></p></div>` : ''}`;
+            applyBorderColors('stats-grid');
+        } else {
+            document.getElementById('results-content').innerHTML = `<div class="autonomy-no-data"><p>Enter valid data (Start % > Current %, distance > 0)</p></div>`;
+            DOMElements.results.stats.innerHTML = '';
+        }
+
+        updateTripEstimatorUI();
+        updateChargingCalculatorUI();
+        updateCO2UI(res);
+        updateHealthUI(res);
+        updateSpeedRangeUI();
+        updateSoCConverter();
+        renderTripLog();
+        renderHealthLog();
+    };
+
+    // ── NEW BATTERY VISUAL UPDATER ──
+    const updateNewBatteryVisuals = (soc, minSoc, startSoc, capacity, fillColor) => {
+        // SoC Ring
+        const ring = document.getElementById('soc-ring-fill');
+        const pctLabel = document.getElementById('soc-ring-pct');
+        const kwhLabel = document.getElementById('soc-ring-kwh');
+        const ringStop1 = document.getElementById('ringGradStop1');
+        const ringStop2 = document.getElementById('ringGradStop2');
+        const ringSvg = document.getElementById('soc-ring-svg');
+
+        if (ring && pctLabel) {
+            const totalArc = 424 * 0.75; // 75% of circumference used for 0-100%
+            const dashOffset = 424 - (soc / 100) * totalArc;
+            ring.style.strokeDashoffset = dashOffset.toFixed(1);
+
+            let c1, c2, glow;
+            if (soc <= minSoc) {
+                c1 = '#f87171'; c2 = '#ef4444'; glow = 'rgba(248,113,113,0.5)';
+            } else if (soc <= 20) {
+                c1 = '#fbbf24'; c2 = '#f59e0b'; glow = 'rgba(251,191,36,0.5)';
+            } else {
+                c1 = '#34d399'; c2 = '#60a5fa'; glow = 'rgba(52,211,153,0.45)';
+            }
+            if (ringStop1) ringStop1.setAttribute('stop-color', c1);
+            if (ringStop2) ringStop2.setAttribute('stop-color', c2);
+            if (ringSvg) ringSvg.style.filter = `drop-shadow(0 0 14px ${glow})`;
+            pctLabel.textContent = `${soc}%`;
+            if (kwhLabel) {
+                const kwhNow = ((soc / 100) * capacity).toFixed(1);
+                kwhLabel.textContent = `${kwhNow} kWh`;
+            }
+        }
+
+        // Horizontal bar
+        const fill = document.getElementById('h-battery-fill');
+        const bufMk = document.getElementById('h-buffer-marker');
+        const startMk = document.getElementById('h-start-marker');
+        const cells = document.getElementById('h-battery-cells');
+
+        if (fill) {
+            fill.style.width = `${soc}%`;
+            if (soc <= minSoc) {
+                fill.style.background = 'linear-gradient(to right, #b91c1c, #f87171)';
+            } else if (soc <= 20) {
+                fill.style.background = 'linear-gradient(to right, #b45309, #fbbf24)';
+            } else if (soc <= 50) {
+                fill.style.background = 'linear-gradient(to right, #047857, #34d399)';
+            } else {
+                fill.style.background = 'linear-gradient(to right, #0369a1, #34d399 40%, #60a5fa)';
+            }
+        }
+
+        if (bufMk) bufMk.style.left = `${minSoc}%`;
+        if (startMk) startMk.style.left = `${startSoc}%`;
+
+        // Cell dividers (every 10%)
+        if (cells && !cells.dataset.built) {
+            cells.dataset.built = '1';
+            for (let i = 10; i < 100; i += 10) {
+                const d = document.createElement('div');
+                d.className = 'h-cell-divider';
+                d.style.left = `${i}%`;
+                cells.appendChild(d);
+            }
+        }
+
+        // Tick marks
+        const ticks = document.getElementById('h-battery-ticks');
+        if (ticks && !ticks.dataset.built) {
+            ticks.dataset.built = '1';
+            for (let i = 0; i <= 100; i += 5) {
+                const t = document.createElement('div');
+                const isMajor = i % 25 === 0;
+                t.className = `h-battery-tick${isMajor ? ' major' : ''}`;
+                t.style.left = `${i}%`;
+                ticks.appendChild(t);
+                if (isMajor && i > 0 && i < 100) {
+                    const lbl = document.createElement('div');
+                    lbl.className = 'h-battery-tick-label';
+                    lbl.style.left = `${i}%`;
+                    lbl.textContent = `${i}%`;
+                    ticks.appendChild(lbl);
+                }
+            }
+        }
+    };
+
+    // ── AUTONOMY TAB RENDERER ──
+    const renderAutonomyTab = (res, soc, minSoc, startSoc, capacity) => {
+        const el = document.getElementById('results-content');
+        if (!el) return;
+
+        // Speed-range pills: 90, 110, 130 Km/h projections
+        const speedData = buildSpeedRangeData();
+        const pillSpeeds = [30, 50, 70, 90, 110, 130];
+        let pillsHtml = '';
+        if (speedData) {
+            pillsHtml = `<div class="speed-range-pills">` +
+                pillSpeeds.map(spd => {
+                    const d = speedData.find(x => x.v === spd);
+                    if (!d) return '';
+                    return `<div class="speed-pill">
+                        <span class="sp-speed">${spd} Km/h</span>
+                        <span class="sp-range">${d.range}</span>
+                        <span class="sp-unit">Km</span>
+                    </div>`;
+                }).join('') +
+            `</div>`;
+        }
+
+        // Time-to-empty at current speed (use avg speed from state if valid, else 90)
+        const refSpeed = state.averageSpeed > 0 ? state.averageSpeed : 90;
+        const hoursToEmpty = res.remainingRange > 0 ? (res.remainingRange / refSpeed) : 0;
+        const hTTE = Math.floor(hoursToEmpty);
+        const mTTE = Math.round((hoursToEmpty - hTTE) * 60);
+        const tteStr = hoursToEmpty > 0 ? `${hTTE}h ${mTTE}m` : '—';
+
+        // kWh remaining above buffer
+        const kwhRemaining = ((soc - minSoc) / 100) * capacity;
+        const kwhTotal = (soc / 100) * capacity;
+
+        // Wh/Km
+        const whPerKm = res.consumptionKwh100km * 10;
+
+        // Range color class
+        const rangeColorClass = res.remainingRange < 50 ? 'red' : res.remainingRange < 100 ? 'yellow' : 'green';
+
+        // WLTP ratio badge
+        const wltpBadge = res.wltpRatio !== null
+            ? `<span style="font-size:0.75rem;font-weight:800;color:${res.wltpRatio >= 80 ? 'var(--accent-emerald)' : res.wltpRatio >= 60 ? 'var(--accent-amber)' : 'var(--accent-red)'}; background:var(--input-bg); border:1px solid var(--border-color); border-radius:99px; padding:2px 10px; margin-left:0.5rem;">${fmt(res.wltpRatio,1)}% WLTP</span>`
+            : '';
+
+        el.innerHTML = `
+            <div class="autonomy-hero">
+                <span class="hero-val" style="color:var(--accent-${rangeColorClass === 'green' ? 'emerald' : rangeColorClass === 'yellow' ? 'amber' : 'red'})">${Math.round(res.remainingRange)}</span>
+                <span class="hero-unit">Km</span>
+                ${wltpBadge}
+            </div>
+            <div class="autonomy-hero-sub">Estimated remaining range</div>
+
+            ${pillsHtml}
+
+            <div class="autonomy-detail-grid" id="autonomy-detail-grid">
+                <div class="autonomy-detail-item">
+                    <p class="ad-label">Usable energy</p>
+                    <p class="ad-val" style="color:var(--accent-emerald)">${fmt(kwhRemaining,1)} <span class="ad-unit">kWh</span></p>
+                </div>
+                <div class="autonomy-detail-item">
+                    <p class="ad-label">Total energy</p>
+                    <p class="ad-val" style="color:var(--accent-blue)">${fmt(kwhTotal,1)} <span class="ad-unit">kWh</span></p>
+                </div>
+                <div class="autonomy-detail-item">
+                    <p class="ad-label">Consumption</p>
+                    <p class="ad-val" style="color:var(--accent-red)">${fmt(res.consumptionKwh100km)} <span class="ad-unit">kWh/100Km</span></p>
+                </div>
+                <div class="autonomy-detail-item">
+                    <p class="ad-label">Time to empty</p>
+                    <p class="ad-val" style="color:var(--accent-purple)">${tteStr}</p>
+                </div>
+                <div class="autonomy-detail-item">
+                    <p class="ad-label">Km per kWh</p>
+                    <p class="ad-val" style="color:var(--accent-amber)">${fmt(res.efficiencyKmKwh)} <span class="ad-unit">Wh/Km</span></p>
+                </div>
+                <div class="autonomy-detail-item">
+                    <p class="ad-label">Km per battery %</p>
+                    <p class="ad-val" style="color:var(--accent-amber)">${fmt(res.kmPerPercent)} <span class="ad-unit">Km</span></p>
+                </div>
+                <div class="autonomy-detail-item">
+                    <p class="ad-label">Full range</p>
+                    <p class="ad-val" style="color:var(--accent-blue)">${fmt(res.fullRangeReal,0)} <span class="ad-unit">Km</span></p>
+                </div>
+                <div class="autonomy-detail-item">
+                    <p class="ad-label">Buffer reserve</p>
+                    <p class="ad-val" style="color:var(--accent-emerald)">${fmt(res.energyAtMinBuffer,1)} <span class="ad-unit">kWh</span></p>
+                </div>
+            </div>`;
+
+        // Apply border colors
+        document.querySelectorAll('#autonomy-detail-grid .autonomy-detail-item').forEach(item => {
+            const v = item.querySelector('.ad-val');
+            if (v) item.style.borderBottomColor = window.getComputedStyle(v).color;
+        });
+    };
+
+    const updateTripEstimatorUI = () => {
+        const res = calculateTripEstimation();
+        if (res) {
+            DOMElements.results.estimator.innerHTML = `
+                <div class="details-item"><p class="label">Estimated consumption</p><p class="value red">${res.adjustedConsumption} <span class="unit">kWh/100Km</span></p></div>
+                <div class="details-item"><p class="label">Estimated energy needed</p><p class="value purple">${res.estimatedKwh} <span class="unit">kWh</span></p></div>
+                <div class="details-item"><p class="label">Estimated battery needed</p><p class="value yellow">${res.socUsed} <span class="unit">%</span></p></div>
+                <div class="details-item"><p class="label">Estimated final SoC</p><p class="value green">${res.finalSoc} <span class="unit">%</span></p></div>`;
+            applyBorderColors('trip-estimator-results');
+        } else {
+            DOMElements.results.estimator.innerHTML = `<div class="no-results" style="grid-column: 1 / -1;"><p>Calculate real consumption first by filling the main form.</p></div>`;
+        }
+    };
+
+    const updateChargingCalculatorUI = () => {
+        const res = calculateCharging();
+        if (res) {
+            DOMElements.results.charging.innerHTML = `
+                <div class="details-item"><p class="label">Energy added</p><p class="value green">${res.kwhAdded} <span class="unit">kWh</span></p></div>
+                <div class="details-item"><p class="label">Energy drawn</p><p class="value yellow">${res.kwhTransferred} <span class="unit">kWh</span></p></div>
+                <div class="details-item"><p class="label">Charging cost</p><p class="value purple">${res.chargedCost} <span class="unit">€</span></p></div>
+                <div class="details-item"><p class="label">Withdrawal cost</p><p class="value red">${res.transferredCost} <span class="unit">€</span></p></div>
+                <div class="details-item"><p class="label">Charging time</p><p class="value blue">${res.time}</p></div>
+                <div class="details-item"><p class="label">Charge rate</p><p class="value blue">${res.pctPerHour} <span class="unit">%/hour</span></p></div>`;
+            applyBorderColors('charging-calculator-results');
+        } else {
+            DOMElements.results.charging.innerHTML = `<div class="no-results" style="grid-column: 1 / -1;"><p>Enter valid data (Target % > Start %)</p></div>`;
+        }
+    };
+
+    const updateCO2UI = (res) => {
+        const el = document.getElementById('co2-results');
+        if (!el) return;
+        const co2 = calculateCO2(res);
+        if (!co2) {
+            el.innerHTML = `<div class="no-results"><p>Enter valid data in the main calculator first.</p></div>`; return;
+        }
+        const pct = Math.max(0, Math.min(100, parseFloat(co2.savingPct)));
+        const barColor = pct > 60 ? 'var(--accent-emerald)' : pct > 30 ? 'var(--accent-amber)' : 'var(--accent-red)';
+        el.innerHTML = `
+            <div style="margin-bottom:1rem;">
+                <div style="display:flex;justify-content:space-between;font-size:0.8rem;font-weight:700;color:var(--text-muted);margin-bottom:0.25rem;">
+                    <span>CO₂ saved VS equivalent ICE trip</span><span style="color:${barColor}">${co2.savingPct}%</span>
+                </div>
+                <div class="co2-bar-track"><div class="co2-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+            </div>
+            <div class="details-grid" id="co2-grid" style="margin-top:0;padding-top:0;border-top:none;">
+                <div class="details-item"><p class="label">EV CO₂</p><p class="value ${parseFloat(co2.evCO2g) < parseFloat(co2.iceCO2g) ? 'green' : 'red'}">${fmt(co2.evCO2g/1000,2)} <span class="unit">Kg</span></p></div>
+                <div class="details-item"><p class="label">Equivalent ICE CO₂</p><p class="value red">${fmt(co2.iceCO2g/1000,2)} <span class="unit">Kg</span></p></div>
+                <div class="details-item"><p class="label">EV emission rate</p><p class="value yellow">${fmt(co2.evGPerKm,2)} <span class="unit">g/Km</span></p></div>
+                <div class="details-item"><p class="label">ICE emission rate</p><p class="value purple">${fmt(state.iceCo2,2)} <span class="unit">g/Km</span></p></div>
+                <div class="details-item"><p class="label">CO₂ saved</p><p class="value blue">${fmt(co2.savedKg,2)} <span class="unit">Kg</span></p></div>
+                <!-- div class="details-item"><p class="label">Grid CO₂ intensity</p><p class="value yellow">${fmt(state.gridCo2,2)} <span class="unit">g/kWh</span></p></div -->
+            </div>`;
+        applyBorderColors('co2-grid');
+    };
+
+    const updateHealthUI = (res) => {
+        const healthEl = document.getElementById('health-results');
+        const arcFill = document.getElementById('health-arc-fill');
+        const pctLabel = document.getElementById('health-pct-label');
+        if (!healthEl) return;
+        const h = calculateHealth(res);
+        if (!h) {
+            healthEl.innerHTML = `<div class="no-results" style="grid-column:1/-1"><p>Fill main calculator &amp; WLTP range field first.</p></div>`;
+            if (arcFill) { arcFill.setAttribute('stroke-dashoffset', '220'); arcFill.setAttribute('stroke', '#1e293b'); }
+            if (pctLabel) { pctLabel.textContent = '—'; pctLabel.style.color = 'var(--text-muted)'; }
+            return;
+        }
+        const soh = parseFloat(h.soh);
+        const arcLen = 220;
+        const offset = arcLen - (soh / 100) * arcLen;
+        const color = soh >= 85 ? '#34d399' : soh >= 70 ? '#fbbf24' : '#f87171';
+        if (arcFill) { arcFill.setAttribute('stroke-dashoffset', offset.toFixed(1)); arcFill.setAttribute('stroke', color); }
+        if (pctLabel) { pctLabel.textContent = h.soh + '%'; pctLabel.style.color = color; }
+
+        const label = soh >= 90 ? '🟢 Excellent' : soh >= 80 ? '🟡 Good' : soh >= 70 ? '🟠 Fair' : '🔴 Degraded';
+        healthEl.innerHTML = `
+            <div class="details-item"><p class="label">Measured real range</p><p class="value blue">${h.fullRangeReal} <span class="unit">Km</span></p></div>
+            <div class="details-item"><p class="label">WLTP rated range</p><p class="value purple">${h.wltpRange} <span class="unit">Km</span></p></div>
+            <div class="details-item"><p class="label">Battery health status</p><p class="value ${soh >= 85 ? 'green' : soh >= 70 ? 'yellow' : 'red'}">${label}</p></div>`;
+        applyBorderColors('health-results');
+
+        // Auto-append to health log
+        const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' });
+        const logKey = `${todayStr}|${h.soh}|${h.fullRangeReal}`;
+        if (!state.healthLog.find(e => e.key === logKey)) {
+            state.healthLog.unshift({ key: logKey, date: todayStr, soh: h.soh, range: h.fullRangeReal });
+            if (state.healthLog.length > 30) state.healthLog.pop();
+            saveState();
+        }
+    };
+
+    const updateSpeedRangeUI = () => {
+        drawSpeedChart();
+        const data = buildSpeedRangeData();
+        const tableEl = document.getElementById('speed-range-table');
+        if (!tableEl) return;
+        if (!data) { tableEl.innerHTML = ''; return; }
+        tableEl.innerHTML = data.map(d => `
+            <div class="details-item">
+                <p class="label">${d.v} Km/h</p>
+                <p class="value green">${d.range} <span class="unit">Km</span></p>
+                <p style="font-size:0.75rem;color:var(--accent-red);font-weight:700;">${d.cons} kWh/100Km</p>
+            </div>`).join('');
+        applyBorderColors('speed-range-table');
+    };
+
+    const updateSoCConverter = () => {
+        const socInput = document.getElementById('socConvInput');
+        const kmInput = document.getElementById('kmConvInput');
+        const socResult = document.getElementById('socConvKm');
+        const kmResult = document.getElementById('kmConvSoc');
+        if (!socInput || !kmInput) return;
+        const kpp = currentKmPerPercent;
+        if (kpp) {
+            const sv = parseFloat(socInput.value);
+            if (!isNaN(sv)) socResult.textContent = fmt(sv * kpp, 1);
+            const kv = parseFloat(kmInput.value);
+            if (!isNaN(kv)) kmResult.textContent = fmt(kv / kpp, 1);
+        } else {
+            socResult.textContent = '—';
+            kmResult.textContent = '—';
+        }
+    };
+
+    // ── TRIP LOG ──
+    const renderTripLog = () => {
+        const list = document.getElementById('trip-log-list');
+        const avgEl = document.getElementById('trip-log-averages');
+        if (!list) return;
+        if (!state.tripLog.length) {
+            list.innerHTML = '<li class="no-log-msg">No trips logged yet.</li>';
+            if (avgEl) avgEl.innerHTML = '';
+            return;
+        }
+        list.innerHTML = state.tripLog.map((t, i) => `
+            <li class="trip-log-item">
+                <span class="tl-date">${t.date}</span>
+                <span class="tl-km">${t.km} Km</span>
+                <span class="tl-cons">${t.cons} kWh/100Km</span>
+                <span style="color:var(--accent-amber);font-weight:700;">${t.cost} €</span>
+                <button class="tl-del" onclick="deleteTripLogEntry(${i})" title="Delete">✕</button>
+            </li>`).join('');
+        if (avgEl && state.tripLog.length > 1) {
+            const avgCons = state.tripLog.reduce((s, t) => s + parseFloat(t.cons), 0) / state.tripLog.length;
+            const totalKm = state.tripLog.reduce((s, t) => s + parseFloat(t.km), 0);
+            avgEl.innerHTML = `
+                <div class="details-grid" id="log-avg-grid" style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--border-color);">
+                    <div class="details-item"><p class="label">Total Km logged</p><p class="value blue">${fmt(totalKm, 0)} <span class="unit">Km</span></p></div>
+                    <div class="details-item"><p class="label">Average consumption</p><p class="value red">${fmt(avgCons)} <span class="unit">kWh/100Km</span></p></div>
+                    <div class="details-item"><p class="label">Trips logged</p><p class="value purple">${state.tripLog.length}</p></div>
+                </div>`;
+            applyBorderColors('log-avg-grid');
+        } else if (avgEl) avgEl.innerHTML = '';
+    };
+
+    const renderHealthLog = () => {
+        const list = document.getElementById('health-log-list');
+        if (!list) return;
+        if (!state.healthLog.length) {
+            list.innerHTML = '<li class="no-log-msg">No SoH sessions recorded yet.</li>'; return;
+        }
+        list.innerHTML = state.healthLog.map(e => `
+            <li class="trip-log-item">
+                <span class="tl-date">${e.date}</span>
+                <span class="tl-km">${e.range} Km measured</span>
+                <span class="tl-cons" style="color:var(--accent-blue);">SoH ${e.soh}%</span>
+            </li>`).join('');
+    };
+
+    // ── BINDING ──
+    const bindInputsToState = () => {
+        Object.keys(DOMElements.inputs).forEach(key => {
+            const input = DOMElements.inputs[key];
+            if (!input) return;
+            const update = (e) => {
+                const value = e.target.type === 'checkbox' ? e.target.checked : Number(e.target.value);
+                state[key] = value;
+                if (DOMElements.inputs[key]) DOMElements.inputs[key].value = e.target.type === 'checkbox' ? value : value;
+                if (DOMElements.ranges[key]) DOMElements.ranges[key].value = value;
+                updateUI();
+                saveState();
+            };
+            input.addEventListener('input', update);
+            if (DOMElements.ranges[key]) DOMElements.ranges[key].addEventListener('input', update);
+        });
+    };
+
+    const syncStateToInputs = () => {
+        Object.keys(state).forEach(key => {
+            if (DOMElements.inputs[key]) {
+                const el = DOMElements.inputs[key];
+                if (el.type === 'checkbox') el.checked = state[key];
+                else el.value = state[key];
+            }
+            if (DOMElements.ranges[key]) DOMElements.ranges[key].value = state[key];
+        });
+    };
+
+    // ── SoC converter live binding ──
+    document.getElementById('socConvInput').addEventListener('input', updateSoCConverter);
+    document.getElementById('kmConvInput').addEventListener('input', updateSoCConverter);
+
+    // ── Log trip button ──
+    document.getElementById('logTripBtn').addEventListener('click', () => {
+        if (!baselineConsumption) { alert('Fill in the main calculator first.'); return; }
+        const res = calculateMainResults();
+        if (!res) { alert('Invalid data — cannot log trip.'); return; }
+        const dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+        state.tripLog.unshift({
+            date: dateStr,
+            km: fmt(state.kilometersTraveled, 1),
+            cons: fmt(res.consumptionKwh100km),
+            cost: fmt(res.tripCost),
+        });
+        if (state.tripLog.length > 50) state.tripLog.pop();
+        saveState();
+        renderTripLog();
+        // Switch to log tab
+        document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelector('[data-tab="triplog"]').classList.add('active');
+        document.getElementById('tab-triplog').classList.add('active');
+    });
+
+    // ── Clear health log ──
+    document.getElementById('clearHealthLogBtn').addEventListener('click', () => {
+        if (confirm('Clear all SoH session history?')) {
+            state.healthLog = [];
+            saveState();
+            renderHealthLog();
+        }
+    });
+
+    // ── Export summary ──
+    document.getElementById('exportSummaryBtn').addEventListener('click', () => {
+        const res = calculateMainResults();
+        if (!res) { alert('No data to export.'); return; }
+        const wltpRatioLine = res.wltpRatio !== null ? `Real vs WLTP ratio: ${fmt(res.wltpRatio, 1)} %` : null;
+        const lines = [
+            `EV Master — Travel and Consumption Statistics (${new Date().toLocaleDateString('en-GB')})`,
+            `─────────────────────────────────────`,
+            `Distance: ${state.kilometersTraveled} Km`,
+            `SoC used: ${state.startBattery}% → ${state.currentBattery}%`,
+            `Battery capacity: ${state.batteryCapacity} kWh`,
+            `─────────────────────────────────────`,
+            `Overall driving consumption: ${fmt(res.consumptionKwh100km)} kWh/100Km`,
+            `Overall energy consumed: ${fmt(res.energyUsedKwh)} kWh`,
+            `Overall driving efficiency: ${fmt(res.efficiencyKmKwh)} Km/kWh`,
+            `Traveled Km per battery %: ${fmt(res.kmPerPercent)} Km`,
+            `Overall driving cost: ${fmt(res.tripCost)} € (@ ${state.kwhPrice} €/kWh)`,
+            `Overall driving cost per Km: ${fmt(res.costPerKm, 3)} €/Km`,
+            `Equivalent ICE efficiency: ${fmt(res.equivalentEfficiency, 1)} Km/L`,
+            `Equivalent ICE traveling cost: ${fmt(res.equivalentIceCostPerKwh)} (@ ${state.fuelPrice} €/L)`,
+            `Equivalent ICE refuel cost: ${fmt(res.iceRefuelCost)} €`,
+            `BEV vs ICE cost gain: ${fmt(res.bevVsIceCostGain)} €`,
+            `Equivalent ICE distance: ${fmt(res.iceEquivalentKm, 1)} Km`,
+            `Residual energy at minimum SoC: ${fmt(res.energyAtMinBuffer)} kWh`,
+            `Projected full charge range: ${fmt(res.fullRangeReal, 0)} Km`,
+            wltpRatioLine,
+        ].filter(Boolean).join('\n');
+        navigator.clipboard.writeText(lines).then(() => {
+            const btn = document.getElementById('exportSummaryBtn');
+            btn.textContent = '✅ Copied!';
+            setTimeout(() => btn.innerHTML = '📋 Copy Summary', 2000);
+        }).catch(() => { alert(lines); });
+    });
+
+    // ── TABS ──
+    const initTabs = () => {
+        const tabContainer = document.querySelector('.tab-nav');
+        if (!tabContainer) return;
+        tabContainer.addEventListener('click', (e) => {
+            const clickedTab = e.target.closest('.tab-btn');
+            if (!clickedTab || clickedTab.classList.contains('active')) return;
+            tabContainer.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            clickedTab.classList.add('active');
+            const target = document.getElementById('tab-' + clickedTab.dataset.tab);
+            if (target) target.classList.add('active');
+            // Redraw chart when speed tab becomes visible
+            if (clickedTab.dataset.tab === 'speed-range') setTimeout(drawSpeedChart, 50);
+        });
+    };
+
+    // ── ABOUT MODAL ──
+    document.getElementById('openAboutBtn').addEventListener('click', () => {
+        document.getElementById('aboutModal').classList.add('open');
+    });
+    document.getElementById('closeAboutBtn').addEventListener('click', () => {
+        document.getElementById('aboutModal').classList.remove('open');
+    });
+    document.getElementById('aboutModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('aboutModal')) document.getElementById('aboutModal').classList.remove('open');
+    });
+
+    // ── INIT ──
+    loadState();
+    initTheme();
+    initPresets();
+    syncStateToInputs();
+    bindInputsToState();
+    updateUI();
+    initTabs();
+
+    // Redraw chart on resize
+    window.addEventListener('resize', () => {
+        if (document.getElementById('tab-speed-range').classList.contains('active')) drawSpeedChart();
+    });
+});
+
+// ── Vehicle profiles (global scope, called from modal inline onclick) ──
+function loadProfileEV(name) {
+    const saved = localStorage.getItem('evMasterState');
+    if (!saved) return;
+    const s = JSON.parse(saved);
+    if (!s.presets || !s.presets[name]) return;
+    const p = s.presets[name];
+    s.batteryCapacity = p.batteryCapacity;
+    s.fuelConsumption = p.fuelConsumption;
+    if (p.wltpRange) s.wltpRange = p.wltpRange;
+    if (p.theme) s.theme = p.theme;
+    if (p.kwhPrice !== undefined) s.kwhPrice = p.kwhPrice;
+    if (p.fuelPrice !== undefined) s.fuelPrice = p.fuelPrice;
+    if (p.gridCo2 !== undefined) s.gridCo2 = p.gridCo2;
+    if (p.iceCo2 !== undefined) s.iceCo2 = p.iceCo2;
+    s.selectedPreset = name;
+    localStorage.setItem('evMasterState', JSON.stringify(s));
+    location.reload();
+}
+
+function deleteProfileEV(name) {
+    const saved = localStorage.getItem('evMasterState');
+    if (!saved) return;
+    const s = JSON.parse(saved);
+    if (!s.presets) return;
+    delete s.presets[name];
+    if (s.selectedPreset === name) s.selectedPreset = null;
+    localStorage.setItem('evMasterState', JSON.stringify(s));
+    location.reload();
+}
+
+// ── Trip log delete (global scope) ──
+function deleteTripLogEntry(index) {
+    const saved = localStorage.getItem('evMasterState');
+    if (!saved) return;
+    const s = JSON.parse(saved);
+    s.tripLog.splice(index, 1);
+    localStorage.setItem('evMasterState', JSON.stringify(s));
+    location.reload();
+}
+
+// ── STANDALONE QUICK CALCULATOR ──
+let expression = '';
+let shouldResetDisplay = false;
+
+function calcAction(val) {
+    const currentDisplay = document.getElementById('calc-current');
+    const opDisplay = document.getElementById('calc-op');
+    const tape = document.getElementById('calc-tape');
+
+    if (val === 'C') {
+        expression = '';
+        currentDisplay.innerText = '0';
+        opDisplay.innerText = '';
+    } else if (val === 'DEL') {
+        expression = expression.trim().slice(0, -1);
+        currentDisplay.innerText = expression || '0';
+    } else if (val === '=') {
+        try {
+            if (!expression) return;
+            let finalExpr = expression.replace(/×/g, '*').replace(/÷/g, '/');
+            let result = new Function('return ' + finalExpr)();
+            if (typeof result === 'number') result = Math.round((result + Number.EPSILON) * 1000) / 1000;
+            const entry = document.createElement('div');
+            entry.className = 'tape-entry';
+            entry.innerHTML = `<div class="expr">${expression} =</div><div class="res">${result}</div>`;
+            tape.prepend(entry);
+            opDisplay.innerText = expression + ' =';
+            currentDisplay.innerText = result;
+            expression = result.toString();
+            shouldResetDisplay = true;
+        } catch (e) {
+            currentDisplay.innerText = 'Error';
+            expression = '';
+        }
     } else {
-      init();
+        if (shouldResetDisplay) {
+            if (/[0-9(]/.test(val)) expression = '';
+            shouldResetDisplay = false;
+        }
+        let visualVal = val;
+        if (val === '*') visualVal = ' × ';
+        if (val === '/') visualVal = ' ÷ ';
+        if (['+', '-'].includes(val)) visualVal = ` ${val} `;
+        expression += visualVal;
+        currentDisplay.innerText = expression;
     }
-
-    (function() {
-      var manifest = {
-        name: 'Il calcolatore di Tonino',
-        short_name: 'Tonino Calc',
-        description: 'Calcolatore energetico per ricarica EV ispirato a Tonino Lucidi',
-        start_url: '.',
-        display: 'standalone',
-        background_color: '#070b12',
-        theme_color: '#070b12',
-        icons: [
-          { src: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192"><rect width="192" height="192" rx="32" fill="#e21017"/><text x="96" y="130" text-anchor="middle" font-size="100" font-family="Inter,sans-serif" font-weight="800" fill="white">TC</text></svg>'), sizes: '192x192', type: 'image/svg+xml' },
-          { src: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="64" fill="#e21017"/><text x="256" y="345" text-anchor="middle" font-size="280" font-family="Inter,sans-serif" font-weight="800" fill="white">TC</text></svg>'), sizes: '512x512', type: 'image/svg+xml' }
-        ]
-      };
-	  
-	  var dataUri = 'data:application/json,' + encodeURIComponent(JSON.stringify(manifest));
-      document.getElementById('manifest-link').href = dataUri;
-
+}
+    </script>
+    <script>
       if ('serviceWorker' in navigator) {
-        var sw = 'self.addEventListener("install",function(){self.skipWaiting()});self.addEventListener("activate",function(e){e.waitUntil(self.clients.claim())});self.addEventListener("fetch",function(e){e.respondWith(fetch(e.request).catch(function(){return new Response("",{status:408})}))});';
-        navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw], { type: 'application/javascript' }))).catch(function(){});
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js').then(function(registration) {
+			updateViaCache: 'none'
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }, function(err) {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
       }
-    })();
-  </script>
+    </script>
 </body>
 </html>
