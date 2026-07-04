@@ -516,6 +516,150 @@
       body::before { display: none; }
     }
 
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+    }
+    .modal-overlay.open { display: flex; align-items: center; justify-content: center; }
+    .modal-box {
+      background: var(--card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      width: 90%;
+      max-width: 440px;
+      position: relative;
+      box-shadow: var(--shadow);
+    }
+    .modal-box h2 {
+      font-size: 1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--cyan);
+      margin: 0 0 0.3rem;
+    }
+    .modal-box p.modal-sub {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      margin: 0 0 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-close {
+      position: absolute;
+      top: 1.1rem; right: 1.25rem;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      line-height: 1;
+      transition: color var(--transition);
+    }
+    .modal-close:hover { color: var(--text); }
+    .profiles-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-height: 260px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+    }
+    .profiles-list::-webkit-scrollbar { width: 4px; }
+    .profiles-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .profile-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      padding: 0.6rem 0.85rem;
+      gap: 0.5rem;
+    }
+    .profile-item-info { display: flex; flex-direction: column; flex: 1; }
+    .profile-item-name {
+      font-weight: 800;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+    .profile-item-details {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin-top: 2px;
+      letter-spacing: 0.02em;
+    }
+    .profile-item-actions { display: flex; gap: 0.4rem; }
+    .profile-action-btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 4px;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.18s ease;
+    }
+    .profile-action-btn:hover { background: var(--surface-hover); }
+    .profile-action-btn.load { color: var(--cyan); border-color: rgba(56,189,248,0.3); }
+    .profile-action-btn.load:hover { background: rgba(56,189,248,0.1); }
+    .profile-action-btn.del { color: var(--red); border-color: rgba(226,16,23,0.3); }
+    .profile-action-btn.del:hover { background: rgba(226,16,23,0.1); }
+    .profile-save-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .profile-name-input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: var(--radius-xs);
+      padding: 0.6rem 0.85rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: var(--font);
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .profile-name-input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 2px rgba(56,189,248,0.2); }
+    .profile-save-btn {
+      border: none;
+      background: linear-gradient(135deg, var(--cyan), var(--green));
+      color: #fff;
+      border-radius: var(--radius-xs);
+      padding: 0.6rem 1.1rem;
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: var(--font);
+      transition: opacity 0.18s;
+    }
+    .profile-save-btn:hover { opacity: 0.88; }
+    .profiles-empty {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      font-style: italic;
+      padding: 1.25rem 0;
+    }
+
     .sr-only {
       position: absolute;
       width: 1px;
@@ -535,9 +679,12 @@
       <span class="header-dot" aria-hidden="true"></span>
       <span class="header-title">Il calcolatore di Tonino</span>
     </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+    <button class="theme-toggle" id="profilesToggle" type="button" aria-label="Gestisci profili" title="Profili">👤</button>
     <button class="theme-toggle" id="themeToggle" type="button" aria-label="Attiva tema chiaro">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
+    </div>
   </header>
 
   <main class="card" role="main">
@@ -605,7 +752,7 @@
         <span class="input-group-value" id="priceDisplay" aria-live="polite">0,25</span>
       </div>
       <div class="input-range-wrapper">
-        <input type="range" id="price" min="0.00" max="1.00" step="0.01" value="0.25" aria-describedby="priceUnit">
+        <input type="range" id="price" min="0.00" max="1.50" step="0.01" value="0.25" aria-describedby="priceUnit">
         <span id="priceUnit" class="sr-only">Euro per kWh</span>
       </div>
     </div>
@@ -627,25 +774,38 @@
       </div>
       <div class="result-breakdown" id="breakdown">
         <div class="breakdown-item">
-          <span class="breakdown-label">Δ SoC</span>
+          <span class="breakdown-label">Δ SoC:</span>
           <span class="breakdown-value" id="bdDelta">0%</span>
         </div>
         <div class="breakdown-item">
-          <span class="breakdown-label">Energia netta</span>
+          <span class="breakdown-label">Energia netta caricata:</span>
           <span class="breakdown-value" id="bdNet">0,00 kWh</span>
         </div>
         <div class="breakdown-item">
-          <span class="breakdown-label">Perdite trasferimento</span>
+          <span class="breakdown-label">Perdite di trasferimento:</span>
           <span class="breakdown-value" id="bdLosses">0,00 kWh</span>
         </div>
         <div class="breakdown-item">
-          <span class="breakdown-label breakdown-label--total">Costo totale</span>
+          <span class="breakdown-label breakdown-label--total">Costo totale ricarica:</span>
           <span class="breakdown-value" id="bdCost">0,00 €</span>
         </div>
       </div>
     </div>
 
   </main>
+
+  <div class="modal-overlay" id="profilesModal">
+    <div class="modal-box">
+      <button class="modal-close" id="closeProfilesBtn">&times;</button>
+      <h2>👤 Profili</h2>
+      <p class="modal-sub">Salva e carica configurazioni dei parametri.</p>
+      <div class="profiles-list" id="profilesList"></div>
+      <div class="profile-save-row">
+        <input type="text" class="profile-name-input" id="profileNameInput" placeholder="Nome profilo" maxlength="40">
+        <button class="profile-save-btn" id="saveProfileBtn">💾 Salva</button>
+      </div>
+    </div>
+  </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -701,6 +861,10 @@
       state.capacity = parseFloat(els.capacity.value) || 0;
       state.socStart = parseFloat(els.socStart.value) || 0;
       state.socTarget = parseFloat(els.socTarget.value) || 0;
+      if (state.socStart > state.socTarget) {
+        state.socStart = state.socTarget;
+        els.socStart.value = state.socStart;
+      }
       state.efficiency = parseFloat(els.efficiency.value) || 100;
       state.price = parseFloat(els.price.value) || 0;
     }
@@ -767,7 +931,16 @@
       updateResult(r);
     }
 
-    function onInput() {
+    function onInput(e) {
+      var t = e && e.target;
+      if (t === els.socStart || t === els.socTarget) {
+        var s1 = parseFloat(els.socStart.value) || 0;
+        var s2 = parseFloat(els.socTarget.value) || 0;
+        if (s1 > s2) {
+          if (t === els.socStart) els.socStart.value = s2;
+          else els.socTarget.value = s1;
+        }
+      }
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(syncAll, 40);
     }
@@ -801,6 +974,99 @@
       els.toast._hide = setTimeout(function() {
         els.toast.classList.remove('toast--visible');
       }, 2000);
+    }
+
+    var profiles = {};
+    var profilesLoaded = false;
+
+    function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+    function saveProfiles() { try { localStorage.setItem('toninoCalcProfiles', JSON.stringify(profiles)); } catch(e) {} }
+
+    function loadProfiles() {
+      if (profilesLoaded) return;
+      try {
+        var d = localStorage.getItem('toninoCalcProfiles');
+        if (d) { profiles = JSON.parse(d); if (typeof profiles !== 'object') profiles = {}; }
+      } catch(e) { profiles = {}; }
+      profilesLoaded = true;
+    }
+
+    function openProfilesModal() {
+      loadProfiles();
+      renderProfilesList();
+      document.getElementById('profilesModal').classList.add('open');
+    }
+
+    function closeProfilesModal() {
+      document.getElementById('profilesModal').classList.remove('open');
+    }
+
+    function renderProfilesList() {
+      var container = document.getElementById('profilesList');
+      var keys = Object.keys(profiles);
+      if (keys.length === 0) {
+        container.innerHTML = '<div class="profiles-empty">Nessun profilo salvato.<br>Configura i parametri e salva un profilo qui sotto.</div>';
+        return;
+      }
+      container.innerHTML = keys.map(function(name) {
+        var p = profiles[name];
+        return '<div class="profile-item">' +
+          '<div class="profile-item-info">' +
+            '<span class="profile-item-name">' + escHtml(name) + '</span>' +
+            '<span class="profile-item-details">Batteria: <b>' + p.capacity + '</b> kWh &middot; SoC finale: <b>' + p.socTarget + '</b>% &middot; Efficienza: <b>' + p.efficiency + '</b>% &middot; Prezzo: <b>' + p.price + '</b> &euro;/kWh</span>' +
+          '</div>' +
+          '<div class="profile-item-actions">' +
+            '<button class="profile-action-btn load" onclick="loadProfile(\'' + escHtml(name) + '\')">Carica</button>' +
+            '<button class="profile-action-btn del" onclick="deleteProfile(\'' + escHtml(name) + '\')">&#10005;</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    function saveProfile() {
+      var input = document.getElementById('profileNameInput');
+      var name = input.value.trim();
+      if (!name) { input.focus(); return; }
+      profiles[name] = {
+        capacity: state.capacity,
+        socTarget: state.socTarget,
+        efficiency: state.efficiency,
+        price: state.price
+      };
+      input.value = '';
+      saveProfiles();
+      renderProfilesList();
+      showToast('Profilo salvato: ' + name);
+    }
+
+    function applyProfile(name) {
+      var p = profiles[name];
+      if (!p) return;
+      state.capacity = p.capacity;
+      state.socTarget = p.socTarget;
+      state.efficiency = p.efficiency;
+      state.price = p.price;
+      els.capacity.value = state.capacity;
+      els.socTarget.value = state.socTarget;
+      els.efficiency.value = state.efficiency;
+      els.price.value = state.price;
+      syncAll();
+      showToast('Profilo caricato: ' + name);
+    }
+
+    function loadProfile(name) {
+      loadProfiles();
+      if (profiles[name]) applyProfile(name);
+    }
+
+    function deleteProfile(name) {
+      loadProfiles();
+      if (!profiles[name]) return;
+      delete profiles[name];
+      saveProfiles();
+      renderProfilesList();
+      showToast('Profilo eliminato');
     }
 
     function copyResult() {
@@ -873,6 +1139,14 @@
       });
 
       els.themeToggle.addEventListener('click', toggleTheme);
+
+      els.profilesToggle = document.getElementById('profilesToggle');
+      els.profilesToggle.addEventListener('click', openProfilesModal);
+      document.getElementById('closeProfilesBtn').addEventListener('click', closeProfilesModal);
+      document.getElementById('profilesModal').addEventListener('click', function(e) {
+        if (e.target === document.getElementById('profilesModal')) closeProfilesModal();
+      });
+      document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
 
       els.presetBtns.forEach(function(btn) {
         btn.addEventListener('click', function() {
