@@ -1008,11 +1008,11 @@ input[type="date"], input[type="number"], input[type="text"], select, textarea {
   </button>
   <button class="tab-btn ripple-host" id="tab-refueling" role="tab" aria-selected="false" aria-controls="panel-refueling" onclick="switchTab('refueling')" aria-label="Refueling tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="10" height="18" rx="2"></rect><path d="M7 7h2"></path><path d="M13 7h4a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-4"></path><path d="M17 11v5a1 1 0 0 0 2 0v-3"></path><circle cx="8" cy="14" r="2" stroke-width="1.6"></circle><path d="M7 12.27V16"></path></svg>
-    <span>Refueling</span>
+    <span>Refuels</span>
   </button>
   <button class="tab-btn ripple-host" id="tab-statistics" role="tab" aria-selected="false" aria-controls="panel-statistics" onclick="switchTab('statistics')" aria-label="Statistics tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
-    <span>Statistics</span>
+    <span>Stats</span>
   </button>
   <button class="tab-btn ripple-host" id="tab-charts" role="tab" aria-selected="false" aria-controls="panel-charts" onclick="switchTab('charts')" aria-label="Charts tab">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -1186,13 +1186,13 @@ input[type="date"], input[type="number"], input[type="text"], select, textarea {
     </div>
     <div class="settings-section">
       <div class="settings-section-title">Data Management</div>
-      <button class="btn btn-secondary ripple-host" onclick="exportRecords()" aria-label="Export all records as JSON">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Export All Records (JSON)
-      </button>
       <button class="btn btn-secondary ripple-host" onclick="exportCSV()" aria-label="Export all records as CSV">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Export All Records (CSV)
+      </button>
+      <button class="btn btn-secondary ripple-host" onclick="exportRecords()" aria-label="Export all records as JSON">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export All Records (JSON)
       </button>
       <button class="btn btn-secondary ripple-host" onclick="triggerImport()" aria-label="Import records from file">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
