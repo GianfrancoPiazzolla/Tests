@@ -1668,16 +1668,32 @@ var searchQuery = '';
 function renderRecordList() {
   const list = document.getElementById('records-list');
   const pagWrap = document.getElementById('pagination-wrap');
+  const wasSearchFocused = document.activeElement && document.activeElement.id === 'search-input';
+  const selStart = wasSearchFocused ? document.activeElement.selectionStart : null;
+  const selEnd = wasSearchFocused ? document.activeElement.selectionEnd : null;
+
   const vehicleRecs = AppState.activeVehicleId
     ? AppState.records.filter(r => r.vehicleId === AppState.activeVehicleId)
     : AppState.records;
   const filtered = filterRecordsBySearch(vehicleRecs, searchQuery);
   const sorted = [...filtered].sort((a,b) => { const d = b.date.localeCompare(a.date); return d !== 0 ? d : (b.createdAt || '').localeCompare(a.createdAt || ''); });
 
+  function restoreSearchFocus() {
+    if (wasSearchFocused) {
+      const el = document.getElementById('search-input');
+      if (el) {
+        el.focus();
+        if (selStart !== null && el.setSelectionRange) {
+          el.setSelectionRange(selStart, selEnd);
+        }
+      }
+    }
+  }
+
   if (!sorted.length) {
     const noVehicle = !AppState.activeVehicleId;
     const hasRecords = vehicleRecs.length > 0;
-    const searchBarHtml = hasRecords ? '<div style="margin-bottom:10px"><input type="text" class="form-input" id="search-input" placeholder="🔍 Search by date, location or notes..." value="' + escapeHtml(searchQuery) + '" oninput="searchQuery=this.value;renderRecordList()" aria-label="Search records"></div>' : '';
+    const searchBarHtml = hasRecords ? '<div style="margin-bottom:10px"><input type="text" class="form-input" id="search-input" placeholder="🔍 Search..." value="' + escapeHtml(searchQuery) + '" oninput="searchQuery=this.value;renderRecordList()" aria-label="Search records"></div>' : '';
     list.innerHTML = searchBarHtml + '<div class="empty-state">' +
       '<svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">' +
         '<rect x="10" y="20" width="60" height="45" rx="6" stroke="currentColor" stroke-width="2"/>' +
@@ -1692,12 +1708,13 @@ function renderRecordList() {
         : '<button class="empty-cta ripple-host" onclick="openForm()" aria-label="Add first record">+ Add First Record</button>') +
     '</div>';
     pagWrap.innerHTML = '';
+    restoreSearchFocus();
     if (!noVehicle) document.getElementById('fab').classList.add('pulse');
     return;
   }
   document.getElementById('fab').classList.remove('pulse');
 
-  const searchHtml = '<div style="margin-bottom:10px"><input type="text" class="form-input" id="search-input" placeholder="🔍 Search by date, location or notes..." value="' + escapeHtml(searchQuery) + '" oninput="searchQuery=this.value;renderRecordList()" aria-label="Search records"></div>';
+  const searchHtml = '<div style="margin-bottom:10px"><input type="text" class="form-input" id="search-input" placeholder="🔍 Search..." value="' + escapeHtml(searchQuery) + '" oninput="searchQuery=this.value;renderRecordList()" aria-label="Search records"></div>';
 
   const allCpkm = sorted.map(r => r.costPerKm);
   const avgCpkm = allCpkm.reduce((a,b)=>a+b,0)/allCpkm.length;
@@ -1761,6 +1778,7 @@ function renderRecordList() {
       <div class="efficiency-bar" style="width:${effPct}%;background:${effColor}" title="Efficiency: ${kmpu.toFixed(2)} Km/${unitLabel()} (${effPct}% of range)"></div>
     </div>`;
   }).join('');
+  restoreSearchFocus();
 
   // pagination
   if (totalPages <= 1) { pagWrap.innerHTML = ''; return; }
@@ -2467,7 +2485,7 @@ function renderCharts() {
     AppState.charts['chart-price'] = new Chart(ctx1, { type:'line', data: {
       labels, datasets: [
         { label:'Price', data:prices, borderColor:'#3B82F6', backgroundColor:grad1, fill:true, tension:0.4, pointRadius:3, pointBackgroundColor:'#3B82F6' },
-        { label:'Moving Avg', data:ma, borderColor:'#06B6D4', borderDash:[4,4], fill:false, tension:0.4, pointRadius:0 }
+        { label:'Moving Avg', data:ma, borderColor:'#D8D8D8', borderDash:[4,4], fill:false, tension:0.4, pointRadius:0 }
       ]
     }, options: { ...baseOpts(), plugins: { ...baseOpts().plugins, tooltip: { ...baseOpts().plugins.tooltip, callbacks: { label: (ctx) => ` € ${ctx.raw.toFixed(2)}/${unitLabel()}` } } } } });
   }
@@ -2484,7 +2502,7 @@ function renderCharts() {
     AppState.charts['chart-cpkm'] = new Chart(ctx2, { type:'line', data: {
       labels: labels2, datasets: [
         { label:'Cost/Km', data:cpkms, borderColor:'#06B6D4', backgroundColor:grad2, fill:true, tension:0.4, pointRadius:3 },
-        { label:'Average', data: Array(cpkms.length).fill(avgLine), borderColor:'#F59E0B', borderDash:[6,3], fill:false, pointRadius:0 }
+        { label:'Average', data: Array(cpkms.length).fill(avgLine), borderColor:'#D8D8D8', borderDash:[6,3], fill:false, pointRadius:0 }
       ]
    }, options: { ...baseOpts(), plugins: { ...baseOpts().plugins, tooltip: { ...baseOpts().plugins.tooltip, callbacks: { label: (ctx) => ` € ${ctx.raw.toFixed(2)}/Km` } } } } });
   }
@@ -2501,7 +2519,7 @@ function renderCharts() {
     AppState.charts['chart-consumption'] = new Chart(ctxCons, { type:'line', data: {
       labels: labelsCons, datasets: [
         { label:`Consumption (${unitLabel()}/100Km)`, data:consValues, borderColor:'#FB923C', backgroundColor:gradCons, fill:true, tension:0.4, pointRadius:3, pointBackgroundColor:'#FB923C' },
-        { label:'Average', data: Array(consValues.length).fill(parseFloat(avgCons.toFixed(2))), borderColor:'#F59E0B', borderDash:[6,3], fill:false, pointRadius:0 }
+        { label:'Average', data: Array(consValues.length).fill(parseFloat(avgCons.toFixed(2))), borderColor:'#D8D8D8', borderDash:[6,3], fill:false, pointRadius:0 }
       ]
     }, options: { ...baseOpts(), plugins: { ...baseOpts().plugins, tooltip: { ...baseOpts().plugins.tooltip, callbacks: { label: (ctx) => ` ${ctx.raw.toFixed(2)} ${unitLabel()}/100Km` } } } } });
   }
@@ -2518,7 +2536,7 @@ function renderCharts() {
     AppState.charts['chart-efficiency'] = new Chart(ctxEff, { type:'line', data: {
       labels: labelsEff, datasets: [
         { label:`Efficiency (Km/${unitLabel()})`, data:effValues, borderColor:'#A855F7', backgroundColor:gradEff, fill:true, tension:0.4, pointRadius:3, pointBackgroundColor:'#A855F7' },
-        { label:'Average', data: Array(effValues.length).fill(parseFloat(avgEff.toFixed(2))), borderColor:'#F59E0B', borderDash:[6,3], fill:false, pointRadius:0 }
+        { label:'Average', data: Array(effValues.length).fill(parseFloat(avgEff.toFixed(2))), borderColor:'#D8D8D8', borderDash:[6,3], fill:false, pointRadius:0 }
       ]
     }, options: { ...baseOpts(), plugins: { ...baseOpts().plugins, tooltip: { ...baseOpts().plugins.tooltip, callbacks: { label: (ctx) => ` ${ctx.raw.toFixed(2)} Km/${unitLabel()}` } } } } });
   }
@@ -2535,7 +2553,7 @@ function renderCharts() {
     AppState.charts['chart-distance'] = new Chart(ctx3, { type:'line', data: {
       labels: labels3, datasets: [
         { label:'Distance (Km)', data:dists, borderColor:'#10B981', backgroundColor:grad3, fill:true, tension:0.4, pointRadius:3, pointBackgroundColor:'#10B981' },
-        { label:'Average', data: Array(dists.length).fill(avgDist), borderColor:'#F59E0B', borderDash:[6,3], fill:false, pointRadius:0 }
+        { label:'Average', data: Array(dists.length).fill(avgDist), borderColor:'#D8D8D8', borderDash:[6,3], fill:false, pointRadius:0 }
       ]
     }, options: { ...baseOpts(), plugins: { ...baseOpts().plugins, tooltip: { ...baseOpts().plugins.tooltip, callbacks: { label: (ctx) => ` ${ctx.raw.toFixed(1)} Km` } } } } });
   }
@@ -3062,8 +3080,17 @@ function renderAnalytics() {
   const r2Cpkm = cpkmReg ? cpkmReg.r2 : 0;
   const confidence = r2Cpkm > 0.7 ? 'High' : r2Cpkm > 0.4 ? 'Moderate' : 'Low';
 
+  var dayDiffs = [];
+  for (var di = 1; di < sorted.length; di++) {
+    dayDiffs.push((new Date(sorted[di].date) - new Date(sorted[di - 1].date)) / 86400000);
+  }
+  var avgDays = dayDiffs.length > 0 ? dayDiffs.reduce(function(a, b) { return a + b; }, 0) / dayDiffs.length : 0;
+  var nextDate = new Date(new Date(sorted[sorted.length - 1].date).getTime() + avgDays * 86400000);
+  var nextDateStr = nextDate.toLocaleDateString();
+
   wrap.innerHTML =
     '<div class="forecast-card"><div class="forecast-header">🔮 Forecast — Next Refueling</div><div class="forecast-stats">' +
+      '<div class="forecast-stat"><div class="forecast-stat-label">Next Refuel Date</div><div class="forecast-stat-value">' + nextDateStr + '</div><div class="forecast-stat-sub">~' + avgDays.toFixed(0) + ' days after last refuel</div></div>' +
       '<div class="forecast-stat"><div class="forecast-stat-label">Predicted Cost</div><div class="forecast-stat-value">€ ' + predictedNextCost.toFixed(2) + '</div><div class="forecast-stat-sub">Based on avg distance: ' + avgDist.toFixed(0) + ' Km</div></div>' +
       '<div class="forecast-stat"><div class="forecast-stat-label">Avg Monthly Spend</div><div class="forecast-stat-value">€ ' + avgMonthlySpend.toFixed(2) + '</div><div class="forecast-stat-sub">Projected for next month</div></div>' +
       '<div class="forecast-stat"><div class="forecast-stat-label">Confidence</div><div class="forecast-stat-value" style="color:' + (confidence === 'High' ? 'var(--success)' : confidence === 'Moderate' ? 'var(--warning)' : 'var(--danger)') + '">' + confidence + '</div><div class="forecast-stat-sub">R² = ' + r2Cpkm.toFixed(3) + '</div></div>' +
@@ -3174,7 +3201,7 @@ function renderHeatmap() {
   if (currentWeek.length > 0) { while (currentWeek.length < 7) currentWeek.push(null); weeks.push(currentWeek); }
 
   const monthLabels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const weekDayLabels = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
+  const weekDayLabels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
   let html = '<div class="heatmap-header">' +
     '<span class="section-title" style="margin:0">📅 ' + heatmapYear + '</span>' +
@@ -3188,7 +3215,7 @@ function renderHeatmap() {
       '</select>' +
     '</div></div>';
 
-  html += '<div style="display:flex;gap:4px;font-size:10px;color:var(--text-muted);margin-bottom:4px;padding-left:30px">';
+  html += '<div style="display:flex;gap:50px;font-size:10px;color:var(--text-muted);margin-bottom:4px;padding-left:23px">';
   monthLabels.forEach(function(m, i) {
     const firstOfMonth = new Date(heatmapYear, i, 1);
     const weekIdx = Math.floor((firstOfMonth - startDate) / (7 * dayMs));
