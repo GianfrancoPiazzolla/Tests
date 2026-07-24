@@ -3295,6 +3295,7 @@ function renderInsights() {
   const gaugeRad = gaugeAngle * Math.PI / 180;
   const gx = 90 + 72 * Math.cos(gaugeRad);
   const gy = 90 + 72 * Math.sin(gaugeRad);
+  const gaugeArcLen = Math.PI * 80;
 
   let html = '' +
     '<div class="forecast-card" style="margin-bottom:14px">' +
@@ -3306,7 +3307,7 @@ function renderInsights() {
             '<stop offset="50%" stop-color="#3B82F6"/><stop offset="75%" stop-color="#06B6D4"/>' +
             '<stop offset="100%" stop-color="#10B981"/></linearGradient></defs>' +
           '<path d="M 10 90 A 80 80 0 0 1 170 90" fill="none" stroke="var(--bg-tertiary)" stroke-width="14" stroke-linecap="round"/>' +
-          '<path d="M 10 90 A 80 80 0 0 1 170 90" fill="none" stroke="url(#gaugeGrad)" stroke-width="14" stroke-linecap="round" stroke-dasharray="' + (effScore * 1.6) + ' 160"/>' +
+          '<path d="M 10 90 A 80 80 0 0 1 170 90" fill="none" stroke="url(#gaugeGrad)" stroke-width="14" stroke-linecap="round" stroke-dasharray="' + ((effScore / 100) * gaugeArcLen) + ' ' + gaugeArcLen + '"/>' +
           '<circle cx="' + gx + '" cy="' + gy + '" r="6" fill="' + effLevel.color + '" stroke="var(--bg-secondary)" stroke-width="2"/>' +
           '<text x="90" y="48" text-anchor="middle" fill="var(--text-primary)" font-size="28" font-weight="700" font-family="\'Rajdhani\',sans-serif">' + effScore + '</text>' +
           '<text x="90" y="64" text-anchor="middle" fill="var(--text-muted)" font-size="10" font-family="\'DM Sans\',sans-serif">/ 100</text>' +
