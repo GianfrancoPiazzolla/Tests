@@ -4765,7 +4765,6 @@
         is3DMode: is3DMode,
         poiTypeEnabled: Object.assign({}, poiTypeEnabled),
         isWeatherOverlayOn: isWeatherOverlayOn,
-        isSoundDesignOn: isSoundDesignOn,
         theme: currentTheme,
         mapZoom2d: map ? map.getZoom() : (savedZoom2d !== null ? savedZoom2d : 13),
         mapZoom3d: map3d ? map3d.getZoom() : (savedZoom3d !== null ? savedZoom3d : 15)
@@ -4820,8 +4819,6 @@
       if (typeof s.is3DMode === 'boolean' && s.is3DMode !== is3DMode) toggle3DMap();
 
       if (typeof s.isWeatherOverlayOn === 'boolean' && s.isWeatherOverlayOn !== isWeatherOverlayOn) toggleWeatherOverlay();
-
-      if (typeof s.isSoundDesignOn === 'boolean' && s.isSoundDesignOn !== isSoundDesignOn) restoreSoundDesignState(s.isSoundDesignOn);
 
       if (s.poiTypeEnabled && typeof s.poiTypeEnabled === 'object') {
         Object.keys(poiTypeEnabled).forEach(function (key) {
@@ -6572,7 +6569,6 @@
     let engineBufferUnavailable = false;
     let engineStartToken = 0;
     let engineIsPlaying = false;
-    let soundDesignPendingStart = false;
 
     function computeEngineGear(speedKmh) {
       if (speedKmh <= 0) return 1;
@@ -6723,24 +6719,16 @@
 
     async function toggleSoundDesign() {
       if (isSoundDesignOn) {
-        disarmPendingSoundDesignStart();
         isSoundDesignOn = false;
         setSoundDesignButtonState();
         stopEngineSound();
-        saveLastSettings();
         return;
       }
-      disarmPendingSoundDesignStart();
       const started = await startEngineSound();
-      if (!started) {
-        isSoundDesignOn = false;
-        setSoundDesignButtonState();
-        return;
-      }
+      if (!started) return;
       isSoundDesignOn = true;
       setSoundDesignButtonState();
       updateSoundParameters(lastSpeedKmh);
-      saveLastSettings();
     }
 
     function setSoundDesignButtonState() {
@@ -6754,49 +6742,6 @@
       btn.classList.add('active');
       btn.title = 'Active Sound Design | Gear ' + computeEngineGear(lastSpeedKmh) + ' | Pitch ' +
         computeEnginePitch(lastSpeedKmh).toFixed(2) + 'x';
-    }
-
-    function armPendingSoundDesignStart() {
-      soundDesignPendingStart = true;
-      window.addEventListener('pointerdown', flushPendingSoundDesignStart);
-      window.addEventListener('keydown', flushPendingSoundDesignStart);
-    }
-
-    function disarmPendingSoundDesignStart() {
-      soundDesignPendingStart = false;
-      window.removeEventListener('pointerdown', flushPendingSoundDesignStart);
-      window.removeEventListener('keydown', flushPendingSoundDesignStart);
-    }
-
-    async function flushPendingSoundDesignStart() {
-      if (!soundDesignPendingStart) return;
-      disarmPendingSoundDesignStart();
-      const started = await startEngineSound();
-      if (started) {
-        updateSoundParameters(lastSpeedKmh);
-        return;
-      }
-      if (!isSoundDesignOn) return;
-      isSoundDesignOn = false;
-      setSoundDesignButtonState();
-      saveLastSettings();
-    }
-
-    async function restoreSoundDesignState(active) {
-      disarmPendingSoundDesignStart();
-      stopEngineSound();
-      isSoundDesignOn = active;
-      setSoundDesignButtonState();
-      if (!active) return;
-      armPendingSoundDesignStart();
-      const started = await startEngineSound();
-      if (!started) return;
-      if (!isSoundDesignOn) {
-        stopEngineSound();
-        return;
-      }
-      disarmPendingSoundDesignStart();
-      updateSoundParameters(lastSpeedKmh);
     }
   </script>
   <div id="maxOverlay" class="card-maximized-overlay" onclick="closeMaximizedCard()"></div>
