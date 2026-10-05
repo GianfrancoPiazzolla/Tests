@@ -6561,6 +6561,7 @@
     const ENGINE_SOUND_MAX_PITCH = 2.5;
     const ENGINE_SOUND_VOLUME = 0.55;
     const ENGINE_FALLBACK_VOLUME = 0.18;
+    const ENGINE_RESUME_TIMEOUT = 800;
 
     let engineAudioCtx = null;
     let engineAudioBuffer = null;
@@ -6664,7 +6665,14 @@
         const AudioCtor = window.AudioContext || window.webkitAudioContext;
         if (!AudioCtor) return false;
         if (!engineAudioCtx) engineAudioCtx = new AudioCtor();
-        if (engineAudioCtx.state === 'suspended') await engineAudioCtx.resume();
+        if (engineAudioCtx.state !== 'running') {
+          const resumed = await Promise.race([
+            Promise.resolve(engineAudioCtx.resume()).then(function () { return true; }, function () { return false; }),
+            new Promise(function (resolve) { setTimeout(function () { resolve(false); }, ENGINE_RESUME_TIMEOUT); })
+          ]);
+          if (token !== engineStartToken) return false;
+          if (!resumed || engineAudioCtx.state !== 'running') return false;
+        }
         if (!engineMasterGain) {
           engineMasterGain = engineAudioCtx.createGain();
           engineMasterGain.gain.value = 0;
@@ -6774,12 +6782,21 @@
       saveLastSettings();
     }
 
-    function restoreSoundDesignState(active) {
+    async function restoreSoundDesignState(active) {
       disarmPendingSoundDesignStart();
       stopEngineSound();
       isSoundDesignOn = active;
       setSoundDesignButtonState();
-      if (active) armPendingSoundDesignStart();
+      if (!active) return;
+      armPendingSoundDesignStart();
+      const started = await startEngineSound();
+      if (!started) return;
+      if (!isSoundDesignOn) {
+        stopEngineSound();
+        return;
+      }
+      disarmPendingSoundDesignStart();
+      updateSoundParameters(lastSpeedKmh);
     }
   </script>
   <div id="maxOverlay" class="card-maximized-overlay" onclick="closeMaximizedCard()"></div>
