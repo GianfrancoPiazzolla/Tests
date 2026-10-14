@@ -119,8 +119,8 @@ display:block;margin-top:5px;touch-action:none;cursor:pointer}
 .jog-info{display:grid;grid-template-columns:repeat(4,1fr);gap:1px 8px;padding:4px 11px;border-radius:10px;
 background:linear-gradient(#1c222d,#11151c);border:1px solid var(--line);box-shadow:0 5px 14px #0006}
 .ji{display:flex;flex-direction:column;align-items:center;line-height:1.08}
-.ji-v{font:700 13px ui-monospace,Menlo,monospace;color:#eaf1fb;font-variant-numeric:tabular-nums}
-.ji-l{font-size:7px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);font-weight:700}
+.ji-v{font:700 13px ui-monospace,Menlo,monospace;color:#eaf1fb;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ji-l{font-size:7px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);font-weight:700;white-space:nowrap}
 .ji-v.key{color:var(--accent)}
 .ji-v.warn{color:#ff5252;animation:blink .6s infinite}
 .jog{width:100%;height:auto;aspect-ratio:1;border-radius:50%;display:block;
@@ -183,7 +183,7 @@ box-shadow:inset 0 1px 0 #ffffff14,0 3px 6px #00000066}
 .knob-dial::after{content:"";position:absolute;inset:3px;border-radius:50%;border:1px solid #ffffff10}
 .knob-ind{position:absolute;left:calc(50% - 1px);top:2px;width:2px;height:8px;background:#e8eef8;
 border-radius:2px;transform-origin:50% 14px;box-shadow:0 0 4px #ffffff66}
-.knob-val{font-size:8.5px;color:#93a0b4;font-family:ui-monospace,Menlo,monospace;line-height:1.05}
+.knob-val{font-size:8.5px;color:#93a0b4;font-family:ui-monospace,Menlo,monospace;line-height:1.05;white-space:nowrap}
 .knob-lab{font-size:8px;letter-spacing:.08em;color:#79839a;text-transform:uppercase;font-weight:700;line-height:1.05}
 .meter{width:14px;height:74px;display:block;border-radius:4px;background:#0a0c10;border:1px solid var(--line)}
 .meter-m{width:26px;height:44px}
@@ -248,7 +248,9 @@ font-size:12px;box-shadow:0 8px 24px #000000aa;animation:tin .18s ease}
   .stage{grid-template-columns:minmax(330px,1fr) 288px minmax(330px,1fr)}
   .deck-main{gap:6px}
   .jog-box{width:162px}
-  .jog-info{padding:4px 7px}
+  .jog-info{gap:1px 6px;padding:3px 6px}
+  .ji-v{font-size:11px}
+  .ji-l{font-size:6px;letter-spacing:.06em}
   .pitch-val{width:40px}
   .pitch-fader{width:26px}
   .row{gap:4px}
@@ -2096,6 +2098,7 @@ mixer.connectDeck(deckA);
 mixer.connectDeck(deckB);
 $('#mixer').innerHTML=mixerHTML();
 const dBandFmt=v=>(v>0?'+':'')+v.toFixed(1)+'dB';
+const hzFmt=f=>f>=1000?((f/1000)>=10?Math.round(f/1000):Math.round(f/100)/10)+'k':String(Math.round(f));
 function buildChan(L){
   const deck=L==='A'?deckA:deckB;
   const id='c'+L;
@@ -2105,7 +2108,7 @@ function buildChan(L){
   const low=makeKnob({label:'lows',min:-26,max:12,value:0,format:dBandFmt,onChange:v=>deck.setEq('low',v)});
   const fil=makeKnob({
     label:'filter',min:-1,max:1,value:0,
-    format:v=>v<-0.02?('LP '+Math.round(22050*Math.pow(200/22050,-v))):(v>0.02?('HP '+Math.round(20*Math.pow(100,v))):'off'),
+    format:v=>v<-0.02?('LP '+hzFmt(22050*Math.pow(200/22050,-v))):(v>0.02?('HP '+hzFmt(20*Math.pow(100,v))):'off'),
     onChange:v=>deck.setFilter(v)
   });
   document.getElementById(id+'Trim').appendChild(trim.el);
